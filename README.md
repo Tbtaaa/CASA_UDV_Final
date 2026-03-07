@@ -2,7 +2,7 @@
 This repository is a collection of documents for the Group Project for the CASA module on Urban Data Visualisation. 
 
 ## Theme: Urban Analytics 
-This project applies network-based accessibility modelling to examine how access to primary schools — particularly high-performing schools — varies across neighbourhoods in London.
+This project applies network-based accessibility modelling to examine how access to secondary schools, particularly high-performing schools varies across neighbourhoods in London.
 It integrates transport network modelling with school performance data and socioeconomic indicators to explore whether spatial accessibility reinforces educational inequality.
 
 ## Core Questions
