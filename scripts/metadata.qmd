@@ -1,0 +1,230 @@
+---
+format:
+  html:
+    page-layout: full
+    code-copy: true
+    code-link: true
+    toc: true
+    toc-title: "On this page"
+    smooth-scroll: true
+---
+
+# Dataset Metadata: England Secondary Schools Database
+
+**File:** `england_secondary_schools.csv`\
+**Scope:** All open, state-funded secondary schools in England (\~3,200 schools)\
+**Geography:** England; filter `london_sub_region` for London analysis\
+**Last updated:** March 2026\
+**Compiled from:** GIAS, Ofsted, DfE KS4 Performance Tables, SCAP, IMD 2025
+
+------------------------------------------------------------------------
+
+## How to read this document
+
+Each variable is listed with: - **Data source** — which government dataset the field comes from - **Variable name** — the column name as it appears in the CSV - **Definition** — a plain-English explanation of what the field means
+
+Ofsted grades use a 1–4 scale: **1 = Outstanding, 2 = Good, 3 = Requires improvement, 4 = Inadequate.**\
+IMD/IDACI deciles use a 1–10 scale: **1 = most deprived 10% nationally, 10 = least deprived 10%.**
+
+------------------------------------------------------------------------
+
+## Section 1 — School Identity
+
+*Source: Get Information About Schools (GIAS), Department for Education*\
+*https://get-information-schools.service.gov.uk*
+
+| Variable name | Definition |
+|------------------------------------|------------------------------------|
+| `URN` | Unique Reference Number — a permanent ID number assigned to every school in England. This is the main join key across all datasets. |
+| `la_code` | The numeric code for the local authority (e.g. borough) that the school belongs to. |
+| `la_name` | The name of the local authority the school belongs to (e.g. "Camden", "Southwark"). |
+| `establishment_number` | A number that identifies the school within its local authority. Combined with `la_code`, it forms the LAESTAB reference used by Ofsted. |
+| `establishment_name` | The official name of the school. |
+: {tbl-colwidths="[30,70]"}
+
+------------------------------------------------------------------------
+
+## Section 2 — School Type & Structure
+
+*Source: Get Information About Schools (GIAS), Department for Education*
+
+| Variable name | Definition |
+|------------------------------------|------------------------------------|
+| `type_of_establishment` | The legal category of the school — for example, Community school, Academy converter, Free school, Voluntary aided school. This determines how the school is governed and funded. |
+| `establishment_type_group` | A broader grouping of school types: Local authority maintained schools, Academies, or Free Schools. |
+| `establishment_status` | Whether the school is currently open, closed, or proposed. This dataset contains open schools only. |
+| `phase_of_education` | The age range the school is designed for — Secondary (ages 11–16/18), All-through (ages 4–18), or Middle deemed secondary. |
+| `statutory_low_age` | The youngest age at which the school is legally required to accept pupils (typically 11 for secondary schools). |
+| `statutory_high_age` | The oldest age at which the school is legally required to accept pupils (typically 16 or 18). |
+| `official_sixth_form` | Whether the school has an official sixth form (post-16 provision for ages 16–18). |
+| `gender` | Whether the school admits Mixed, Boys only, or Girls only pupils. |
+| `admissions_policy` | How the school selects its pupils — Non-selective (open to all), or Selective (entry by academic ability, i.e. a grammar school). |
+| `religious_character` | Whether the school has a religious character and, if so, which faith (e.g. Church of England, Roman Catholic, Jewish). Schools with no religious affiliation are recorded as "Does not apply". |
+: {tbl-colwidths="[30,70]"}
+
+------------------------------------------------------------------------
+
+## Section 3 — School Capacity (GIAS Snapshot)
+
+*Source: Get Information About Schools (GIAS), Department for Education*\
+*Note: These figures are a snapshot from GIAS and may differ from the SCAP survey figures in Section 7. SCAP figures are preferred for capacity analysis.*
+
+| Variable name | Definition |
+|------------------------------------|------------------------------------|
+| `school_capacity` | The total number of pupil places the school is registered to provide, as recorded in GIAS. |
+| `number_of_pupils` | The number of pupils currently enrolled at the school, as recorded in GIAS. |
+| `percentage_fsm` | The percentage of pupils at the school who are eligible for Free School Meals (FSM). This is widely used as a proxy for the proportion of pupils from low-income households. |
+: {tbl-colwidths="[30,70]"}
+
+------------------------------------------------------------------------
+
+## Section 4 — Location
+
+*Source: Get Information About Schools (GIAS), Department for Education*
+
+| Variable name | Definition |
+|------------------------------------|------------------------------------|
+| `postcode` | The school's postal address postcode. |
+| `easting` | The school's map position measured east from a reference point, in the British National Grid coordinate system (metres). Used for spatial mapping. |
+| `northing` | The school's map position measured north from a reference point, in the British National Grid coordinate system (metres). Used for spatial mapping. |
+| `lsoa_code` | Lower Layer Super Output Area code — a small geographic area containing roughly 1,500 residents, used for joining neighbourhood-level statistics such as deprivation data. Uses 2021 boundaries. |
+| `msoa_code` | Middle Layer Super Output Area code — a larger geographic area containing roughly 8,000 residents, used for joining mid-level neighbourhood data. |
+| `gor_name` | Government Office Region — the broad region of England the school is in (e.g. "London", "South East", "North West"). |
+| `urban_rural` | Whether the school is located in an urban or rural setting, and how urban/rural that setting is (e.g. "Urban major conurbation", "Rural town and fringe"). |
+| `london_sub_region` | Whether the school is in Inner London, Outer London, or outside London entirely. Derived from the local authority name. Inner London includes the 14 inner boroughs; Outer London includes the remaining 19 London boroughs. |
+: {tbl-colwidths="[30,70]"}
+
+------------------------------------------------------------------------
+
+## Section 5 — Ofsted Inspection Outcomes
+
+*Source: Ofsted, State-funded schools inspections and outcomes as at 31 August 2025*\
+*https://www.gov.uk/government/collections/maintained-schools-and-academies-inspections-and-outcomes-official-statistics*\
+*Coverage: State-funded schools only. Independent/private schools are not inspected by Ofsted.*\
+*Note: From September 2024, Ofsted no longer issues a single overall grade for new inspections. Schools inspected only under the new report card framework will have null values for overall_effectiveness and sub-judgement fields.*
+
+| Variable name | Definition |
+|------------------------------------|------------------------------------|
+| `laestab` | The combined Local Authority and Establishment number (7 digits), used by Ofsted as its primary school identifier. |
+| `idaci_quintile` | Ofsted's own assignment of the school to an Income Deprivation Affecting Children Index (IDACI) quintile (1–5), based on the deprivation level of the area the school serves. Used internally by Ofsted for contextual comparison. |
+| `inspection_number` | The unique reference number for the school's most recent graded inspection. |
+| `inspection_type` | The type of inspection — for example, a standard Section 5 graded inspection, or a Section 8 ungraded inspection that was converted to a graded inspection. |
+| `inspection_start_date` | The date the most recent graded inspection began. Inspections are typically 2 days long. Note that some schools still carry grades from pre-2019 inspections — check this field when interpreting grades. |
+| `publication_date` | The date Ofsted published the school's inspection report publicly. |
+| `overall_effectiveness` | The school's overall Ofsted grade from its most recent graded inspection: 1 = Outstanding, 2 = Good, 3 = Requires improvement, 4 = Inadequate. Null for schools not yet inspected under the graded framework. |
+| `ofsted_overall_label` | The text label for the overall_effectiveness grade (e.g. "Outstanding", "Good"). Derived field for convenience. |
+| `category_of_concern` | Whether the school was placed in a formal category of concern at its last inspection — either Special Measures (most serious) or Serious Weaknesses. Blank for schools not in a category. |
+| `quality_of_education` | Ofsted sub-judgement grade for the quality of teaching, learning and curriculum: 1–4 scale. |
+| `behaviour_and_attitudes` | Ofsted sub-judgement grade for pupils' behaviour in school and their attitudes towards learning: 1–4 scale. |
+| `personal_development` | Ofsted sub-judgement grade for how well the school supports pupils' wider personal development beyond academic achievement: 1–4 scale. |
+| `effectiveness_of_leadership_and_management` | Ofsted sub-judgement grade for how well school leaders and governors manage and improve the school: 1–4 scale. |
+| `safeguarding_is_effective` | Whether Ofsted judged the school's safeguarding arrangements to be effective (Yes/No). A "No" judgement is very serious and typically triggers a graded inspection. |
+| `sixth_form_provision` | Ofsted's grade for the school's sixth form provision, where applicable: 1–4 scale. Only populated for schools with a sixth form. |
+| `previous_inspection_start_date` | The start date of the school's previous graded inspection (before the most recent one). Useful for tracking change over time. |
+| `previous_overall_effectiveness` | The school's overall Ofsted grade from its previous graded inspection: 1–4 scale. Compare with `overall_effectiveness` to assess improvement or decline. |
+| `previous_category_of_concern` | Whether the school was in a category of concern at its previous inspection. |
+| `previous_quality_of_education` | Ofsted's quality of education grade from the previous inspection: 1–4 scale. |
+: {tbl-colwidths="[30,70]"}
+
+------------------------------------------------------------------------
+
+## Section 6 — Key Stage 4 Performance (2023/24)
+
+*Source: DfE Key Stage 4 Performance Tables, final data 2023/24*\
+*https://explore-education-statistics.service.gov.uk/find-statistics/key-stage-4-performance/2023-24*\
+*Note: 2023/24 is the last year for which Progress 8 is published. Progress 8 is not available for 2024/25 or 2025/26 due to disruption to Key Stage 2 assessments during the COVID-19 pandemic, which are used as the baseline.*\
+*All figures are for the "All pupils" breakdown.*
+
+| Variable name | Definition |
+|------------------------------------|------------------------------------|
+| `ks4_attainment8` | The school's average Attainment 8 score. Attainment 8 measures pupils' achievement across 8 GCSE-equivalent subjects, combining grades into a total score. The national average is around 46–50. Higher scores indicate stronger academic results. |
+| `ks4_pct_grade4_eng_maths` | The percentage of pupils at the school who achieved a grade 4 or above (a standard pass) in both English and maths GCSEs. Grade 4 is broadly equivalent to the old grade C. This is a key government benchmark. |
+| `ks4_pct_grade5_eng_maths` | The percentage of pupils who achieved a grade 5 or above (a strong pass) in both English and maths GCSEs. Grade 5 is broadly equivalent to a high C or low B under the old system. |
+| `ks4_progress8` | The school's Progress 8 score. This measures how much progress pupils made during secondary school compared to other pupils who had similar results at primary school (Key Stage 2). A score of 0 means pupils made average progress; positive scores mean better-than-expected progress; negative scores mean worse-than-expected. This is considered the most important measure of a school's effectiveness as it adjusts for intake. |
+| `ks4_p8_lower_ci` | The lower bound of the 95% confidence interval around the school's Progress 8 score. If this lower bound is above 0, the school is performing significantly above average. |
+| `ks4_p8_upper_ci` | The upper bound of the 95% confidence interval around the school's Progress 8 score. If this upper bound is below 0, the school is performing significantly below average. |
+| `ks4_pct_in_p8_calc` | The percentage of the school's pupils included in the Progress 8 calculation. Schools with very low percentages may have less reliable Progress 8 scores. |
+| `ks4_pct_entering_ebacc` | The percentage of pupils entering the English Baccalaureate (EBacc) — a combination of GCSEs in English, maths, sciences, a humanity, and a language. Entering does not mean passing. |
+| `ks4_pct_achieving_ebacc` | The percentage of pupils achieving a grade 4 or above across all EBacc subjects. |
+| `ks4_ebacc_aps` | The EBacc Average Points Score — the average grade pupils achieved across EBacc subjects (on a points scale). A more nuanced measure than simply pass/fail. |
+| `ks4_total_pupils` | The total number of pupils included in the end-of-Key Stage 4 performance data at this school. |
+: {tbl-colwidths="[30,70]"}
+
+------------------------------------------------------------------------
+
+## Section 7 — School Capacity Survey (SCAP 2023/24)
+
+*Source: DfE School Capacity Survey, academic year 2023/24 (as at 1 May 2024)*\
+*https://explore-education-statistics.service.gov.uk/find-statistics/school-capacity/2023-24*\
+*Coverage: State-funded mainstream schools. Data reported by local authorities.*
+
+### Mainstream capacity
+
+| Variable name | Definition |
+|------------------------------------|------------------------------------|
+| `scap_school_places` | The total number of pupil places available at the school, including sixth form places but excluding nursery places, as reported in the 2023/24 SCAP survey. |
+| `scap_pupils_on_roll` | The number of pupils enrolled at the school as of May 2024, taken from the School Census. |
+| `scap_unfilled_places` | The number of places at the school that are not filled — i.e. the difference between capacity and pupils on roll, for schools with surplus places. |
+| `scap_pct_unfilled` | Unfilled places as a percentage of total school capacity. A high percentage suggests the school has significant surplus capacity. |
+| `scap_pupils_over_capacity` | The number of pupils enrolled above the school's official capacity. Only populated for oversubscribed schools. |
+| `scap_pct_over_capacity` | Pupils over capacity as a percentage of total places. A positive value indicates the school is oversubscribed. |
+| `scap_utilisation_pct` | Derived field: pupils on roll divided by school places, expressed as a percentage. 100% means the school is exactly at capacity; above 100% means oversubscribed; below 100% means surplus places. |
+: {tbl-colwidths="[30,70]"}
+
+### Sixth form capacity
+
+| Variable name | Definition |
+|------------------------------------|------------------------------------|
+| `sf_capacity` | The number of sixth form places (Year 12–14) reported by the school. Sixth form capacity is reported voluntarily, so not all schools with sixth forms will have a value here. |
+| `sf_pupils_on_roll` | The number of pupils enrolled in the sixth form as of May 2024. |
+| `sf_utilisation_pct` | Derived field: sixth form pupils on roll divided by sixth form capacity, expressed as a percentage. Indicates how full the school's sixth form is. |
+: {tbl-colwidths="[30,70]"}
+
+------------------------------------------------------------------------
+
+## Section 8 — Indices of Multiple Deprivation 2025 (LSOA Level)
+
+*Source: Ministry of Housing, Communities & Local Government, English Indices of Deprivation 2025*\
+*Published October 2025. File 7: All Ranks, Scores, Deciles and Population Denominators*\
+*https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025*\
+*Joined to schools on LSOA code (2021 boundaries). Measures the deprivation level of the neighbourhood in which the school is located — not of the pupils themselves.*
+
+| Variable name | Definition |
+|------------------------------------|------------------------------------|
+| `imd_score` | The overall Index of Multiple Deprivation score for the school's neighbourhood (LSOA). Combines seven domains including income, employment, health, education, crime, housing, and environment. Higher scores indicate greater deprivation. Scores are not comparable across different editions of the IMD. |
+| `imd_rank` | How the school's neighbourhood ranks among all 33,755 LSOAs in England for overall deprivation. Rank 1 is the most deprived LSOA; rank 33,755 is the least deprived. |
+| `imd_decile` | The school's neighbourhood divided into ten equal groups by overall deprivation. Decile 1 = most deprived 10% of neighbourhoods nationally; Decile 10 = least deprived 10%. Easier to interpret than rank or score. |
+| `idaci_score` | The Income Deprivation Affecting Children Index (IDACI) score — the proportion of children aged 0–15 in the LSOA living in income-deprived households. Ranges from 0 to 1 (higher = more deprived children). This is the most relevant deprivation measure for school research as it focuses specifically on children. |
+| `idaci_decile` | The IDACI score divided into ten equal groups nationally. Decile 1 = most deprived 10% for child income deprivation; Decile 10 = least deprived 10%. |
+| `imd_education_score` | The Education, Skills and Training domain score from the IMD. This specifically measures deprivation related to lack of educational attainment and skills in the local area. Higher scores indicate greater educational deprivation in the neighbourhood. |
+| `imd_education_decile` | The Education domain score divided into ten equal groups nationally. Decile 1 = most educationally deprived 10% of neighbourhoods; Decile 10 = least deprived 10%. |
+: {tbl-colwidths="[30,70]"}
+
+------------------------------------------------------------------------
+
+## Section 9 — Derived Fields
+
+*Source: Computed during database build (March 2026)*\
+*These fields do not come directly from any source dataset — they are calculated from the fields above.*
+
+| Variable name | Definition |
+|------------------------------------|------------------------------------|
+| `ks4_attainment8_england_quartile` | Which quarter of English secondary schools this school falls into based on its Attainment 8 score. Q1 (lowest) = bottom 25% of schools nationally; Q4 (highest) = top 25% of schools nationally. Schools without an Attainment 8 score are excluded. |
+| `ks4_p8_category` | A descriptive band for the school's Progress 8 score, making it easier to interpret: Well below average (below −0.5), Below average (−0.5 to −0.1), Average (−0.1 to +0.1), Above average (+0.1 to +0.5), Well above average (above +0.5). |
+| `idaci_pct_approx` | An approximate conversion of the school's neighbourhood IDACI decile into a 0–100 percentage scale, for use in the intake-neighbourhood gap calculation. Decile 1 (most deprived) ≈ 100%; Decile 10 (least deprived) ≈ 10%. |
+| `intake_neighbourhood_gap` | The difference between the school's Free School Meal percentage (`percentage_fsm`) and the approximate neighbourhood deprivation level (`idaci_pct_approx`). A negative value means the school serves a less deprived intake than the surrounding neighbourhood would suggest — indicating potential socioeconomic sorting. A positive value means the school serves a more deprived intake than its neighbourhood. This is a key variable for Sub-Research Question 2 (intake vs neighbourhood inequality). *Note: currently uses GIAS FSM% as proxy; will be updated when school-level pupil characteristics data is sourced.* |
+: {tbl-colwidths="[30,70]"}
+
+------------------------------------------------------------------------
+
+## Coverage Notes
+
+| Issue | Detail |
+|------------------------------------|------------------------------------|
+| Ofsted coverage | Ofsted inspects state-funded schools only. Independent/private schools are not in this dataset. 77 schools in London (15%) have no Ofsted grade, typically because they are newly opened. |
+| Inspection freshness | Approximately 100 London schools still carry Ofsted grades from before 2019. Grades from 2012–2018 should be interpreted with caution as school performance may have changed. Check `inspection_start_date`. |
+| KS4 coverage | \~5% of schools have no KS4 data, typically schools without a Year 11 cohort (e.g. all-through schools with small secondary sections, or schools with very small cohorts below the suppression threshold). |
+| SCAP coverage | SCAP is reported by local authorities and is not always complete. A small number of schools may be missing capacity data. |
+| IMD join | IMD data is matched to schools via their LSOA code from GIAS. Three schools had no LSOA code and therefore have no IMD data. IMD measures neighbourhood deprivation, not pupil deprivation — a school in a deprived area does not necessarily serve a deprived intake (see `intake_neighbourhood_gap`). |
+| Progress 8 availability | Progress 8 is only available for 2023/24. It will not be published for 2024/25 or 2025/26 due to disruption to Key Stage 2 baseline assessments during COVID-19. |
+: {tbl-colwidths="[30,70]"}
