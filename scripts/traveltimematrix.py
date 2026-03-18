@@ -161,8 +161,16 @@ def run_matrix_batched(network, origins, destinations, mode_label):
 
 transit_tt = run_matrix_batched(
     transport_network, origins, dest_gdf, "transit")
+transit_tt.to_parquet("large/raw_transit_tt.parquet", index=False)
+print("✓ raw transit saved")
+
 walk_tt = run_matrix_batched(transport_network, origins, dest_gdf, "walk")
+walk_tt.to_parquet("large/raw_walk_tt.parquet", index=False)
+print("✓ raw walk saved")
+
 cycle_tt = run_matrix_batched(transport_network, origins, dest_gdf, "cycle")
+cycle_tt.to_parquet("large/raw_cycle_tt.parquet", index=False)
+print("✓ raw cycle saved")
 
 # ── 7. Summarise into per-LSOA metrics ───────────────────────────────────────
 
