@@ -1,18 +1,18 @@
 """
 r5py travel time matrix — London secondary schools accessibility
 ================================================================
-Modes:       TRANSIT+WALK, WALK only, CYCLE only
+Modes:       TRANSIT+WALK, WALK only, CYCLE only, CAR only (free-flow)
 Origins:     4,994 London LSOA population weighted centroids
 Destinations: All secondary schools within 5km buffer of GLA boundary
 Departure:   Tuesday 17 March 2026, 08:30, 60-min window, median
 Targets:
   (1) Nearest any school
-  (2) Nearest Outstanding school          [thresholds = London schools only]
-  (3) Nearest top-25% Attainment 8 school [thresholds = London schools only]
-  (4) Nearest top-25% Progress 8 school   [thresholds = London schools only]
-
-Note: destinations include schools up to 5km outside GLA to avoid
-boundary artifacts for peripheral LSOAs.
+  (2) Nearest Outstanding school
+  (3) Nearest top-25% Attainment 8 school
+  (4) Nearest top-25% Progress 8 school
+ 
+Note: car times are free-flow (OSM speed limits, no congestion).
+AM peak actual times likely 1.3-1.5x longer. Use with caveat.
 """
 
 import r5py
@@ -41,8 +41,8 @@ OUTPUT_PATH = "data/lsoa_travel_times.parquet"
 DEPARTURE = datetime(2026, 3, 17, 8, 30)
 MAX_MINS = 90
 PERCENTILE = 50
-BUFFER_M = 5_000    # 5km buffer around GLA for destination schools
-BATCH_SIZE = 200      # origins per batch
+BUFFER_M = 5_000   # 5km buffer around GLA for destination schools
+BATCH_SIZE = 200     # origins per batch
 
 # ── 1. Load origins ───────────────────────────────────────────────────────────
 
@@ -68,16 +68,13 @@ schools_gdf = gpd.GeoDataFrame(
     crs="EPSG:27700"
 )
 
-# Filter to schools within buffered GLA
 schools_buffered = gpd.clip(schools_gdf, gla_buffered).copy()
 print(f"  {len(schools_buffered):,} schools within {BUFFER_M/1000:.0f}km of GLA")
 
-# London schools only — used for threshold calculation
 london_mask = schools_buffered["london_sub_region"].isin(
     ["Inner London", "Outer London"])
 london_schools = schools_buffered[london_mask]
-print(
-    f"  of which {len(london_schools):,} are London schools (used for thresholds)")
+print(f"  of which {len(london_schools):,} are London schools")
 
 # ── 3. Build destinations GeoDataFrame ────────────────────────────────────────
 
@@ -89,7 +86,7 @@ destinations = destinations.rename(columns={"URN": "urn"})
 destinations["id"] = destinations["urn"].astype(str)
 destinations = destinations.to_crs("EPSG:4326")
 
-# ── 4. Tag destination tiers (thresholds from London schools only) ────────────
+# ── 4. Tag destination tiers ──────────────────────────────────────────────────
 
 att8_threshold = schools_buffered["ks4_attainment8"].quantile(0.75)
 p8_threshold = schools_buffered["ks4_progress8"].quantile(0.75)
@@ -136,6 +133,8 @@ def run_matrix_batched(network, origins, destinations, mode_label):
         modes = [r5py.TransportMode.TRANSIT, r5py.TransportMode.WALK]
     elif mode_label == "cycle":
         modes = [r5py.TransportMode.BICYCLE]
+    elif mode_label == "car":
+        modes = [r5py.TransportMode.CAR]
     else:
         modes = [r5py.TransportMode.WALK]
 
@@ -154,8 +153,9 @@ def run_matrix_batched(network, origins, destinations, mode_label):
         results.append(computer[["from_id", "to_id", "travel_time"]])
 
     full = pd.concat(results, ignore_index=True)
-    print(f"  ✓ {len(full):,} pairs | "
-          f"NaN (unreachable): {full['travel_time'].isna().sum():,}")
+    nan_count = full["travel_time"].isna().sum()
+    print(f"  ✓ {len(full):,} pairs | NaN (unreachable): {nan_count:,} "
+          f"({nan_count/len(full)*100:.1f}%)")
     return full
 
 
@@ -172,13 +172,17 @@ cycle_tt = run_matrix_batched(transport_network, origins, dest_gdf, "cycle")
 cycle_tt.to_parquet("large/raw_cycle_tt.parquet", index=False)
 print("✓ raw cycle saved")
 
+car_tt = run_matrix_batched(transport_network, origins, dest_gdf, "car")
+car_tt.to_parquet("large/raw_car_tt.parquet", index=False)
+print("✓ raw car saved")
+
 # ── 7. Summarise into per-LSOA metrics ───────────────────────────────────────
 
 
 def summarise(tt_matrix, school_tags, mode_label):
     df = tt_matrix.rename(columns={
-        "from_id": "lsoa_id",
-        "to_id":   "school_id",
+        "from_id":     "lsoa_id",
+        "to_id":       "school_id",
         "travel_time": "tt"
     })
     df = df.dropna(subset=["tt"])
@@ -220,6 +224,7 @@ def summarise(tt_matrix, school_tags, mode_label):
 transit_metrics = summarise(transit_tt, school_tags, "transit")
 walk_metrics = summarise(walk_tt,    school_tags, "walk")
 cycle_metrics = summarise(cycle_tt,   school_tags, "cycle")
+car_metrics = summarise(car_tt,     school_tags, "car")
 
 # ── 8. Merge and save ─────────────────────────────────────────────────────────
 
@@ -227,6 +232,7 @@ lsoa_metrics = (
     transit_metrics
     .merge(walk_metrics,  on="lsoa_id", how="outer")
     .merge(cycle_metrics, on="lsoa_id", how="outer")
+    .merge(car_metrics,   on="lsoa_id", how="outer")
 )
 
 lsoa_metrics.to_parquet(OUTPUT_PATH, index=False)
