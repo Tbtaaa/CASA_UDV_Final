@@ -13,7 +13,7 @@ File layout expected (edit PATHS block below if yours differ):
         lsoa_travel_times.parquet
         gla_boundary.geojson          ← or .gpkg / .shp
 
-Outputs → paths['outputs']  (set in PATHS block above)
+Outputs → paths['charts']  (outputs/charts/ subfolder)
     chart2_schools_per_borough.png   Section 3 — schools per borough + Ofsted overlay
     chart2b_utilisation.png          Section 3 — pupil-place utilisation by borough
     chart3_mode_times_borough.png    Section 3 — borough median travel times by mode
@@ -22,7 +22,9 @@ Outputs → paths['outputs']  (set in PATHS block above)
     chart6_mode_gap_matrix.png       Section 4 — walk vs transit gap by borough
     chart10_imd_vs_p8_transit.png    Section 5 — IMD vs P8 transit scatter (fills placeholder)
     chart11_ofsted_by_imd.png        Section 5 — Ofsted grade by IMD quintile
-    borough_ranking.csv              Ready to pipe into the page's interactive borough table
+    chart1b_travel_time_by_mode.png  Travel section — dark-themed mode × borough times
+    chart2c_utilisation_dark.png     Travel section — dark-themed utilisation by borough
+    borough_ranking.csv              → outputs/ (ready for page's interactive borough table)
 """
 
 import os
@@ -50,9 +52,11 @@ paths = {
     "output":     os.path.join(root, "outputs", "commuter_behavior_report.csv"),
     "gla":        os.path.join(root, "data", "London_GLA_Boundary.shp"),
     "outputs":    os.path.join(root, "outputs"),
+    "charts":     os.path.join(root, "outputs", "charts"),
 }
 
 os.makedirs(paths["outputs"], exist_ok=True)
+os.makedirs(paths["charts"],  exist_ok=True)
 
 # Admissions policies to exclude (mirrors review-traveltimematrix-code-2.py)
 EXCLUDE_ADMISSIONS = {"Selective", "selective"}
@@ -217,16 +221,27 @@ lsoa_la = (
 )
 
 # Travel times → LA medians
-TRAVEL_COLS = {
-    "Transit any":  "tt_transit_nearest_any",
-    "Walk any":     "tt_walk_nearest_any",
-    "Cycle any":    "tt_cycle_nearest_any",
-    "Car any":      "tt_car_nearest_any",
-    "Transit P8":   "tt_transit_nearest_top25_p8",
-    "Walk P8":      "tt_walk_nearest_top25_p8",
-    "Cycle P8":     "tt_cycle_nearest_top25_p8",
-    "Car P8":       "tt_car_nearest_top25_p8",
+TRAVEL_COLS_ALL = {
+    "Transit any":          "tt_transit_nearest_any",
+    "Walk any":             "tt_walk_nearest_any",
+    "Cycle any":            "tt_cycle_nearest_any",
+    "Car any":              "tt_car_nearest_any",
+    "Transit P8":           "tt_transit_nearest_top25_p8",
+    "Walk P8":              "tt_walk_nearest_top25_p8",
+    "Cycle P8":             "tt_cycle_nearest_top25_p8",
+    "Car P8":               "tt_car_nearest_top25_p8",
+    "Transit Outstanding":  "tt_transit_nearest_outstanding",
+    "Walk Outstanding":     "tt_walk_nearest_outstanding",
+    "Cycle Outstanding":    "tt_cycle_nearest_outstanding",
+    "Transit Att8":         "tt_transit_nearest_top25_att8",
+    "Walk Att8":            "tt_walk_nearest_top25_att8",
+    "Cycle Att8":           "tt_cycle_nearest_top25_att8",
 }
+# Keep only columns that actually exist in the travel data
+TRAVEL_COLS = {k: v for k, v in TRAVEL_COLS_ALL.items() if v in travel.columns}
+if len(TRAVEL_COLS) < len(TRAVEL_COLS_ALL):
+    missing = set(TRAVEL_COLS_ALL.values()) - set(TRAVEL_COLS.values())
+    print(f"  ⚠ Skipping missing travel columns: {missing}")
 
 travel_la_base = travel.merge(lsoa_la, left_on="lsoa_id", right_on="lsoa_code", how="inner")
 
@@ -248,6 +263,16 @@ la = (
 la["p8_school_count"] = la["p8_school_count"].fillna(0).astype(int)
 la["penalty_transit"] = la["Transit P8"] - la["Transit any"]
 la["penalty_walk"]    = la["Walk P8"]    - la["Walk any"]
+# Outstanding penalties (if columns exist)
+if "Transit Outstanding" in la.columns:
+    la["penalty_transit_outstanding"] = la["Transit Outstanding"] - la["Transit any"]
+if "Walk Outstanding" in la.columns:
+    la["penalty_walk_outstanding"]    = la["Walk Outstanding"]    - la["Walk any"]
+# Att8 penalties (if columns exist)
+if "Transit Att8" in la.columns:
+    la["penalty_transit_att8"] = la["Transit Att8"] - la["Transit any"]
+if "Walk Att8" in la.columns:
+    la["penalty_walk_att8"]    = la["Walk Att8"]    - la["Walk any"]
 la["borough_short"]   = la["la_name"].str.replace(
     r"London Borough of |Royal Borough of |City of ", "", regex=True
 )
@@ -280,9 +305,9 @@ handles = [mpatches.Patch(color=OFSTED_COLORS[g], label=g) for g in ofsted_order
 ax.legend(handles=handles, fontsize=9, loc="lower right", frameon=False)
 ax.tick_params(axis="y", labelsize=9)
 plt.tight_layout()
-plt.savefig(os.path.join(paths["outputs"], "chart2_schools_per_borough.png"))
+plt.savefig(os.path.join(paths["charts"], "chart2_schools_per_borough.png"))
 plt.close()
-print(f"    → {os.path.join(paths['outputs'], 'chart2_schools_per_borough.png')}")
+print(f"    → {os.path.join(paths['charts'], 'chart2_schools_per_borough.png')}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -304,9 +329,9 @@ ax.legend(fontsize=9, loc="lower right", frameon=False)
 ax.tick_params(axis="y", labelsize=9)
 ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{int(x)}%"))
 plt.tight_layout()
-plt.savefig(os.path.join(paths["outputs"], "chart2b_utilisation.png"))
+plt.savefig(os.path.join(paths["charts"], "chart2b_utilisation.png"))
 plt.close()
-print(f"    → {os.path.join(paths['outputs'], 'chart2b_utilisation.png')}")
+print(f"    → {os.path.join(paths['charts'], 'chart2b_utilisation.png')}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -317,6 +342,9 @@ print("Chart 3 — Travel times by mode per borough...")
 modes        = ["Transit any", "Walk any", "Cycle any", "Car any"]
 mode_colors  = [BLUE, TEAL, PURPLE, AMBER]
 mode_labels  = ["Transit", "Walk", "Cycle", "Car"]
+# Keep only modes present in data
+_avail = [(m, c, l) for m, c, l in zip(modes, mode_colors, mode_labels) if m in la.columns]
+modes, mode_colors, mode_labels = zip(*_avail) if _avail else ([], [], [])
 
 df = la.dropna(subset=["Transit any"]).sort_values("Transit any", ascending=True)
 fig, ax = plt.subplots(figsize=(9, 10))
@@ -334,9 +362,9 @@ ax.set_title("Median travel time to nearest secondary school\nby mode and boroug
              fontsize=13, fontweight="bold", pad=12)
 ax.legend(fontsize=9, loc="lower right", frameon=False)
 plt.tight_layout()
-plt.savefig(os.path.join(paths["outputs"], "chart3_mode_times_borough.png"))
+plt.savefig(os.path.join(paths["charts"], "chart3_mode_times_borough.png"))
 plt.close()
-print(f"    → {os.path.join(paths['outputs'], 'chart3_mode_times_borough.png')}")
+print(f"    → {os.path.join(paths['charts'], 'chart3_mode_times_borough.png')}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -344,7 +372,7 @@ print(f"    → {os.path.join(paths['outputs'], 'chart3_mode_times_borough.png')
 # ══════════════════════════════════════════════════════════════════════════════
 print("Chart 4 — Borough P8 access table...")
 
-cols = ["borough_short", "p8_school_count", "Transit P8", "Walk P8", "Car P8"]
+cols = [c for c in ["borough_short", "p8_school_count", "Transit P8", "Walk P8", "Car P8"] if c in la.columns]
 df   = (
     la[cols]
     .dropna(subset=["Transit P8"])
@@ -360,7 +388,8 @@ df   = (
 )
 df.index += 1
 for col in ["Transit (min)", "Walk (min)", "Car (min)"]:
-    df[col] = df[col].round(1)
+    if col in df.columns:
+        df[col] = df[col].round(1)
 
 fig, ax = plt.subplots(figsize=(10, len(df) * 0.32 + 1.2))
 ax.axis("off")
@@ -379,20 +408,21 @@ for i in range(1, len(df) + 1):
         for j in range(len(df.columns)):
             tbl[i, j].set_facecolor("#F5F4F0")
     transit_val = df.iloc[i - 1]["Transit (min)"]
+    transit_col_idx = list(df.columns).index("Transit (min)")
     if transit_val > 30:
-        tbl[i, 2].set_facecolor("#FCEBEB")
-        tbl[i, 2].set_text_props(color=RED)
+        tbl[i, transit_col_idx].set_facecolor("#FCEBEB")
+        tbl[i, transit_col_idx].set_text_props(color=RED)
     elif transit_val > 22:
-        tbl[i, 2].set_facecolor("#FAEEDA")
-        tbl[i, 2].set_text_props(color=AMBER)
+        tbl[i, transit_col_idx].set_facecolor("#FAEEDA")
+        tbl[i, transit_col_idx].set_text_props(color=AMBER)
 
 ax.set_title("Borough-level access to Top 25% P8 schools — ranked by transit time\n"
              f"(P8 cutoff: {p8_threshold:.2f}, non-selective schools only)",
              fontsize=12, fontweight="bold", pad=10, loc="left")
 plt.tight_layout()
-plt.savefig(os.path.join(paths["outputs"], "chart4_borough_p8_table.png"))
+plt.savefig(os.path.join(paths["charts"], "chart4_borough_p8_table.png"))
 plt.close()
-print(f"    → {os.path.join(paths['outputs'], 'chart4_borough_p8_table.png')}")
+print(f"    → {os.path.join(paths['charts'], 'chart4_borough_p8_table.png')}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -415,9 +445,9 @@ ax.set_title("The quality penalty — extra travel time to reach\na Top 25% P8 s
 ax.legend(fontsize=9, loc="lower right", frameon=False)
 ax.tick_params(axis="y", labelsize=9)
 plt.tight_layout()
-plt.savefig(os.path.join(paths["outputs"], "chart5_quality_penalty.png"))
+plt.savefig(os.path.join(paths["charts"], "chart5_quality_penalty.png"))
 plt.close()
-print(f"    → {os.path.join(paths['outputs'], 'chart5_quality_penalty.png')}")
+print(f"    → {os.path.join(paths['charts'], 'chart5_quality_penalty.png')}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -449,9 +479,9 @@ fig.suptitle("Walk vs transit access to nearest school by London borough\n"
              "(sorted by transit − walk gap, largest first)",
              fontsize=13, fontweight="bold", y=1.01)
 plt.tight_layout()
-plt.savefig(os.path.join(paths["outputs"], "chart6_mode_gap_matrix.png"))
+plt.savefig(os.path.join(paths["charts"], "chart6_mode_gap_matrix.png"))
 plt.close()
-print(f"    → {os.path.join(paths['outputs'], 'chart6_mode_gap_matrix.png')}")
+print(f"    → {os.path.join(paths['charts'], 'chart6_mode_gap_matrix.png')}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -511,9 +541,9 @@ ax.set_title(f"Deprivation vs transit time to quality schools — each dot = one
              fontsize=13, fontweight="bold", pad=12)
 ax.legend(fontsize=9, frameon=False)
 plt.tight_layout()
-plt.savefig(os.path.join(paths["outputs"], "chart10_imd_vs_p8_transit.png"))
+plt.savefig(os.path.join(paths["charts"], "chart10_imd_vs_p8_transit.png"))
 plt.close()
-print(f"    → {os.path.join(paths['outputs'], 'chart10_imd_vs_p8_transit.png')}")
+print(f"    → {os.path.join(paths['charts'], 'chart10_imd_vs_p8_transit.png')}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -565,9 +595,184 @@ ax.legend(handles=handles, fontsize=9, loc="upper left",
 ax.set_xlabel("IMD quintile (school's LSOA)")
 ax.grid(axis="y", linewidth=0.4)
 plt.tight_layout()
-plt.savefig(os.path.join(paths["outputs"], "chart11_ofsted_by_imd.png"))
+plt.savefig(os.path.join(paths["charts"], "chart11_ofsted_by_imd.png"))
 plt.close()
-print(f"    → {os.path.join(paths['outputs'], 'chart11_ofsted_by_imd.png')}")
+print(f"    → {os.path.join(paths['charts'], 'chart11_ofsted_by_imd.png')}")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DARK THEME PALETTE (for travel-section charts)
+# ══════════════════════════════════════════════════════════════════════════════
+BG       = "#13162A"
+CARD     = "#1E2240"
+ORANGE   = "#F5A623"
+D_GREEN  = "#4EC9A0"
+D_BLUE   = "#5B8DEF"
+D_PURPLE = "#A78BFA"
+D_LGRAY  = "#8B8FA8"
+D_TEXT   = "#E8E4D9"
+D_SUB    = "#8B8FA8"
+RED_SOFT = "#F07070"
+AMB_SOFT = "#F5C06A"
+
+def dark_ax(ax, bg=CARD):
+    """Apply dark card styling to an axes."""
+    ax.set_facecolor(bg)
+    ax.tick_params(colors=D_TEXT, labelsize=9)
+    ax.xaxis.label.set_color(D_TEXT)
+    ax.yaxis.label.set_color(D_TEXT)
+    ax.title.set_color(D_TEXT)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    ax.grid(axis="x", color=D_LGRAY, linewidth=0.4, alpha=0.35)
+    ax.set_axisbelow(True)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CHART 1b — Travel time by mode per borough (dark theme)
+# ══════════════════════════════════════════════════════════════════════════════
+print("Chart 1b — Travel time by mode per borough (dark)...")
+
+modes_1b       = ["Transit any", "Walk any", "Cycle any", "Car any"]
+mode_colors_1b = [D_BLUE, D_GREEN, D_PURPLE, ORANGE]
+mode_labels_1b = ["Transit", "Walk", "Cycle", "Car"]
+_avail = [(m, c, l) for m, c, l in zip(modes_1b, mode_colors_1b, mode_labels_1b) if m in la.columns]
+modes_1b, mode_colors_1b, mode_labels_1b = zip(*_avail) if _avail else ([], [], [])
+
+df_1b = (
+    la.dropna(subset=["Transit any"])
+    .sort_values("Transit any", ascending=True)
+    .copy()
+)
+
+fig, ax = plt.subplots(figsize=(11, 10))
+fig.patch.set_facecolor(BG)
+dark_ax(ax)
+
+y       = np.arange(len(df_1b))
+n       = len(modes_1b)
+total_h = 0.72
+bar_h   = total_h / n
+offsets = np.linspace(-(total_h - bar_h) / 2, (total_h - bar_h) / 2, n)
+
+for i, (mode, color, label) in enumerate(zip(modes_1b, mode_colors_1b, mode_labels_1b)):
+    vals = df_1b[mode].fillna(0)
+    bars = ax.barh(y + offsets[i], vals, height=bar_h * 0.88,
+                   color=color, alpha=0.88, label=label)
+
+ax.set_yticks(y)
+ax.set_yticklabels(df_1b["borough_short"], color=D_TEXT, fontsize=9)
+ax.set_xlabel("Median travel time to nearest non-selective school (minutes)",
+              color=D_SUB, fontsize=10)
+
+overall_median = df_1b["Transit any"].median()
+ax.axvline(overall_median, color=ORANGE, linewidth=1, linestyle="--",
+           alpha=0.5, zorder=0)
+ax.text(overall_median + 0.3, len(df_1b) - 0.5,
+        f"London median\n{overall_median:.0f} min (transit)",
+        color=ORANGE, fontsize=8, va="top", alpha=0.85)
+
+fig.text(0.13, 0.97, "CHART 1b", color=ORANGE,
+         fontsize=9, fontweight="bold", transform=fig.transFigure)
+fig.text(0.13, 0.945,
+         "How long does it take to reach the nearest school — by mode and borough",
+         color=D_TEXT, fontsize=13, fontweight="bold", transform=fig.transFigure)
+fig.text(0.13, 0.925,
+         "Source: LSOA travel time matrix (r5py) · non-selective schools only",
+         color=D_SUB, fontsize=9, transform=fig.transFigure)
+
+handles = [mpatches.Patch(color=c, label=l)
+           for c, l in zip(mode_colors_1b, mode_labels_1b)]
+leg = ax.legend(handles=handles, fontsize=9, loc="lower right",
+                frameon=True, framealpha=0.2,
+                facecolor=CARD, edgecolor=D_LGRAY, labelcolor=D_TEXT)
+
+plt.subplots_adjust(left=0.22, right=0.97, top=0.91, bottom=0.07)
+out_1b = os.path.join(paths["charts"], "chart1b_travel_time_by_mode.png")
+plt.savefig(out_1b, facecolor=BG, dpi=150)
+plt.close()
+print(f"    → {out_1b}")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CHART 2c — School place utilisation by borough (dark theme)
+#             Renamed from 2b to avoid clash with existing Chart 2 / chart2b.
+# ══════════════════════════════════════════════════════════════════════════════
+print("Chart 2c — School place utilisation by borough (dark)...")
+
+df_2c = (
+    la.dropna(subset=["utilisation_pct"])
+    .sort_values("utilisation_pct", ascending=True)
+    .copy()
+)
+
+bar_colors_2c = []
+for v in df_2c["utilisation_pct"]:
+    if v > 100:
+        bar_colors_2c.append(RED_SOFT)
+    elif v > 95:
+        bar_colors_2c.append(AMB_SOFT)
+    else:
+        bar_colors_2c.append(ORANGE)
+
+fig, ax = plt.subplots(figsize=(10, 10))
+fig.patch.set_facecolor(BG)
+dark_ax(ax)
+
+bars = ax.barh(df_2c["borough_short"], df_2c["utilisation_pct"],
+               color=bar_colors_2c, height=0.65)
+
+ax.axvline(100, color=RED_SOFT, linewidth=1.2, linestyle="--",
+           alpha=0.7, zorder=3, label="At capacity (100%)")
+ax.axvline(90,  color=AMB_SOFT, linewidth=1,   linestyle=":",
+           alpha=0.6, zorder=3, label="Near capacity (90%)")
+
+for bar, val in zip(bars, df_2c["utilisation_pct"]):
+    color = RED_SOFT if val > 100 else AMB_SOFT if val > 95 else D_TEXT
+    ax.text(val + 0.5, bar.get_y() + bar.get_height() / 2,
+            f"{val:.0f}%", va="center", ha="left",
+            fontsize=8, color=color)
+
+ax.set_xlabel("Utilisation (pupils on roll ÷ school capacity)",
+              color=D_SUB, fontsize=10)
+ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{int(x)}%"))
+ax.set_xlim(0, df_2c["utilisation_pct"].max() * 1.12)
+ax.tick_params(axis="y", labelsize=9, colors=D_TEXT)
+
+n_over = (df_2c["utilisation_pct"] > 100).sum()
+n_near = ((df_2c["utilisation_pct"] > 95) & (df_2c["utilisation_pct"] <= 100)).sum()
+fig.text(0.13, 0.97, "CHART 2c", color=ORANGE,
+         fontsize=9, fontweight="bold", transform=fig.transFigure)
+fig.text(0.13, 0.945,
+         "Are there enough school places? — utilisation by borough",
+         color=D_TEXT, fontsize=13, fontweight="bold", transform=fig.transFigure)
+fig.text(0.13, 0.925,
+         "Source: DfE SCAP 2024 · non-selective schools only",
+         color=D_SUB, fontsize=9, transform=fig.transFigure)
+
+callout = (
+    f"{n_over} borough{'s' if n_over != 1 else ''} over capacity · "
+    f"{n_near} near capacity — demand pressure forces families to look further afield"
+)
+fig.text(0.13, 0.905, callout, color=D_LGRAY,
+         fontsize=8.5, style="italic", transform=fig.transFigure)
+
+handles = [
+    mpatches.Patch(color=RED_SOFT, label=f"Over capacity  (>100%)"),
+    mpatches.Patch(color=AMB_SOFT, label=f"Near capacity  (91–100%)"),
+    mpatches.Patch(color=ORANGE,   label=f"Within capacity (≤90%)"),
+]
+leg = ax.legend(handles=handles, fontsize=9, loc="lower right",
+                frameon=True, framealpha=0.2,
+                facecolor=CARD, edgecolor=D_LGRAY, labelcolor=D_TEXT)
+
+plt.subplots_adjust(left=0.25, right=0.95, top=0.89, bottom=0.07)
+out_2c = os.path.join(paths["charts"], "chart2c_utilisation_dark.png")
+plt.savefig(out_2c, facecolor=BG, dpi=150)
+plt.close()
+print(f"    → {out_2c}")
+
+print("\nTravel section dark-theme charts done.")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -584,9 +789,19 @@ export = (
         "utilisation_pct": "Utilisation (%)",
         "Transit any":     "Transit to any school (min)",
         "Transit P8":      "Transit to P8 school (min)",
-        "penalty_transit": "Quality penalty — transit (min)",
+        "Transit Outstanding": "Transit to Outstanding school (min)",
+        "Transit Att8":    "Transit to Att8 school (min)",
+        "penalty_transit": "Quality penalty P8 — transit (min)",
+        "penalty_transit_outstanding": "Quality penalty Outstanding — transit (min)",
+        "penalty_transit_att8": "Quality penalty Att8 — transit (min)",
         "Walk any":        "Walk to any school (min)",
         "Walk P8":         "Walk to P8 school (min)",
+        "Walk Outstanding":"Walk to Outstanding school (min)",
+        "Walk Att8":       "Walk to Att8 school (min)",
+        "Cycle any":       "Cycle to any school (min)",
+        "Cycle P8":        "Cycle to P8 school (min)",
+        "Cycle Outstanding":"Cycle to Outstanding school (min)",
+        "Cycle Att8":      "Cycle to Att8 school (min)",
         "Car any":         "Car to any school (min)",
         "Car P8":          "Car to P8 school (min)",
     })
@@ -597,5 +812,5 @@ export.to_csv(os.path.join(paths["outputs"], "borough_ranking.csv"), index=False
 print(f"    → {os.path.join(paths['outputs'], 'borough_ranking.csv')}")
 
 print("\n" + "=" * 60)
-print(f"All done. Charts saved to {paths['outputs']}")
+print(f"All done. Charts saved to {paths['charts']}")
 print("=" * 60)
