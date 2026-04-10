@@ -1,0 +1,34 @@
+la_name,tt_transit_nearest_any,tt_walk_nearest_any,tt_car_nearest_any,tt_transit_nearest_outstanding,quality_penalty
+Does not apply,18.0,24.5,6.5,21.0,3.0
+Greenwich,12.0,12.0,3.0,28.0,16.0
+Sutton,11.0,11.0,3.0,35.0,24.0
+Kingston upon Thames,11.0,11.0,3.0,28.0,17.0
+Brent,11.0,11.0,3.0,18.0,7.0
+Hounslow,11.0,11.0,3.0,22.0,11.0
+Hillingdon,10.0,10.0,3.0,32.0,22.0
+Croydon,10.0,10.0,3.0,35.5,25.5
+Bromley,10.0,10.0,3.0,42.0,32.0
+Richmond upon Thames,9.0,9.0,3.0,26.0,17.0
+Barnet,9.0,9.0,3.0,30.0,21.0
+Haringey,8.5,8.5,2.5,27.5,19.0
+Waltham Forest,8.0,8.0,3.0,25.0,17.0
+Enfield,8.0,8.0,3.0,39.0,31.0
+Harrow,8.0,8.0,2.0,29.0,21.0
+Havering,8.0,8.0,2.0,35.0,27.0
+Redbridge,8.0,8.0,3.0,24.0,16.0
+Bexley,8.0,8.0,2.0,41.0,33.0
+Merton,8.0,8.0,4.0,25.0,17.0
+Newham,7.5,7.5,2.0,26.0,18.5
+Wandsworth,7.0,7.0,2.0,23.0,16.0
+Lewisham,7.0,7.0,2.0,28.5,21.5
+Barking and Dagenham,7.0,7.0,3.0,24.0,17.0
+Lambeth,7.0,7.0,2.0,23.0,16.0
+Kensington and Chelsea,7.0,7.0,1.0,17.0,10.0
+Camden,7.0,7.0,3.0,23.0,16.0
+Southwark,6.5,6.5,2.0,18.5,12.0
+Ealing,6.5,6.5,2.0,11.0,4.5
+Islington,6.0,6.0,2.5,16.5,10.5
+Hackney,6.0,6.0,2.0,22.0,16.0
+Tower Hamlets,5.5,5.5,2.0,20.5,15.0
+Hammersmith and Fulham,5.0,5.0,2.0,14.0,9.0
+Westminster,5.0,5.0,2.0,13.5,8.5

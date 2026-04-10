@@ -3,7 +3,7 @@ r5py travel time matrix — London secondary schools accessibility
 ================================================================
 Modes:       TRANSIT+WALK, WALK only, CYCLE only
 Origins:     4,994 London LSOA population weighted centroids
-Destinations: All secondary schools within 5km buffer of GLA boundary
+Destinations: All non-selective secondary schools within GLA boundary
 Departure:   Tuesday 17 March 2026, 08:30, 60-min window, median
 Targets:
   (1) Nearest any school
@@ -11,10 +11,9 @@ Targets:
   (3) Nearest top-25% Attainment 8 school [thresholds = London schools only]
   (4) Nearest top-25% Progress 8 school   [thresholds = London schools only]
 
-Note: destinations include schools up to 5km outside GLA to avoid
-boundary artifacts for peripheral LSOAs.
+Note: schools with admissions_policy of "Selective" or "Not applicable"
+are excluded. The destination pool uses the exact GLA boundary (no buffer).
 """
-
 
 import geopandas as gpd
 import pandas as pd
@@ -46,7 +45,6 @@ OUTPUT_PATH = "data/lsoa_travel_times.parquet"
 DEPARTURE = datetime(2026, 3, 17, 8, 30)
 MAX_MINS = 90
 PERCENTILE = 50
-BUFFER_M = 5_000    # 5km buffer around GLA for destination schools
 BATCH_SIZE = 200      # origins per batch
 
 # ── 1. Load origins ───────────────────────────────────────────────────────────
@@ -59,23 +57,38 @@ print(f"  {len(origins):,} origins")
 
 # ── 2. Load destinations ──────────────────────────────────────────────────────
 
-print("Loading GLA boundary and applying buffer...")
+print("Loading GLA boundary...")
 gla = gpd.read_file(GLA_PATH).to_crs("EPSG:27700")
+
+# Build dissolved GLA union (geopandas >=1.0 uses union_all, older uses unary_union)
+try:
+    gla_union = gla.union_all()
+except AttributeError:
+    gla_union = gla.unary_union  # older geopandas fallback
+
+# Clip boundary: buffer(0) = exact GLA boundary, no expansion
 gla_buffered = gla.copy()
-gla_buffered["geometry"] = gla.buffer(BUFFER_M)
-print(f"  Buffer: {BUFFER_M/1000:.0f}km around GLA")
+gla_buffered["geometry"] = gla.buffer(0)
+print("  Using exact GLA boundary (no buffer) for school clipping")
 
 print("Loading schools...")
-schools = pd.read_parquet(SCHOOLS_PATH)
-schools_gdf = gpd.GeoDataFrame(
-    schools,
-    geometry=gpd.points_from_xy(schools["easting"], schools["northing"]),
+schools_raw = pd.read_parquet(SCHOOLS_PATH)
+schools_gdf_all = gpd.GeoDataFrame(
+    schools_raw,
+    geometry=gpd.points_from_xy(schools_raw["easting"], schools_raw["northing"]),
     crs="EPSG:27700"
 )
 
-# Filter to schools within buffered GLA
-schools_buffered = gpd.clip(schools_gdf, gla_buffered).copy()
-print(f"  {len(schools_buffered):,} schools within {BUFFER_M/1000:.0f}km of GLA")
+# Filter to schools within GLA boundary
+schools_buffered = gpd.clip(schools_gdf_all, gla_buffered).copy()
+print(f"  {len(schools_buffered):,} schools within GLA boundary")
+
+# --- Filter out selective and non-applicable admissions policies ---
+excluded_policies = ["Selective", "Not applicable"]
+schools_buffered = schools_buffered[
+    ~schools_buffered["admissions_policy"].isin(excluded_policies)
+].copy()
+print(f"  {len(schools_buffered):,} schools remaining after excluding Selective/NA policies")
 
 # London schools only — used for threshold calculation
 london_mask = schools_buffered["london_sub_region"].isin(
@@ -94,27 +107,21 @@ destinations = destinations.rename(columns={"URN": "urn"})
 destinations["id"] = destinations["urn"].astype(str)
 destinations = destinations.to_crs("EPSG:4326")
 
-# ── (updated) 4. Tag destination tiers (thresholds from London schools only) ────────────
+# ── 4. Tag destination tiers (thresholds from London schools only) ────────────
 
-# original:
-# att8_threshold = schools_buffered["ks4_attainment8"].quantile(0.75)
-# p8_threshold = schools_buffered["ks4_progress8"].quantile(0.75)
-
-# updated:
-# I used `london_schools` from section 2
+# Thresholds derived from London schools only (not the full buffered pool)
 att8_threshold = london_schools["ks4_attainment8"].quantile(0.75)
 p8_threshold = london_schools["ks4_progress8"].quantile(0.75)
 
-print(
-    f"\nDestination thresholds (all schools within {BUFFER_M/1000:.0f}km of GLA):")
+print(f"\nDestination thresholds (London schools only):")
 print(f"  Top 25% Attainment 8 cutoff : {att8_threshold:.1f}")
 print(f"  Top 25% Progress 8 cutoff   : {p8_threshold:.2f}")
 print(
-    f"  Outstanding schools (buffer) : {(destinations['ofsted_overall_label'] == 'Outstanding').sum()}")
+    f"  Outstanding schools          : {(destinations['ofsted_overall_label'] == 'Outstanding').sum()}")
 print(
-    f"  Top 25% Att8 (buffer)        : {(destinations['ks4_attainment8'] >= att8_threshold).sum()}")
+    f"  Top 25% Att8                 : {(destinations['ks4_attainment8'] >= att8_threshold).sum()}")
 print(
-    f"  Top 25% P8 (buffer)          : {(destinations['ks4_progress8'] >= p8_threshold).sum()}")
+    f"  Top 25% P8                   : {(destinations['ks4_progress8'] >= p8_threshold).sum()}")
 
 school_tags = destinations.set_index("id")[[
     "ofsted_overall_label",
@@ -133,7 +140,7 @@ print("\nBuilding transport network (this takes a few minutes)...")
 transport_network = r5py.TransportNetwork(OSM_PATH, GTFS_PATHS)
 print("✓ Network built")
 
-# ── (updated) 6. Compute travel time matrices in batches ────────────────────────────────
+# ── 6. Compute travel time matrices in batches ────────────────────────────────
 
 
 def run_matrix_batched(network, origins, destinations, mode_label):
@@ -162,9 +169,7 @@ def run_matrix_batched(network, origins, destinations, mode_label):
             transport_modes=modes,
             percentiles=[PERCENTILE],
         )
-        # update: added 3 extra lines with `.compute()` to generate the dataframe
-        computed_df = computer.compute()
-        results.append(computed_df[["from_id", "to_id", "travel_time"]])
+        results.append(computer[["from_id", "to_id", "travel_time"]])
 
     full = pd.concat(results, ignore_index=True)
     print(f"  ✓ {len(full):,} pairs | "
@@ -226,25 +231,11 @@ transit_metrics = summarise(transit_tt, school_tags, "transit")
 walk_metrics = summarise(walk_tt,    school_tags, "walk")
 cycle_metrics = summarise(cycle_tt,   school_tags, "cycle")
 
-# # ── (original) 8. Merge and save ─────────────────────────────────────────────────────────
-# lsoa_metrics = (
-#     transit_metrics
-#     .merge(walk_metrics,  on="lsoa_id", how="outer")
-#     .merge(cycle_metrics, on="lsoa_id", how="outer")
-# )
-# lsoa_metrics.to_parquet(OUTPUT_PATH, index=False)
-# print(f"\n✓ Saved to {OUTPUT_PATH}")
-# print(f"  Shape:   {lsoa_metrics.shape}")
-# print(f"  Columns: {lsoa_metrics.columns.tolist()}")
+# ── 8. Merge and save ─────────────────────────────────────────────────────────
 
-
-# ── (updated) 8. Merge and save ─────────────────────────────────────────────────────────
-
-# use all 4,994 LSOAs 
+# Anchor on all 4,994 LSOAs; left join so unroutable LSOAs appear as NaN
 lsoa_metrics = origins[["id"]].rename(columns={"id": "lsoa_id"})
 
-# use left join 
-# let value = null if a certain lsoa is out of all metrics
 lsoa_metrics = (
     lsoa_metrics
     .merge(transit_metrics, on="lsoa_id", how="left")
@@ -253,3 +244,6 @@ lsoa_metrics = (
 )
 
 lsoa_metrics.to_parquet(OUTPUT_PATH, index=False)
+print(f"\n✓ Saved to {OUTPUT_PATH}")
+print(f"  Shape:   {lsoa_metrics.shape}")
+print(f"  Columns: {lsoa_metrics.columns.tolist()}")
