@@ -656,8 +656,12 @@
 
     #s2-motivation .section-intro {
       padding: 80px 80px 40px;
-      min-height: unset;       /* wrapper handles 100vh now */
+      min-height: unset;
       max-width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     /* Image column */
@@ -855,8 +859,13 @@
 
     /* Section intro keeps its own padding */
     #s4-access .section-intro {
-      padding: 80px 80px 60px;
-      max-width: 1025px;
+      padding: 80px 80px 40px;
+      min-height: unset;
+      max-width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     /* ── Steps 3 & 4 — explorer sticky (map spans both scroll steps) ── */
@@ -1152,8 +1161,14 @@
        SECTION 5 — VULNERABILITY (sticky scroll)
     ───────────────────────────────────────── */
 
-    #s5-vulnerability {
-      padding: 80px 80px 80px;
+    #s5-vulnerability .section-intro {
+      padding: 80px 80px 40px;
+      min-height: unset;
+      max-width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .vuln-stat-block {
@@ -1558,7 +1573,7 @@
   ═══════════════════════════════════════ -->
   <section id="s2-motivation" class="page-section" data-section-index="1">
 
-    <div class="motivation-intro-wrap">
+    <div class="motivation-intro-wrap" id="s2-intro">
     <!-- Left — existing text -->
         <div class="section-intro reveal">
           <p class="section-label">Motivation</p>
@@ -1591,9 +1606,9 @@
 
 
     </div>
-    
+        
     <!-- Sticky map + scroll steps -->
-    <div class="sticky-section">
+    <div class="sticky-section" id="s2-map-start">
       <div class="sticky-map-col">
         <div id="s2-map" class="map-canvas"></div>
         <div class="map-step-label" id="s2-map-label">All secondary schools — London</div>
@@ -1829,18 +1844,32 @@
   ═══════════════════════════════════════ -->
   <section id="s4-access" class="page-section" data-section-index="3">
 
+  <div class="motivation-intro-wrap" id="s4-intro">
     <div class="section-intro reveal">
       <p class="section-label">Access to opportunity</p>
       <h2 class="section-headline">How does travel time change<br>when quality matters?</h2>
       <p class="section-intro-body">
-        We layer <strong style="color:#FF9043">Progress 8 scores</strong> and <strong style="color:#FF9043"> Ofsted ratings </strong> onto the accessibility
+        We layer <strong style="color:#FF9043">Progress 8 scores</strong> and 
+        <strong style="color:#FF9043">Ofsted ratings</strong> onto the accessibility
         analysis — and find that filtering for quality significantly extends
         the journeys many children must make.
       </p>
     </div>
 
+    <div class="motivation-img-col reveal reveal-delay-2">
+      <div class="motivation-img-wrap">
+        <img
+          src="./images/access-section4.png"
+          alt="School access across London"
+          class="motivation-img"
+        />
+        <div class="motivation-img-mask"></div>
+      </div>
+    </div>
+  </div>
+
     <!-- ── Steps 1 & 2 — sticky comparison slider ──────────────────── -->
-    <div class="sticky-section">
+    <div class="sticky-section" id="s4-map-start">
       <div class="sticky-map-col">
         <div class="map-compare-wrap">
           <!-- Left: any school choropleth -->
@@ -2039,17 +2068,30 @@
   ═══════════════════════════════════════ -->
   <section id="s5-vulnerability" class="page-section" data-section-index="4">
 
-    <div class="section-intro reveal">
-      <p class="section-label">Pockets of vulnerability</p>
-      <h2 class="section-headline">Where deprivation meets<br>long journeys</h2>
-      <p class="section-intro-body">
-        Using Local Indicators of Spatial Autocorrelation (LISA), we identify
-        neighbourhoods where high transit times to Progress 8 schools coincide
-        with elevated child deprivation — compounding barriers to opportunity.
-      </p>
+    <div class="motivation-intro-wrap" id="s5-intro">
+      <div class="section-intro reveal">
+        <p class="section-label">Pockets of vulnerability</p>
+        <h2 class="section-headline">Where deprivation meets<br>long journeys</h2>
+        <p class="section-intro-body">
+          Using Local Indicators of Spatial Autocorrelation (LISA), we identify
+          neighbourhoods where high transit times to Progress 8 schools coincide
+          with elevated child deprivation — compounding barriers to opportunity.
+        </p>
+      </div>
+
+      <div class="motivation-img-col reveal reveal-delay-2">
+        <div class="motivation-img-wrap">
+          <img
+            src="./images/deprivation-section5.png"
+            alt="Vulnerable neighbourhoods in London"
+            class="motivation-img"
+          />
+          <div class="motivation-img-mask"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="sticky-section">
+    <div class="sticky-section" id="s5-map-start">
       <div class="sticky-map-col">
         <div id="s5-map" class="map-canvas"></div>
         <div class="map-legend">
@@ -4065,7 +4107,7 @@ const s2StepActions = {
     { id: 's4-access' },
     { id: 's5-vulnerability' },
     { id: 's6-reflections' },
-    { id: 's7-team' }
+    { id: 's7-about' }
   ];
 
   // Build dot rail
@@ -4154,36 +4196,36 @@ const s2StepActions = {
   (function initSectionSnap() {
     const SECTION_IDS = [
       's1-hero',
-      's2-motivation',
+      's2-intro',       // S2 intro wrap  (100vh)
+      's2-map-start',   // S2 sticky maps
       's3-travel',
-      's4-access',
-      's5-vulnerability',
+      's4-intro',       // S4 intro wrap  (100vh)
+      's4-map-start',   // S4 sticky map-1
+      's4-step3-wrap',   // S4 sticky maps-2
+      's5-intro',       // S5 intro wrap  (100vh)
+      's5-map-start',   // S5 sticky maps
       's6-reflections',
-      's7-team'
+      's7-about'
     ];
 
-    // How long to lock snapping after a snap fires (ms)
-    // Long enough that the smooth scroll completes before
-    // the next wheel event can trigger another snap.
+    // Intro snap targets — these are 100vh single screens.
+    // When the current target is one of these we skip the
+    // insideStickyWithStepsRemaining check entirely.
+    const INTRO_IDS = new Set(['s2-intro','s4-intro','s5-intro']);
+
     const SNAP_COOLDOWN = 900;
+    let snapping   = false;
+    let lastWheelY = 0;
 
-    let snapping    = false;
-    let lastWheelY  = 0;   // track touch start Y for swipe direction
-
-    function getSection(id) {
-      return document.getElementById(id);
-    }
+    function getSection(id) {return document.getElementById(id);}
 
     // Returns the index of the section whose top is closest to
-    // (but not below) the current scroll position.
     function currentSectionIdx() {
       const scrollY = window.scrollY + window.innerHeight * 0.15;
       let idx = 0;
       SECTION_IDS.forEach((id, i) => {
         const el = getSection(id);
-        if (el && el.getBoundingClientRect().top + window.scrollY <= scrollY) {
-          idx = i;
-        }
+        if (el && el.getBoundingClientRect().top + window.scrollY <= scrollY) idx = i;
       });
       return idx;
     }
@@ -4192,29 +4234,37 @@ const s2StepActions = {
       const el = getSection(SECTION_IDS[idx]);
       if (!el) return;
       snapping = true;
-      el.scrollIntoView({ behavior: 'smooth' });
+      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY, behavior: 'smooth' });
       setTimeout(() => { snapping = false; }, SNAP_COOLDOWN);
     }
 
-    // Returns true if the user is inside a scrollable container
-    // that still has room to scroll (i.e. we should NOT snap yet).
+    // Block snap if inside a panel with its own scrollbar that still has content
     function insideScrollableContent(e) {
       let node = e.target;
       while (node && node !== document.body) {
-        const style    = getComputedStyle(node);
-        const overflow = style.overflowY;
-        const canScroll = overflow === 'auto' || overflow === 'scroll';
-        if (canScroll && node.scrollHeight > node.clientHeight) {
+        const ov = getComputedStyle(node).overflowY;
+        if ((ov === 'auto' || ov === 'scroll') && node.scrollHeight > node.clientHeight) {
           const atTop    = node.scrollTop === 0;
           const atBottom = node.scrollTop + node.clientHeight >= node.scrollHeight - 1;
-          // Still has content to scroll — don't snap
-          if (!(atTop && e.deltaY < 0) && !(atBottom && e.deltaY > 0)) {
-            return true;
-          }
+          if (!(atTop && e.deltaY < 0) && !(atBottom && e.deltaY > 0)) return true;
         }
         node = node.parentElement;
       }
       return false;
+    }
+
+    // Block downward snap if we are inside a sticky section that still
+    // has narrative steps to scroll through.
+    // NOT called when the current snap target is an intro wrap.
+    function insideStickyWithStepsRemaining(currentEl) {
+      if (!currentEl) return false;
+      const sec = currentEl.closest('.sticky-section, .s4-explorer-section') || currentEl;
+      const r = sec.getBoundingClientRect();
+      if (r.top >= window.innerHeight || r.bottom <= 0) return false;
+      const steps = sec.querySelectorAll('.scroll-step, .s4-standalone-controls, .s4-borough-chart-panel');
+      if (!steps.length) return false;
+      const lastRect = steps[steps.length - 1].getBoundingClientRect();
+      return lastRect.top > window.innerHeight * 0.1;
     }
 
     // Wheel handler
@@ -4222,34 +4272,52 @@ const s2StepActions = {
       if (snapping) return;
       if (insideScrollableContent(e)) return;
 
-      const idx = currentSectionIdx();
-      const el  = getSection(SECTION_IDS[idx]);
+      const idx    = currentSectionIdx();
+      const currId = SECTION_IDS[idx];
+
+      const el = getSection(currId);
+
+      // Only apply the sticky-steps guard when we are NOT on an intro screen
+      if (!INTRO_IDS.has(currId)) {
+        if (e.deltaY > 0 && insideStickyWithStepsRemaining(el)) return;
+      }
       if (!el) return;
 
-      const rect     = el.getBoundingClientRect();
-      const atTop    = rect.top > -10;                     // section top is at/above viewport
-      const atBottom = rect.bottom <= window.innerHeight + 10; // section bottom is in view
+      const rect  = el.getBoundingClientRect();
+      const atTop = rect.top > -100;
+
+      // For sticky/explorer sections (which are many vh tall), we cannot
+      // use the section's own bottom. Instead find the last scrollable
+      // panel inside — whichever of these exists last in DOM order.
+      const LAST_STEP_SELECTORS = [
+        '.s4-borough-chart-panel',        // explorer section step 4
+        '.s4-standalone-controls',        // explorer section step 3
+        '.scroll-narrative-col .scroll-step:last-child',  // standard sticky
+      ];
+      let bottomEl = el;
+      for (const sel of LAST_STEP_SELECTORS) {
+        const found = el.querySelector(sel);
+        if (found) { bottomEl = found; break; }
+      }
+      const atBottom = bottomEl.getBoundingClientRect().bottom <= window.innerHeight + 150;
 
       if (e.deltaY > 0 && atBottom && idx < SECTION_IDS.length - 1) {
-        // Scrolling down, reached section bottom → snap to next
         e.preventDefault();
         snapTo(idx + 1);
       } else if (e.deltaY < 0 && atTop && idx > 0) {
-        // Scrolling up, at section top → snap to previous
         e.preventDefault();
         snapTo(idx - 1);
       }
     }, { passive: false });
 
-    // Touch swipe handler
     window.addEventListener('touchstart', (e) => {
       lastWheelY = e.touches[0].clientY;
     }, { passive: true });
 
     window.addEventListener('touchend', (e) => {
       if (snapping) return;
-      const deltaY  = lastWheelY - e.changedTouches[0].clientY;
-      if (Math.abs(deltaY) < 40) return;   // ignore tiny swipes
+      const deltaY = lastWheelY - e.changedTouches[0].clientY;
+      if (Math.abs(deltaY) < 40) return;
 
       const idx  = currentSectionIdx();
       const el   = getSection(SECTION_IDS[idx]);
@@ -4259,11 +4327,8 @@ const s2StepActions = {
       const atBottom = rect.bottom <= window.innerHeight + 10;
       const atTop    = rect.top > -10;
 
-      if (deltaY > 0 && atBottom && idx < SECTION_IDS.length - 1) {
-        snapTo(idx + 1);
-      } else if (deltaY < 0 && atTop && idx > 0) {
-        snapTo(idx - 1);
-      }
+      if (deltaY > 0 && atBottom && idx < SECTION_IDS.length - 1) snapTo(idx + 1);
+      else if (deltaY < 0 && atTop && idx > 0) snapTo(idx - 1);
     }, { passive: true });
   })();
 
