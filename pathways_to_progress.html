@@ -3504,10 +3504,6 @@ const s2StepActions = {
         }
         const lbl = document.getElementById('s4-label-right');
         if (lbl) lbl.textContent = 'Top 25% P8';
-        // Hide filtered dots on right map
-        if (s4MapRight && s4MapRight.getLayer('right-schools-highlight')) {
-          s4MapRight.setLayoutProperty('right-schools-highlight', 'visibility', 'none');
-        }
         // Hide schools legend highlight row
         const legendRow = document.getElementById('s4-schools-legend-highlight');
         if (legendRow) legendRow.style.display = 'none';
@@ -3692,14 +3688,13 @@ const s2StepActions = {
             }
           });
 
-          // ── Quality-filtered dots (orange, hidden by default) ──
+          // ── Quality-filtered dots ──
           s4MapExplorer.addLayer({
             id:             'explorer-schools-highlight',
             type:           'circle',
             source:         'explorer-schools-src',
             'source-layer': SCHOOLS_SRC_LAYER,
             filter:         ['==', 'top_p8_quartile_GLA', true],
-            layout:         { visibility: 'none' },
             paint: {
               'circle-radius':         ['interpolate', ['linear'], ['zoom'], 8, 4, 12, 7],
               'circle-color':          '#FF9043',
