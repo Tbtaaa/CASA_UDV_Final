@@ -794,7 +794,7 @@
       max-width: 1025px;
     }
 
-    /* ── Steps 3 & 4 — explorer sticky (map spans both scroll steps) ── */
+    /* ── Step 3 — standalone full-width map ── */
     .s4-explorer-section {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -815,6 +815,17 @@
       display: flex;
       flex-direction: column;
     }
+    .s4-standalone {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      height: 80vh;
+      position: relative;
+    }
+    .s4-standalone-map {
+      position: relative;
+      height: 100%;
+    }
     .s4-standalone-controls {
       background: var(--bg2);
       padding: 48px 40px;
@@ -822,8 +833,7 @@
       flex-direction: column;
       justify-content: center;
       gap: 32px;
-      min-height: 100vh;
-      border-bottom: 0.5px solid var(--border);
+      overflow-y: auto;
     }
     .s4-ctrl-group-label {
       font-family: var(--font-mono);
@@ -856,17 +866,33 @@
     .s4-ctrl-btn.active-ofsted  { border-color: #FF9043; color: #FF9043; background: rgba(255,144,67,0.10); }
     .s4-ctrl-btn.active-transit { border-color: #4fc3f7; color: #4fc3f7; background: rgba(79,195,247,0.08); }
     .s4-ctrl-btn.active-walk    { border-color: #66bb6a; color: #66bb6a; background: rgba(102,187,106,0.08); }
-    .s4-ctrl-btn.active-car     { border-color: #ce93d8; color: #ce93d8; background: rgba(206,147,216,0.08); }
+    .s4-ctrl-btn.active-cycle   { border-color: #ce93d8; color: #ce93d8; background: rgba(206,147,216,0.08); }
 
-    /* ── Step 4 — borough chart panel (map shared with step 3) ── */
+    /* ── Step 4 — borough map + chart ── */
+    .s4-borough-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      height: 100vh;
+    }
+    .s4-borough-map { position: relative; height: 100%; }
     .s4-borough-chart-panel {
       background: var(--bg2);
-      padding: 48px 40px;
+      padding: 40px 36px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      min-height: 100vh;
       overflow-y: auto;
+    }
+    .s4-borough-chart-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .s4-borough-chart-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
     }
     .s4-expand-btn {
       font-family: var(--font-mono);
@@ -1833,95 +1859,94 @@
       </div>
     </div>
 
-    <!-- ── Steps 3 & 4 — explorer + borough (shared sticky map) ──────── -->
-    <div class="s4-explorer-section" id="s4-step3-wrap">
-
-      <!-- Left col: sticky map spanning both scroll steps -->
-      <div class="s4-explorer-map-col">
-        <div id="s4-map-explorer" class="map-canvas"></div>
-
-        <!-- Schools legend -->
-        <div id="s4-explorer-schools-legend" style="position:absolute;bottom:178px;left:24px;z-index:21;background:rgba(8,12,18,0.85);border:0.5px solid var(--border-mid);padding:8px 12px;border-radius:4px;display:flex;flex-direction:column;gap:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;color:var(--text-muted)">
-          <div class="schools-legend-row">
-            <div class="schools-legend-dot" style="background:#fff6ec"></div>
-            <span>All schools</span>
-          </div>
-          <div class="schools-legend-row" id="s4-explorer-highlight-row" style="display:none">
-            <div class="schools-legend-dot" style="background:#FF9043"></div>
-            <span id="s4-explorer-highlight-label">Top 25% P8</span>
-          </div>
-        </div>
-
-        <!-- Travel-time legend -->
-        <div class="map-legend" id="s4-explorer-legend" style="bottom:24px;left:24px;right:auto">
+    <!-- ── Step 3 — standalone mode × school type explorer ─────────── -->
+    <div class="s4-standalone" id="s4-step3-wrap">
+      <!-- Map -->
+      <div class="s4-standalone-map">
+        <div id="s4-map-explorer" style="width:100%;height:100%"></div>
+        <div class="map-legend" style="bottom:24px;right:16px">
           <div class="map-legend-title" id="s4-explorer-legend-title">Transit — any school</div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#e3f2fd"></div><span>&lt; 10 min</span></div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#81d4fa"></div><span>11–20 min</span></div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#29b6f6"></div><span>21–30 min</span></div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#0277bd"></div><span>31–40 min</span></div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#01396e"></div><span>41–54 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffe066"></div><span>&lt; 10 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffb347"></div><span>11–20 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ff7c2a"></div><span>21–30 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#e64400"></div><span>31–40 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#8b1a00"></div><span>41–54 min</span></div>
         </div>
       </div>
 
-      <!-- Right col: two scroll steps stacked -->
-      <div class="s4-explorer-narrative-col">
-
-        <!-- Step 3 — mode × school controls -->
-        <div class="s4-standalone-controls">
-          <div>
-            <p class="step-index" style="margin-bottom:12px">03 — Mode comparison</p>
-            <h3 class="step-heading" style="margin-bottom:16px">How does travel mode affect this picture?</h3>
-            <p class="step-body" style="font-size:17px;color:var(--text-secondary);line-height:1.65">
-              Select a school type and travel mode to update the choropleth.
-              <br> Each combination reveals a different dimension of potential access inequality.
-            </p>
-          </div>
-
-          <!-- School type -->
-          <div>
-            <div class="s4-ctrl-group-label">School type</div>
-            <div class="s4-ctrl-btns" id="s4-school-btns">
-              <button class="s4-ctrl-btn active-any" data-school="any"    onclick="updateExplorer(this)">Any school</button>
-              <button class="s4-ctrl-btn"             data-school="p8"     onclick="updateExplorer(this)">Top 25% P8</button>
-              <button class="s4-ctrl-btn"             data-school="ofsted" onclick="updateExplorer(this)">Ofsted Outstanding</button>
-            </div>
-          </div>
-
-          <!-- Travel mode -->
-          <div>
-            <div class="s4-ctrl-group-label">Travel mode</div>
-            <div class="s4-ctrl-btns" id="s4-mode-btns">
-              <button class="s4-ctrl-btn active-transit" data-mode="transit" onclick="updateExplorer(this)">Transit</button>
-              <button class="s4-ctrl-btn"                data-mode="walk"    onclick="updateExplorer(this)">Walk</button>
-              <button class="s4-ctrl-btn"                data-mode="car"     onclick="updateExplorer(this)">Car</button>
-            </div>
-          </div>
-
-          <!-- Stat display -->
-          <div style="background:var(--bg3);border:0.5px solid var(--border-mid);border-radius:8px;padding:20px 24px">
-            <div class="s4-ctrl-group-label" style="margin-bottom:8px">London median</div>
-            <div style="font-family:var(--font-mono);font-size:36px;font-weight:600;color:var(--accent)" id="s4-explorer-stat">16</div>
-            <div style="font-size:13px;color:var(--text-muted);margin-top:4px" id="s4-explorer-stat-label">min median · Transit · any school</div>
-          </div>
-        </div>
-
-        <!-- Step 4 — borough chart -->
-        <div class="s4-borough-chart-panel" id="s4-step4-wrap">
-          <p class="step-index" style="margin-bottom:12px">04 — Borough summary</p>
-          <h3 class="step-heading" style="margin-bottom:8px">Borough-level variation in school access</h3>
-          <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px">
-            Median transit time · Top 25% P8 vs any school · by borough
+      <!-- Controls panel -->
+      <div class="s4-standalone-controls">
+        <div>
+          <p class="step-index" style="margin-bottom:12px">03 — Mode comparison</p>
+          <h3 class="step-heading" style="margin-bottom:16px">How does travel mode affect this picture?</h3>
+          <p class="step-body" style="font-size:17px;color:var(--text-secondary);line-height:1.65">
+            Select a school type and travel mode to update the choropleth.
+            <br> Each combination reveals a different dimension of potential access inequality.
           </p>
-          <div style="position:relative;flex:1;min-height:300px">
-            <canvas id="chart-borough-compare"></canvas>
-          </div>
-          <button class="s4-expand-btn" id="s4-expand-btn" onclick="toggleBoroughExpand()">
-            Show all 33 boroughs ↓
-          </button>
         </div>
 
-      </div><!-- /s4-explorer-narrative-col -->
-    </div><!-- /s4-explorer-section -->
+        <!-- School type -->
+        <div>
+          <div class="s4-ctrl-group-label">School type</div>
+          <div class="s4-ctrl-btns" id="s4-school-btns">
+            <button class="s4-ctrl-btn active-any" data-school="any"    onclick="updateExplorer(this)">Any school</button>
+            <button class="s4-ctrl-btn"             data-school="p8"     onclick="updateExplorer(this)">Top 25% P8</button>
+            <button class="s4-ctrl-btn"             data-school="ofsted" onclick="updateExplorer(this)">Ofsted Outstanding</button>
+          </div>
+        </div>
+
+        <!-- Travel mode -->
+        <div>
+          <div class="s4-ctrl-group-label">Travel mode</div>
+          <div class="s4-ctrl-btns" id="s4-mode-btns">
+            <button class="s4-ctrl-btn active-transit" data-mode="transit" onclick="updateExplorer(this)">Transit</button>
+            <button class="s4-ctrl-btn"                data-mode="walk"    onclick="updateExplorer(this)">Walk</button>
+            <button class="s4-ctrl-btn"                data-mode="car"   onclick="updateExplorer(this)">Car</button>
+          </div>
+        </div>
+
+        <!-- Stat display -->
+        <div style="background:var(--bg3);border:0.5px solid var(--border-mid);border-radius:8px;padding:20px 24px">
+          <div class="s4-ctrl-group-label" style="margin-bottom:8px">London median</div>
+          <div style="font-family:var(--font-mono);font-size:36px;font-weight:600;color:var(--accent)" id="s4-explorer-stat">—</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:4px" id="s4-explorer-stat-label">minutes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Step 4 — borough map + chart ────────────────────────────── -->
+    <div class="s4-borough-wrap" id="s4-step4-wrap">
+      <!-- Left — P8 travel time map -->
+      <div class="s4-borough-map">
+        <div id="s4-map-borough" style="width:100%;height:100%"></div>
+        <div class="map-legend" style="bottom:24px;right:16px">
+          <div class="map-legend-title">Transit → Top 25% P8 (min)</div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffe066"></div><span>&lt; 10</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffb347"></div><span>11–20</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ff7c2a"></div><span>21–30</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#e64400"></div><span>31–40</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#8b1a00"></div><span>41–54</span></div>
+        </div>
+        <div style="position:absolute;bottom:24px;left:16px;z-index:10;font-family:var(--font-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:rgba(8,12,18,0.8);padding:5px 9px;border-radius:3px">
+          Transit · Top 25% P8
+        </div>
+      </div>
+
+      <!-- Right — borough bar chart -->
+      <div class="s4-borough-chart-panel">
+        <p class="step-index" style="margin-bottom:12px">04 — Borough summary</p>
+        <h3 class="step-heading" style="margin-bottom:8px">Borough-level variation in school access</h3>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px">
+          Median transit time · Top 25% P8 vs any school · by borough
+        </p>
+        <div style="position:relative;flex:1;min-height:300px">
+          <canvas id="chart-borough-compare"></canvas>
+        </div>
+        <button class="s4-expand-btn" id="s4-expand-btn" onclick="toggleBoroughExpand()">
+          Show all 33 boroughs ↓
+        </button>
+      </div>
+    </div>
 
   </section>
 
