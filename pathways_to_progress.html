@@ -855,10 +855,10 @@
     }
     .s4-ctrl-group-label {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       margin-bottom: 10px;
     }
     .s4-ctrl-btns {
@@ -868,7 +868,7 @@
     }
     .s4-ctrl-btn {
       font-family: var(--font-mono);
-      font-size: 13px;
+      font-size: 14px;
       letter-spacing: 0.08em;
       padding: 8px 16px;
       border-radius: 4px;
@@ -1784,11 +1784,11 @@
         <div id="s4-schools-legend">
           <div class="schools-legend-row">
             <div class="schools-legend-dot" style="background:#fff6ec"></div>
-            <span>All schools</span>
+            <span style="color:var(--text-secondary)">All schools</span>
           </div>
           <div class="schools-legend-row" id="s4-schools-legend-highlight" style="display:none">
             <div class="schools-legend-dot" style="background:#FF9043"></div>
-            <span id="s4-schools-legend-label">Top 25% P8</span>
+            <span id="s4-schools-legend-label" style="color:var(--text-secondary)">Top 25% P8</span>
           </div>
         </div>
 
@@ -1828,6 +1828,11 @@
               The map shows travel time from each LSOA to its <strong style="color:#FF9043">nearest secondary school</strong>.
               <br>Dots mark every secondary school in London. 
               <br>The map's color intensity provides a sense of travel time via transit (i.e. bus & rail).
+              <br>
+              <br>
+              <br>
+              <br>
+              <br>
             </p>
           </div>
         </div>
@@ -1857,7 +1862,10 @@
               <br>
               <br> Use the toggle above the map to select the desired metric. 
               <br> Use the slider to see how travel times compare with the baseline scenario. 
-              
+              <br>
+              <br>
+              <br>
+              <br>
             </p>
           </div>
         </div>
@@ -1871,20 +1879,20 @@
       <div class="s4-explorer-map-col">
         <div id="s4-map-explorer" class="map-canvas"></div>
 
-        <!-- Schools legend -->
+        <!-- Schools legend — always visible, highlight row toggles -->
         <div id="s4-explorer-schools-legend" style="position:absolute;bottom:178px;left:24px;z-index:21;background:rgba(8,12,18,0.85);border:0.5px solid var(--border-mid);padding:8px 12px;border-radius:4px;display:flex;flex-direction:column;gap:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;color:var(--text-muted)">
-          <div class="schools-legend-row">
+          <div class="schools-legend-row" id="s4-explorer-all-schools-row">
             <div class="schools-legend-dot" style="background:#fff6ec"></div>
-            <span>All schools</span>
+            <span style="color:var(--text-secondary)">All schools</span>
           </div>
           <div class="schools-legend-row" id="s4-explorer-highlight-row" style="display:none">
             <div class="schools-legend-dot" style="background:#FF9043"></div>
-            <span id="s4-explorer-highlight-label">Top 25% P8</span>
+            <span id="s4-explorer-highlight-label" style="color:var(--text-secondary)">Top 25% P8</span>
           </div>
         </div>
 
         <!-- Travel-time legend -->
-        <div class="map-legend" id="s4-explorer-legend" style="bottom:24px;left:24px;right:auto">
+        <div class="map-legend" id="s4-explorer-legend" style="bottom:24px;left:24px">
           <div class="map-legend-title" id="s4-explorer-legend-title">Transit — any school</div>
           <div class="legend-row"><div class="legend-swatch" style="background:#ffe066"></div><span>&lt; 10 min</span></div>
           <div class="legend-row"><div class="legend-swatch" style="background:#ffb347"></div><span>11–20 min</span></div>
@@ -1912,9 +1920,9 @@
           <div>
             <div class="s4-ctrl-group-label">School type</div>
             <div class="s4-ctrl-btns" id="s4-school-btns">
-              <button class="s4-ctrl-btn active-any" data-school="any"    onclick="updateExplorer(this)">Any school</button>
-              <button class="s4-ctrl-btn"             data-school="p8"     onclick="updateExplorer(this)">Top 25% P8</button>
-              <button class="s4-ctrl-btn"             data-school="ofsted" onclick="updateExplorer(this)">Ofsted Outstanding</button>
+              <button class="s4-ctrl-btn" data-school="any" onclick="updateExplorer(this)">Any school</button>
+              <button class="s4-ctrl-btn active-p8" data-school="p8" onclick="updateExplorer(this)">Top 25% P8</button>
+              <button class="s4-ctrl-btn" data-school="ofsted" onclick="updateExplorer(this)">Ofsted Outstanding</button>
             </div>
           </div>
 
@@ -1923,8 +1931,8 @@
             <div class="s4-ctrl-group-label">Travel mode</div>
             <div class="s4-ctrl-btns" id="s4-mode-btns">
               <button class="s4-ctrl-btn active-transit" data-mode="transit" onclick="updateExplorer(this)">Transit</button>
-              <button class="s4-ctrl-btn"                data-mode="walk"    onclick="updateExplorer(this)">Walk</button>
-              <button class="s4-ctrl-btn"                data-mode="car"     onclick="updateExplorer(this)">Car</button>
+              <button class="s4-ctrl-btn" data-mode="walk" onclick="updateExplorer(this)">Walk</button>
+              <button class="s4-ctrl-btn" data-mode="car" onclick="updateExplorer(this)">Car</button>
             </div>
           </div>
 
@@ -1937,7 +1945,7 @@
         </div>
 
         <!-- Step 4 — borough chart -->
-        <div class="s4-borough-chart-panel" id="s4-step4-wrap">
+        <div class="s4-borough-chart-panel scroll-step" id="s4-step4-wrap" data-step="s4-2">
           <p class="step-index" style="margin-bottom:12px">04 — Borough summary</p>
           <h3 class="step-heading" style="margin-bottom:8px">Borough-level variation in school access</h3>
           <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px">
@@ -3286,7 +3294,6 @@ const s2StepActions = {
         source:         srcId,
         'source-layer': SCHOOLS_SRC_LAYER,
         filter:         ['==', 'top_p8_quartile_GLA', true],
-        layout:         { visibility: 'none' },  // shown at s4-1
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
@@ -3459,6 +3466,32 @@ const s2StepActions = {
         document.querySelectorAll('.s4-quality-btn').forEach(b =>
           b.classList.toggle('active', b.dataset.quality === 'p8')
         );
+      },
+
+      's4-2': () => {
+        // Reset explorer map to default zoom and P8/transit view
+        if (s4MapExplorer) {
+          s4MapExplorer.easeTo({
+            center:   EXPLORER_CENTER,
+            zoom:     EXPLORER_ZOOM,
+            duration: 1000,
+            easing:   t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t
+          });
+        }
+        // Reset school buttons to P8
+        document.querySelectorAll('#s4-school-btns .s4-ctrl-btn').forEach(b => {
+          b.className = 's4-ctrl-btn';
+        });
+        document.querySelector('#s4-school-btns .s4-ctrl-btn[data-school="p8"]')
+          ?.classList.add('active-p8');
+        // Reset mode buttons to transit
+        document.querySelectorAll('#s4-mode-btns .s4-ctrl-btn').forEach(b => {
+          b.className = 's4-ctrl-btn';
+        });
+        document.querySelector('#s4-mode-btns .s4-ctrl-btn[data-mode="transit"]')
+          ?.classList.add('active-transit');
+        // Sync map layers and legend to match
+        updateExplorer(null);
       }
     };
 
@@ -3467,24 +3500,34 @@ const s2StepActions = {
     setTimeout(() => s4StepActions['s4-0'](), 300);
 
     // ── Pin schools-legend directly above travel-time legend ────────
-    // Runs once after layout settles; uses offsetHeight so it's pixel-exact
-    // regardless of how many rows the legend has.
     (function stackS4Legends() {
-      const GAP = 8;   // px gap between the two legend boxes
-      function position() {
-        const travelLegend  = document.getElementById('s4-legend');
-        const schoolsLegend = document.getElementById('s4-schools-legend');
-        if (!travelLegend || !schoolsLegend) return;
-        const legendH = travelLegend.offsetHeight;
-        const baseBottom = parseInt(getComputedStyle(travelLegend).bottom) || 24;
-        schoolsLegend.style.bottom = (baseBottom + legendH + GAP) + 'px';
+      const GAP = 8;
+
+      // Stacks legendB directly above legendA, with GAP px between them
+      function stackAbove(legendAId, legendBId) {
+        const a = document.getElementById(legendAId);
+        const b = document.getElementById(legendBId);
+        if (!a || !b) return;
+        const baseBottom = parseInt(getComputedStyle(a).bottom) || 24;
+        b.style.bottom = (baseBottom + a.offsetHeight + GAP) + 'px';
+        b.style.left   = (parseInt(getComputedStyle(a).left) || 24) + 'px';
       }
-      // Initial pass after a render tick
-      setTimeout(position, 400);
-      // Re-run if the schools legend gains/loses its highlight row
-      const observer = new MutationObserver(position);
-      const row = document.getElementById('s4-schools-legend-highlight');
-      if (row) observer.observe(row, { attributes: true, attributeFilter: ['style'] });
+
+      function positionAll() {
+        // Comparison map (steps 1 & 2)
+        stackAbove('s4-legend', 's4-schools-legend');
+        // Explorer map (steps 3 & 4)
+        stackAbove('s4-explorer-legend', 's4-explorer-schools-legend');
+      }
+
+      setTimeout(positionAll, 400);
+
+      // Re-run when either highlight row shows/hides
+      const observer = new MutationObserver(positionAll);
+      ['s4-schools-legend-highlight', 's4-explorer-highlight-row'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el, { attributes: true, attributeFilter: ['style'] });
+      });
     })();
 
     /* ─────────────────────────────────────────
@@ -3502,6 +3545,10 @@ const s2StepActions = {
         walk:    '#66bb6a',   // green
         car:     '#4fc3f7',   // blue
       };
+
+      // Default explorer view
+      const EXPLORER_CENTER = [-0.12, 51.50];
+      const EXPLORER_ZOOM   = 9.5;
 
       // Per-mode stepped choropleth colour scales
       // Each ramp stays in a single hue family, dark→light mirrors slow→fast journey
@@ -3644,6 +3691,16 @@ const s2StepActions = {
           s4MapExplorer.setPaintProperty('explorer-fill', 'fill-color', colorExpr);
         }
 
+        // ── Reset to default view on every button toggle ──
+        if (clickedBtn && s4MapExplorer) {
+          s4MapExplorer.easeTo({
+            center:   EXPLORER_CENTER,
+            zoom:     EXPLORER_ZOOM,
+            duration: 800,
+            easing:   t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t
+          });
+        }
+
         // ── Update school dots ──
         // 'any'           → show all-schools layer, hide highlight layer
         // 'p8' / 'ofsted' → hide all-schools layer, show only filtered subset
@@ -3685,10 +3742,12 @@ const s2StepActions = {
         });
 
         // ── Update schools legend ──
+        const allSchoolsRow  = document.getElementById('s4-explorer-all-schools-row');
         const highlightRow   = document.getElementById('s4-explorer-highlight-row');
         const highlightLabel = document.getElementById('s4-explorer-highlight-label');
-        if (highlightRow)   highlightRow.style.display = isFiltered ? 'flex' : 'none';
-        if (highlightLabel) highlightLabel.textContent  = school === 'p8' ? 'Top 25% P8' : 'Ofsted Outstanding';
+        if (allSchoolsRow)  allSchoolsRow.style.display  = isFiltered ? 'none' : 'flex';
+        if (highlightRow)   highlightRow.style.display   = isFiltered ? 'flex' : 'none';
+        if (highlightLabel) highlightLabel.textContent   = school === 'p8' ? 'Top 25% P8' : 'Ofsted Outstanding';
 
         // ── Update stat card and legend title ──
         const statEl      = document.getElementById('s4-explorer-stat');
