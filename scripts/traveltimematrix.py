@@ -41,7 +41,7 @@ OUTPUT_PATH = "data/lsoa_travel_times.parquet"
 DEPARTURE = datetime(2026, 3, 17, 8, 30)
 MAX_MINS = 90
 PERCENTILE = 50
-BUFFER_M = 5_000   # 5km buffer around GLA for destination schools
+BUFFER_M = 0
 BATCH_SIZE = 200     # origins per batch
 
 # ── 1. Load origins ───────────────────────────────────────────────────────────
@@ -54,37 +54,48 @@ print(f"  {len(origins):,} origins")
 
 # ── 2. Load destinations ──────────────────────────────────────────────────────
 
-print("Loading GLA boundary and applying buffer...")
+# ── 2. Load destinations ──────────────────────────────────────────────────────
+
+print("Loading GLA boundary...")
 gla = gpd.read_file(GLA_PATH).to_crs("EPSG:27700")
+
+# Build dissolved GLA union (geopandas >=1.0 uses union_all, older uses unary_union)
+try:
+    gla_union = gla.union_all()
+except AttributeError:
+    gla_union = gla.unary_union  # older geopandas fallback
+
+# Clip boundary: buffer(0) = exact GLA boundary, no expansion
 gla_buffered = gla.copy()
-gla_buffered["geometry"] = gla.buffer(BUFFER_M)
-print(f"  Buffer: {BUFFER_M/1000:.0f}km around GLA")
+gla_buffered["geometry"] = gla.buffer(0)
+print("  Using exact GLA boundary (no buffer) for school clipping")
 
 print("Loading schools...")
-schools = pd.read_parquet(SCHOOLS_PATH)
-schools_gdf = gpd.GeoDataFrame(
-    schools,
-    geometry=gpd.points_from_xy(schools["easting"], schools["northing"]),
+schools_raw = pd.read_parquet(SCHOOLS_PATH)
+schools_gdf_all = gpd.GeoDataFrame(
+    schools_raw,
+    geometry=gpd.points_from_xy(
+        schools_raw["easting"], schools_raw["northing"]),
     crs="EPSG:27700"
 )
 
-# --- FILTER SCHOOLS IN GREATER LONDON WITH 5KM BUFFER HERE ---
-schools_buffered = gpd.clip(schools_gdf, gla_buffered).copy()
-print(f"  {len(schools_buffered):,} schools within {BUFFER_M/1000:.0f}km of GLA")
+# Filter to schools within GLA boundary
+schools_buffered = gpd.clip(schools_gdf_all, gla_buffered).copy()
+print(f"  {len(schools_buffered):,} schools within GLA boundary")
 
-# --- FILTER SCHOOLS IN LONDON HERE ---
+# --- Filter out selective and non-applicable admissions policies ---
+excluded_policies = ["Selective", "Not applicable"]
+schools_buffered = schools_buffered[
+    ~schools_buffered["admissions_policy"].isin(excluded_policies)
+].copy()
+print(f"  {len(schools_buffered):,} schools remaining after excluding Selective/NA policies")
+
+# London schools only — used for threshold calculation
 london_mask = schools_buffered["london_sub_region"].isin(
     ["Inner London", "Outer London"])
 london_schools = schools_buffered[london_mask]
-print(f"  of which {len(london_schools):,} are London schools")
-
-# --- FILTER SCHOOLS WITHOUT SELECTIVE ADMISSION HERE ---
-excluded_policies = ["Selective", "Not applicable"]
-schools_buffered = schools_buffered[~schools_buffered["admissions_policy"].isin(
-    excluded_policies)].copy()
-print(f"  {len(schools_buffered):,} schools remaining after excluding Selective/NA policies")
-
-# ------------------------------
+print(
+    f"  of which {len(london_schools):,} are London schools (used for thresholds)")
 
 # ── 3. Build destinations GeoDataFrame ────────────────────────────────────────
 
@@ -238,12 +249,15 @@ cycle_metrics = summarise(cycle_tt,   school_tags, "cycle")
 car_metrics = summarise(car_tt,     school_tags, "car")
 
 # ── 8. Merge and save ─────────────────────────────────────────────────────────
+# Anchor on all 4,994 LSOAs; left join so unroutable LSOAs appear as NaN
+lsoa_metrics = origins[["id"]].rename(columns={"id": "lsoa_id"})
 
 lsoa_metrics = (
-    transit_metrics
-    .merge(walk_metrics,  on="lsoa_id", how="outer")
-    .merge(cycle_metrics, on="lsoa_id", how="outer")
-    .merge(car_metrics,   on="lsoa_id", how="outer")
+    lsoa_metrics
+    .merge(transit_metrics, on="lsoa_id", how="left")
+    .merge(walk_metrics,    on="lsoa_id", how="left")
+    .merge(cycle_metrics,   on="lsoa_id", how="left")
+    .merge(car_metrics,   on="lsoa_id", how="left")
 )
 
 lsoa_metrics.to_parquet(OUTPUT_PATH, index=False)
