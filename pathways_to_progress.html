@@ -96,7 +96,7 @@
       right: 0;
       width: 100%; 
       height: 50px;
-      z-index: 40;
+      z-index: 15;
       pointer-events: none;
       background: linear-gradient(to bottom,
       rgba(0, 0, 0, 0.95) 0%, 
@@ -348,6 +348,14 @@
       color: var(--text-secondary);
       line-height: 1.75;
     }
+    .step-instructions {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.75;
+      padding: 14px 0px;
+      font-style: italic;
+    }
     .step-body p + p { margin-top: 12px; }
     .step-stat {
       display: inline-block;
@@ -368,7 +376,7 @@
     /* map overlay label (step label on map side) */
     .map-step-label {
       position: absolute;
-      bottom: 24px;
+      top: 24px;
       left: 24px;
       z-index: 10;
       font-family: var(--font-mono);
@@ -382,12 +390,58 @@
       border: 0.5px solid var(--border);
     }
 
+    /* tooltip for info */
+    .tooltip-term {
+      position: relative;
+      text-decoration: underline;
+      text-decoration-color: rgba(255, 144, 67, 0.45);
+      text-underline-offset: 3px;
+      cursor: help;
+      transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    }
+    .tooltip-term:hover {
+      color: var(--text-primary);
+      text-decoration-color: var(--accent);
+    }
+    .tooltip-term::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 0;
+      top: calc(100% + 10px);
+      width: 320px;
+      max-width: 38vw;
+      background: rgba(8,12,18,0.96);
+      color: var(--text-secondary);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.5;
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 300;
+      white-space: normal;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px);
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+      z-index: 50;
+      pointer-events: none;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    }
+    .tooltip-term:hover::after {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
     /* ─────────────────────────────────────────
        MAP LEGEND
     ───────────────────────────────────────── */
     .map-legend {
       position: absolute;
-      bottom: 70px;        
+      bottom: 20px;        
       left: 24px;
       z-index: 10;
       background: rgba(8,12,18,0.85);
@@ -471,12 +525,6 @@
       border: 0.5px solid var(--border-mid);
       border-radius: 8px;
       padding: 14px 16px;
-    }
-
-    .metric-box:hover {
-      border-color: var(--accent);
-      transform: translateY(-1px);
-      transition: 0.2s ease;
     }
 
     .metric-value {
@@ -646,17 +694,6 @@
         rgba(8,12,18,0.1) 60%,
         rgba(8,12,18,0.0) 100%
       );
-    }
-
-    .footnotes {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      color: var(--text-secondary);
-      margin-top: 24px;
-      margin-bottom: 48px;
-      opacity: 0.7;
-      line-height: 1.5;
     }
 
     /* Responsive */
@@ -834,6 +871,7 @@
       top: 0;
       height: 100vh;
       overflow: hidden;
+      z-index: 60;
     }
     .s4-explorer-map-col .map-canvas {
       width: 100%;
@@ -919,7 +957,7 @@
       top: 16px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 22;
+      z-index: 50;
       display: flex;             /* shown/hidden by JS */
       flex-direction: row;
       gap: 6px;
@@ -990,6 +1028,7 @@
       transform: translateX(-50%);
       /* smooth scroll-driven transitions; JS disables for drag */
       transition: left 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 50;
     }
     #map-compare-slider::before {
       content: '◀ ▶';
@@ -1011,7 +1050,7 @@
     #s4-label-left, #s4-label-right {
       position: absolute;
       top: 16px;
-      z-index: 21;
+      z-index: 50;
       font-family: var(--font-mono);
       font-size: 15px;
       letter-spacing: 0.12em;
@@ -1050,7 +1089,7 @@
       bottom: 24px;
       left: 24px;
       right: auto;          /* override any right-anchoring from global rule */
-      z-index: 21;
+      z-index: 50;
     }
     #s4-schools-legend {
       position: absolute;
@@ -1058,7 +1097,7 @@
          fallback keeps it visible even without JS measurement */
       bottom: 178px;        /* approx: legend ~154px + 24px gap */
       left: 24px;
-      z-index: 21;
+      z-index: 50;
       background: rgba(8,12,18,0.85);
       border: 0.5px solid var(--border-mid);
       padding: 8px 12px;
@@ -1424,6 +1463,34 @@
     .mapboxgl-ctrl-logo,
     .mapboxgl-ctrl-attrib { display: none !important; }
 
+    /* Zoom controlers */
+    .mapboxgl-ctrl-group {
+      background: rgba(8, 12, 18, 0.9) !important;
+      border: 0.5px solid rgba(255, 144, 67, 0.25) !important;
+      border-radius: 6px !important;
+      box-shadow: none !important;
+      overflow: hidden;
+    }
+    /* Buttoms*/
+    .mapboxgl-ctrl-group button {
+      background: transparent !important;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+    }
+    /* Hover */
+    .mapboxgl-ctrl-group button:hover {
+      background: rgba(255, 144, 67, 0.1) !important;
+    }
+    /* Icons (+ -) */
+    .mapboxgl-ctrl-group button span {
+      filter: invert(1); /* los vuelve blancos */
+    }
+    /* Line */
+    .mapboxgl-ctrl-group button + button {
+      border-top: 0.5px solid rgba(255, 144, 67, 0.2);
+    }
+
     /* ─────────────────────────────────────────
        RESPONSIVE
     ───────────────────────────────────────── */
@@ -1535,7 +1602,7 @@
           <!-- School dot legend (default) -->
           <div id="s2-legend-schools">
             <div class="legend-row">
-              <div class="legend-swatch" style="background:#ffffff;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
+              <div class="legend-swatch" style="background:#ffffff; border:2px solid #FF9043;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
               <span>School location</span>
             </div>
           </div>
@@ -1583,9 +1650,9 @@
               of education of the school, its admissions policy, or how long it takes a child
               in any given neighbourhood to reach it.
             </p>
-            <p>
-              Click on each dot to find out more about each school. 
-            </p>
+          </div>
+          <div class="step-instructions">
+               Click on each dot to find out more about each school.
           </div>
         </div>
 
@@ -1614,7 +1681,9 @@
               <strong style="color:var(--accent)">7 schools</strong>.
               The transit network simply does not extend here with the same density.
             </p>
-            <p>Click to compare the two areas:</p>
+          <div class="step-instructions">
+            Click to compare the two areas:
+          </div> 
           </div>
 
                   <!-- Toggle buttons -->
@@ -1653,7 +1722,14 @@
                 <div class="pillar-num">02</div>
                 <div class="pillar-title">Access to opportunity</div>
               </div>
-              <div class="pillar-desc">How does this change for Ofsted-Outstanding schools, and schools with strong Progress 8 scores?</div>
+              <div class="pillar-desc">
+                How does this change for 
+              <span class="tooltip-term" data-tooltip="Highest rating given by the UK schools inspectorate (Ofsted), indicating exceptional quality of teaching, leadership, and student outcomes.">
+                Ofsted-Outstanding schools </span>, 
+                and schools with strong 
+              <span class="tooltip-term" data-tooltip="Measures how much progress students make between primary school and GCSEs. A score above 0 indicates above-average progress.">
+                Progress 8 scores</span>?
+              </div>
             </div>
             <div class="pillar-card" style="padding:16px 20px">
               <div class="pillar-header">
@@ -1663,12 +1739,6 @@
               <div class="pillar-desc">Where might poor connectivity and deprivation affecting children intersect?</div>
             </div>
           </div>
-
-           <!-- Footnote -->
-          <p class="footnotes">
-            <br>Ofsted Outstanding: Highest rating given by the UK schools inspectorate (Ofsted), indicating exceptional quality of teaching, leadership, and student outcomes.
-            <br>Progress 8: Measures how much progress students make between primary school and GCSEs. A score above 0 indicates above-average progress.
-          </p>
         </div>
       </div>
     </div>
@@ -2352,12 +2422,12 @@
   /* ─────────────────────────────────────────
      MAP 2 — MOTIVATION (schools + isochrones)
   ───────────────────────────────────────── */
-  const s2Map = initMap('s2-map', { zoom: 9.5 });
+  const s2Map = initMap('s2-map', { zoom: 9.25, extra: { minZoom: 9 } });
 
   if (s2Map) {
     s2Map.on('load', () => {
       // Add controls
-      s2Map.addControl(new mapboxgl.NavigationControl());
+      s2Map.addControl(new mapboxgl.NavigationControl(), 'top-right');
       s2Map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
 
       // ── Darken the basemap ──────────────────────────────────────────
@@ -2413,7 +2483,7 @@
         source: 'la_source',
         'source-layer': 'LAD_Simplified-9zfv2n', 
         paint: {
-          'line-color': '#957D4E',   // light grey for dark map
+          'line-color': '#a4a2a2',   // light grey for dark map
           'line-width': [
             'interpolate',
             ['linear'],
@@ -2437,25 +2507,20 @@
           // Grow slightly on hover
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
-            8, ['case', ['boolean', ['feature-state', 'hovered'], false], 4,  3],
-            12,['case', ['boolean', ['feature-state', 'hovered'], false], 8,  5]
+            11, ['case', ['boolean', ['feature-state', 'hovered'], false], 4,  3],
+            15, ['case', ['boolean', ['feature-state', 'hovered'], false], 8,  5]
           ],
           // Brighten fill on hover
           'circle-color': [
             'case',
             ['boolean', ['feature-state', 'hovered'], false],
             '#EE4B2B',   // hover — brighter red
-            '#fff6ec'    // default
+            '#ffffff'    // default
           ],
           'circle-opacity': 0.9,
           // Thin stroke only on hover, invisible otherwise
-          'circle-stroke-width': [
-            'case',
-            ['boolean', ['feature-state', 'hovered'], false],
-            1.5,
-            0
-          ],
-          'circle-stroke-color': '#EE4B2B',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#c96820',
           'circle-stroke-opacity': 0.9
         }
       }, 'waterway-label');
@@ -3056,7 +3121,7 @@ const s2StepActions = {
     window.setCustomLabelOpacity(null);   
 
     s2Map.easeTo({
-      zoom: 9.5, center: [-0.12, 51.50],
+      zoom: 9.25, center: [-0.12, 51.50], extra: { minZoom: 9 },
       pitch: 0, bearing: 0, duration: 1000
     });
     document.getElementById('s2-map-label').textContent =
@@ -3142,7 +3207,7 @@ const s2StepActions = {
      window.setCustomLabelOpacity('both');
     
     s2Map.flyTo({
-      zoom:     9.5,
+      zoom:     9.25,
       center:   [-0.12, 51.50],
       pitch:    0,
       bearing:  0,
@@ -3176,8 +3241,8 @@ const s2StepActions = {
     ];
 
     // ── Initialise both comparison maps ────────────────────────────
-    const s4MapBase  = initMap('s4-map-base',  { zoom: 9.5 });
-    const s4MapRight = initMap('s4-map-right', { zoom: 9.5 });
+    const s4MapBase  = initMap('s4-map-base',  { zoom: 9.25 });
+    const s4MapRight = initMap('s4-map-right', { zoom: 9.25 });
 
     // ── LSOA choropleth helper ──────────────────────────────────────
     function addS4ChoroLayer(map, srcId, field) {
@@ -3576,7 +3641,7 @@ const s2StepActions = {
         ],
       };
 
-      const s4MapExplorer = initMap('s4-map-explorer', { zoom: 9.5 });
+      const s4MapExplorer = initMap('s4-map-explorer', { zoom: 9.25, extra: { minZoom: 9 } });
       let explorerLoaded = false;
 
       if (s4MapExplorer) {
@@ -3766,7 +3831,7 @@ const s2StepActions = {
   /* ─────────────────────────────────────────
      MAP 5 — VULNERABILITY (LISA clusters)
   ───────────────────────────────────────── */
-  const s5Map = initMap('s5-map', { zoom: 9.5 });
+  const s5Map = initMap('s5-map', { zoom: 9.25, extra: { minZoom: 9 } });
   if (s5Map) {
     s5Map.on('load', () => {
       s5Map.addSource('lisa', { type: 'geojson', data: DATA.lsoa_lisa });
@@ -3801,7 +3866,7 @@ const s2StepActions = {
   }
 
   const s5StepActions = {
-    's5-0': () => { if (s5Map) s5Map.easeTo({ zoom: 9.5, center: [-0.12, 51.50], pitch: 0 }); },
+    's5-0': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, center: [-0.12, 51.50], pitch: 0 }); },
     's5-1': () => { if (s5Map) s5Map.easeTo({ zoom: 10.5, center: [-0.05, 51.47], pitch: 20 }); },
     's5-2': () => { if (s5Map) s5Map.easeTo({ zoom: 10, center: [-0.15, 51.52], pitch: 15 }); }
   };
