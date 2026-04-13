@@ -349,7 +349,7 @@
       line-height: 1.75;
     }
     .step-instructions {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 300;
       color: var(--text-muted);
       line-height: 1.75;
@@ -698,6 +698,18 @@
         rgba(8,12,18,0.1) 60%,
         rgba(8,12,18,0.0) 100%
       );
+    }
+
+    .motivation-img-credit {
+      position: absolute;
+      bottom: 12px;
+      right: 14px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      letter-spacing: 0.06em;
+      color: rgba(240, 236, 228, 0.35);
+      z-index: 10;
+      pointer-events: none;
     }
 
     /* Responsive */
@@ -1602,9 +1614,8 @@
           <!-- Left-fade mask so image bleeds into background -->
           <div class="motivation-img-mask"></div>
         </div>
+          <p class="motivation-img-credit">Photo: Hounslow Council Images</p>
       </div>
-
-
     </div>
         
     <!-- Sticky map + scroll steps -->
@@ -1724,6 +1735,9 @@
         <div class="scroll-step" data-step="s2-3">
           <p class="step-index">03 — What we explore</p>
           <h3 class="step-heading">We investigate how school access varies across London using three lenses</h3>
+          <p>
+            <br>
+          </p>
           <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px;">
             <div class="pillar-card" style="padding:16px 20px">
               <div class="pillar-header">
@@ -1754,6 +1768,10 @@
               <div class="pillar-desc">Where might poor connectivity and deprivation affecting children intersect?</div>
             </div>
           </div>
+          <p>
+            <br>
+            <br>
+          </p>
         </div>
       </div>
     </div>
@@ -1865,6 +1883,7 @@
         />
         <div class="motivation-img-mask"></div>
       </div>
+      <p class="motivation-img-credit">Photo: Gary John Norman / GettyImages</p>
     </div>
   </div>
 
@@ -1957,10 +1976,14 @@
               </div>
             </div>
             <p>
-              Highlighted dots show qualifying schools for the selected metric: <strong>Top 25% Progress 8 scores</strong> and <strong>Ofsted Outstanding ratings</strong>.
+              Highlighted dots show qualifying schools for the selected metric: 
+              <br><strong style="color:#FF9043">Top 25% Progress 8 scores</strong> and <strong style="color:#FF9043">Ofsted Outstanding ratings</strong>.
               <br>
-              <br> Use the toggle above the map to select the desired metric. 
-              <br> Use the slider to see how travel times compare with the baseline scenario. 
+              <div class="step-instructions">
+                <br>Use the buttons above the map to toggle between different filters. 
+                <br>Use the slider to see how travel times compare with the baseline scenario. 
+              </div>
+              <br> 
               <br>
               <br>
               <br>
@@ -2088,6 +2111,7 @@
           />
           <div class="motivation-img-mask"></div>
         </div>
+          <p class="motivation-img-credit">Photo: Matt Cardy/Getty Images</p>
       </div>
     </div>
 
@@ -3286,6 +3310,32 @@ const s2StepActions = {
     const s4MapBase  = initMap('s4-map-base',  { zoom: 9.25 });
     const s4MapRight = initMap('s4-map-right', { zoom: 9.25 });
 
+     // Reusable basemap darkening — applied to both S4 maps
+    function darkenBasemap(map) {
+      map.setPaintProperty('land', 'background-color', '#171717');
+      map.setPaintProperty('landuse', 'fill-color', '#171717');
+      map.setPaintProperty('landuse', 'fill-opacity', 0.9);
+      map.setPaintProperty('national-park', 'fill-color', '#1c1c1c');
+      map.setPaintProperty('national-park', 'fill-opacity', 0.9);
+      map.setPaintProperty('road-simple', 'line-color', '#2a2a2a');
+      map.setPaintProperty('water', 'fill-color', '#080808');
+
+      ['settlement-label', 'settlement-major-label', 'settlement-minor-label',
+       'state-label', 'country-label'].forEach(id => {
+        if (map.getLayer(id)) {
+          map.setPaintProperty(id, 'text-color', '#FFFFFF');
+          map.setPaintProperty(id, 'text-halo-color', '#000000');
+          map.setPaintProperty(id, 'text-halo-width', 1.7);
+          map.setPaintProperty(id, 'text-halo-blur', 0.2);
+        }
+      });
+
+      if (map.getLayer('settlement-subdivision-label', 'poi-label', 'airport-label'))
+        map.setLayoutProperty('settlement-subdivision-label', 'visibility', 'none');
+        map.setLayoutProperty('poi-label', 'visibility', 'none');
+        map.setLayoutProperty('airport-label', 'visibility', 'none');
+    }
+
     // ── LSOA choropleth helper ──────────────────────────────────────
     function addS4ChoroLayer(map, srcId, field) {
       if (!map) return;
@@ -3300,7 +3350,7 @@ const s2StepActions = {
           'fill-opacity':       0.8,
           'fill-outline-color': 'rgba(0,0,0,0.02)'
         }
-      });
+      }, 'waterway-label');
     }
 
     // ── Borough boundary helper ─────────────────────────────────────
@@ -3317,7 +3367,7 @@ const s2StepActions = {
           'line-width':   ['interpolate', ['linear'], ['zoom'], 8, 0.7, 12, 1.5],
           'line-opacity': 0.9
         }
-      });
+      }, 'waterway-label');
     }
 
     // ── Left map: all schools as dim white dots (with hover) ───────
@@ -3352,35 +3402,7 @@ const s2StepActions = {
           'circle-stroke-color':   '#EE4B2B',
           'circle-stroke-opacity': 0.9
         }
-      });
-
-      // Hover state
-      let hoveredId = null;
-      map.on('mousemove', 'base-schools-all', (e) => {
-        if (!e.features.length) return;
-        map.getCanvas().style.cursor = 'pointer';
-        if (hoveredId !== null) {
-          map.setFeatureState(
-            { source: srcId, sourceLayer: SCHOOLS_SRC_LAYER, id: hoveredId },
-            { hovered: false }
-          );
-        }
-        hoveredId = e.features[0].id;
-        map.setFeatureState(
-          { source: srcId, sourceLayer: SCHOOLS_SRC_LAYER, id: hoveredId },
-          { hovered: true }
-        );
-      });
-      map.on('mouseleave', 'base-schools-all', () => {
-        map.getCanvas().style.cursor = '';
-        if (hoveredId !== null) {
-          map.setFeatureState(
-            { source: srcId, sourceLayer: SCHOOLS_SRC_LAYER, id: hoveredId },
-            { hovered: false }
-          );
-          hoveredId = null;
-        }
-      });
+      }, 'waterway-label');
     }
 
     // ── Right map: quality-filtered dots only ───────────────────────
@@ -3412,13 +3434,14 @@ const s2StepActions = {
           'circle-stroke-color':   '#fff',
           'circle-stroke-opacity': 0.7
         }
-      });
+      },'waterway-label');
     }
 
     // ── Single load handler per map: choro → borough → schools ─────
     // Explicit ordering ensures dots always render above fill + boundaries.
     if (s4MapBase) {
       s4MapBase.on('load', () => {
+        darkenBasemap(s4MapBase);
         addS4ChoroLayer(s4MapBase,  'base-lsoa',  'tt_transit_nearest_any');
         addS4BoroughLayer(s4MapBase,  'base');
         addS4AllSchoolsLayer(s4MapBase);    // left: all schools (white dots)
@@ -3426,6 +3449,7 @@ const s2StepActions = {
     }
     if (s4MapRight) {
       s4MapRight.on('load', () => {
+        darkenBasemap(s4MapRight);
         addS4ChoroLayer(s4MapRight, 'right-lsoa', 'tt_transit_nearest_top25_p8');
         addS4BoroughLayer(s4MapRight, 'right');
         addS4HighlightLayer(s4MapRight);    // right: filtered dots only (orange)
@@ -3684,7 +3708,9 @@ const s2StepActions = {
 
       if (s4MapExplorer) {
         s4MapExplorer.on('load', () => {
-          // ── Choropleth ──
+          // Darken Basemap
+          darkenBasemap(s4MapExplorer);
+          // Choropleth 
           s4MapExplorer.addSource('explorer-lsoa', { type: 'vector', url: S4_TILESET });
           s4MapExplorer.addLayer({
             id:             'explorer-fill',
@@ -3696,7 +3722,7 @@ const s2StepActions = {
               'fill-opacity':       0.8,
               'fill-outline-color': 'rgba(0,0,0,0.02)'
             }
-          });
+          }, 'waterway-label');
 
           // ── Borough boundaries ──
           s4MapExplorer.addSource('explorer-la', { type: 'vector', url: 'mapbox://teechinminben.8wonydq8' });
@@ -3710,7 +3736,7 @@ const s2StepActions = {
               'line-width':   ['interpolate', ['linear'], ['zoom'], 8, 0.7, 12, 1.5],
               'line-opacity': 0.9
             }
-          });
+          }, 'waterway-label');
 
           // ── All schools (white dots) ──
           s4MapExplorer.addSource('explorer-schools-src', {
@@ -3728,7 +3754,7 @@ const s2StepActions = {
               'circle-color':   '#fff6ec',
               'circle-opacity': 0.8,
             }
-          });
+          }, 'waterway-label');
 
           // ── Quality-filtered dots ──
           s4MapExplorer.addLayer({
@@ -3745,7 +3771,7 @@ const s2StepActions = {
               'circle-stroke-color':   '#fff',
               'circle-stroke-opacity': 0.7
             }
-          });
+          }, 'waterway-label');
 
           explorerLoaded = true;
           updateExplorer(null);
