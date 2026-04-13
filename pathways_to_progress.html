@@ -30,7 +30,7 @@
       --border-mid:  rgba(255,144,67,0.22);
 
       --text-primary:   #f0ece4;
-      --text-secondary: #d1c0ae;
+      --text-secondary: #d1c0ae; 
       --text-muted:     #836e5a;
 
       --accent:      #FF9043;      /* high-hue orange — primary */
@@ -83,12 +83,28 @@
       text-transform: uppercase;
       color: var(--text-muted);
       text-decoration: none;
-      padding: 5px 10px;
+      padding: 0px 10px;
       border-radius: 3px;
       transition: color 0.2s, background 0.2s;
     }
     #top-nav a:hover  { color: var(--text-secondary); }
-    #top-nav a.active { color: var(--accent); background: rgba(255,144,67,0.10); }
+    #top-nav a.active { color: var(--accent); background: rgba(107,65,38,0.65); }
+
+    #top-fade {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 100%; 
+      height: 50px;
+      z-index: 40;
+      pointer-events: none;
+      background: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0.95) 0%, 
+      rgba(0, 0, 0, 0.75) 40%, 
+      rgba(0, 0, 0, 0.4) 70%, 
+      rgba(0, 0, 0, 0) 100%
+      );
+    }
 
     /* ─────────────────────────────────────────
        SCROLL DOT RAIL
@@ -269,6 +285,7 @@
       top: 0;
       height: 100vh;
       overflow: hidden;
+      z-index: 120;
     }
     .sticky-map-col .map-canvas {
       width: 100%;
@@ -279,6 +296,17 @@
       display: flex;
       flex-direction: column;
       gap: 0;
+    }
+    #s2-motivation .scroll-narrative-col {
+      position: relative;
+    }
+    #s2-motivation .scroll-step {
+      position: relative;
+      z-index: 4;
+    }
+    #s4-map-explorer {
+      position: relative;
+      z-index: 120;
     }
 
     /* ─────────────────────────────────────────
@@ -1420,6 +1448,9 @@
   <!-- ═══════════════════════════════════════
        TOP NAV
   ═══════════════════════════════════════ -->
+
+  <div id="top-fade"></div>
+
   <nav id="top-nav" aria-label="Page sections">
     <a href="#s1-hero"          class="nav-link active" data-section="0">Intro</a>
     <a href="#s2-motivation"    class="nav-link"        data-section="1">Motivation</a>
@@ -2227,7 +2258,7 @@
   /* ─────────────────────────────────────────
      CONFIGURATION — edit these values
   ───────────────────────────────────────── */
-  const MAPBOX_TOKEN = 'pk.eyJ1IjoidGVlY2hpbm1pbmJlbiIsImEiOiJjbW5zdmY5cm0wNHV3Mm9zaGNteWF3Nm1yIn0._RlOi9ksVyUQju810F2H9w'; 
+  const MAPBOX_TOKEN = 'pk.eyJ1IjoidGVlY2hpbm1pbmJlbiIsImEiOiJjbWtmcTJldHgwMWg2M2lzYnV2cnUzN2twIn0.6iawA9W8OLSwrcV_ZHG41g'; 
   // GeoJSON URLs — host these alongside index.html or on a CDN
   const DATA = {
     schools:          './data/schools.geojson',
@@ -2374,7 +2405,7 @@
         source: 'la_source',
         'source-layer': 'LAD_Simplified-9zfv2n', 
         paint: {
-          'line-color': '#a4a2a2',   // light grey for dark map
+          'line-color': '#957D4E',   // light grey for dark map
           'line-width': [
             'interpolate',
             ['linear'],
