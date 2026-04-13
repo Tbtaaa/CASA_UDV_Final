@@ -25,6 +25,15 @@ Data Sources:
                Auto-downloaded to large/, cached as data/imd.parquet
                Published October 2025. Uses 2021 LSOA boundaries — matches GIAS directly.
 
+  6. Workforce - School Workforce in England — Pupil to teacher ratios, school level
+               Reporting Year 2024 (2024/25 academic year)
+               Auto-downloaded to large/, cached as data/workforce.parquet
+
+  7. GLA      - Greater London Authority boundary (shapefile)
+               Auto-downloaded to large/, cached as data/gla_boundary.parquet
+               Used with 5 km buffer to derive top-quartile Att8/P8 flags for
+               schools in the London region.
+
 Caching strategy:
   large/   Raw CSVs as downloaded (large files, kept for reference / re-processing)
   data/    Parquet versions (fast to read, type-safe, compressed)
@@ -51,13 +60,16 @@ Post-processing (London filter example):
   london = df[df["london_sub_region"].isin(["Inner London", "Outer London"])]
 
 Requirements:
-  pip install pandas requests pyarrow
+  pip install pandas requests pyarrow geopandas shapely
 """
 
 import os
 import io
+import zipfile
 import pandas as pd
 import requests
+import geopandas as gpd
+from shapely.geometry import Point
 
 # ==============================================================
 # DIRECTORIES
@@ -130,6 +142,28 @@ SOURCES = {
         "large":    "large/imd2025_file7.csv",
         "data":     "data/imd.parquet",
         "encoding": "utf-8",
+    },
+    "workforce": {
+        # School Workforce in England — Pupil to teacher ratios, school level (2024/25)
+        # https://explore-education-statistics.service.gov.uk/data-catalogue/data-set/12849f4a-1427-4dc2-9f7a-e069087824aa
+        "url": (
+            "https://explore-education-statistics.service.gov.uk"
+            "/data-catalogue/data-set/12849f4a-1427-4dc2-9f7a-e069087824aa/csv"
+        ),
+        "large":    "large/workforce_pupil_teacher_ratios_school.csv",
+        "data":     "data/workforce.parquet",
+        "encoding": "utf-8",
+    },
+    "gla_boundary": {
+        # Greater London Authority boundary (shapefile in zip)
+        # Used for spatial filtering: top Att8/P8 quartile within GLA + 5 km buffer
+        "url": (
+            "https://data.london.gov.uk/download/20od9/"
+            "114d1137-e339-4b50-b409-124c17f4b59a/gla.zip"
+        ),
+        "large":    "large/gla.zip",
+        "data":     "data/gla_boundary.parquet",
+        "format":   "shapefile_zip",   # signals special handling (not a CSV)
     },
 }
 
@@ -750,10 +784,151 @@ def load_imd():
 
 
 # ==============================================================
+# STEP 6: School Workforce — Pupil:Teacher Ratios
+# ==============================================================
+
+def load_workforce():
+    """
+    School Workforce in England — Pupil to teacher ratios, school level.
+    Reporting Year 2024 (2024/25 academic year).
+    Published June 2025.
+
+    Source: DfE School Workforce in England
+    https://explore-education-statistics.service.gov.uk/data-catalogue/data-set/12849f4a-1427-4dc2-9f7a-e069087824aa
+
+    The file covers multiple years (2010/11–2024/25) and all school types.
+    Filtered to: time_period == 202425 (most recent year only).
+
+    Fields retained:
+      wf_pupils_fte                       Total full-time equivalent pupils
+      wf_qualified_teachers_fte           Full-time equivalent qualified teachers
+      wf_teachers_fte                     Full-time equivalent all teachers (qualified + unqualified)
+      wf_pupil_to_qual_unqual_teacher_ratio  Pupils per teacher (qualified and unqualified combined)
+    """
+    print("\n[6/6] Loading School Workforce — pupil:teacher ratios (2024/25)...")
+    df = ensure_parquet("workforce")
+    if df is None or df.empty:
+        return pd.DataFrame(columns=["URN"])
+
+    print(f"  Loaded {len(df):,} rows (all years, all school types)")
+    df = normalise_urn(df)
+
+    # Filter to most recent year only
+    year_col = next((c for c in df.columns
+                     if "time_period" in c.lower()), None)
+    if year_col:
+        df = df[df[year_col].astype(str).str.contains("202425", na=False)].copy()
+        print(f"  After 2024/25 filter: {len(df):,} rows")
+
+    rename = {
+        "pupils_fte":                          "wf_pupils_fte",
+        "qualified_teachers_fte":              "wf_qualified_teachers_fte",
+        "teachers_fte":                        "wf_teachers_fte",
+        "pupil_to_qual_unqual_teacher_ratio":  "wf_pupil_to_qual_unqual_teacher_ratio",
+    }
+    df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
+
+    keep = [
+        "URN",
+        "wf_pupils_fte",
+        "wf_qualified_teachers_fte",
+        "wf_teachers_fte",
+        "wf_pupil_to_qual_unqual_teacher_ratio",
+    ]
+    df = select(df, keep, "Workforce")
+
+    for col in df.columns:
+        if col != "URN":
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    df = df.drop_duplicates("URN")
+    print(f"  Retained {len(df):,} schools, {len(df.columns)} fields")
+    return df
+
+
+# ==============================================================
+# STEP 7: GLA Boundary (spatial layer)
+# ==============================================================
+
+def load_gla_boundary():
+    """
+    GLA boundary — Greater London Authority boundary shapefile.
+    Downloaded as a zip containing a shapefile.
+
+    Used to derive top_att8_quartile_GLA and top_p8_quartile_GLA:
+      Schools within GLA boundary + 5 km buffer, with non-null Att8/P8,
+      flagged 1 if in the top 25 %, else 0.
+
+    Returns:
+      gpd.GeoDataFrame with the GLA boundary in British National Grid (EPSG:27700),
+      or None if unavailable.
+    """
+    print("\n[7/7] Loading GLA boundary...")
+    src      = SOURCES["gla_boundary"]
+    parquet  = src["data"]
+    zip_path = src["large"]
+    url      = src.get("url")
+
+    # ── 1. Fast path: parquet cache already exists ────────────
+    if os.path.exists(parquet):
+        size_mb = os.path.getsize(parquet) / 1_048_576
+        print(f"    [cache hit]  {parquet}  ({size_mb:.1f} MB)")
+        gdf = gpd.read_parquet(parquet)
+        return gdf
+
+    # ── 2. Zip already in large/ ──────────────────────────────
+    if not os.path.exists(zip_path):
+        if url:
+            print(f"    [download]   {url[:80]}...")
+            resp = requests.get(url, timeout=300)
+            resp.raise_for_status()
+            with open(zip_path, "wb") as f:
+                f.write(resp.content)
+            zip_mb = os.path.getsize(zip_path) / 1_048_576
+            print(f"    Saved zip     → {zip_path}  ({zip_mb:.1f} MB)")
+        else:
+            print(f"\n  *** MANUAL DOWNLOAD REQUIRED for 'gla_boundary' ***")
+            print(f"  Place the zip at: {zip_path}")
+            return None
+
+    # ── 3. Read shapefile from zip ────────────────────────────
+    # Extract to a temp folder so pyogrio gets an absolute path on all platforms
+    print(f"    [large/ hit] {zip_path} — extracting and reading shapefile...")
+    extract_dir = os.path.join(DIR_LARGE, "gla_extracted")
+    abs_zip = os.path.abspath(zip_path)
+    with zipfile.ZipFile(abs_zip, "r") as zf:
+        zf.extractall(extract_dir)
+
+    # Find the .shp file inside the extracted folder
+    shp_files = [
+        os.path.join(root, f)
+        for root, _, files in os.walk(extract_dir)
+        for f in files if f.lower().endswith(".shp")
+    ]
+    if not shp_files:
+        print("  ERROR: no .shp file found inside gla.zip")
+        return None
+    shp_path = shp_files[0]
+    print(f"    Reading: {shp_path}")
+    gdf = gpd.read_file(shp_path)
+
+    # Ensure British National Grid
+    if gdf.crs is None:
+        gdf = gdf.set_crs(epsg=27700)
+    elif gdf.crs.to_epsg() != 27700:
+        gdf = gdf.to_crs(epsg=27700)
+
+    gdf.to_parquet(parquet, index=False)
+    pq_mb = os.path.getsize(parquet) / 1_048_576
+    print(f"    Saved parquet → {parquet}  ({pq_mb:.1f} MB)")
+    return gdf
+
+
+# ==============================================================
 # DERIVED FIELDS
 # ==============================================================
 
-def add_derived_fields(db):
+def add_derived_fields(db, gla_boundary=None):
     """
     Compute analytical derived fields after all joins are complete.
 
@@ -763,6 +938,12 @@ def add_derived_fields(db):
                                           (Sub-RQ 2 key variable; uses GIAS percentage_fsm
                                            as fallback — full version pending pupil
                                            characteristics data source)
+    4. top_att8_quartile_GLA            — 1 if school is in top 25 % of Att8 scores
+                                          among schools within GLA boundary + 5 km buffer
+                                          (excluding nulls), else 0
+    5. top_p8_quartile_GLA             — 1 if school is in top 25 % of Progress 8 scores
+                                          among schools within GLA boundary + 5 km buffer
+                                          (excluding nulls), else 0
     """
     print("\n[Derived fields]")
 
@@ -808,6 +989,73 @@ def add_derived_fields(db):
             )
             print(f"  intake_neighbourhood_gap: computed (using {fsm_col})")
 
+    # ── GLA top-quartile flags ────────────────────────────────
+    # Schools within GLA boundary + 5 km buffer, non-null scores,
+    # top 25 % flagged as 1, rest as 0.
+    db["top_att8_quartile_GLA"] = 0
+    db["top_p8_quartile_GLA"]   = 0
+
+    if gla_boundary is not None and "easting" in db.columns and "northing" in db.columns:
+        print("\n  [GLA top-quartile derivation]")
+
+        # Build school points (BNG) — only rows with valid coordinates
+        east = pd.to_numeric(db["easting"], errors="coerce")
+        north = pd.to_numeric(db["northing"], errors="coerce")
+        has_coords = east.notna() & north.notna()
+
+        if has_coords.any():
+            geom = [Point(e, n) for e, n in zip(east[has_coords], north[has_coords])]
+            schools_gdf = gpd.GeoDataFrame(
+                db.loc[has_coords].copy(),
+                geometry=geom,
+                crs="EPSG:27700",
+            )
+
+            # Dissolve GLA boundary to single polygon and buffer by 5 km
+            gla_dissolved = gla_boundary.dissolve().to_crs(epsg=27700)
+            gla_buffered  = gla_dissolved.buffer(5000).union_all()   # 5 km buffer
+            print(f"    GLA boundary buffered by 5 km")
+
+            # Spatial filter: schools within the buffered boundary
+            in_gla = schools_gdf.within(gla_buffered)
+            gla_schools = schools_gdf.loc[in_gla]
+            print(f"    Schools within GLA + 5 km buffer: {len(gla_schools):,}")
+
+            # --- Top Att8 quartile ---
+            if "ks4_attainment8" in gla_schools.columns:
+                att8_valid = gla_schools["ks4_attainment8"].dropna()
+                if len(att8_valid) >= 4:
+                    threshold_att8 = att8_valid.quantile(0.75)
+                    top_att8_idx = gla_schools.loc[
+                        gla_schools["ks4_attainment8"].notna()
+                        & (gla_schools["ks4_attainment8"] >= threshold_att8)
+                    ].index
+                    db.loc[top_att8_idx, "top_att8_quartile_GLA"] = 1
+                    print(f"    top_att8_quartile_GLA: {len(top_att8_idx):,} schools flagged "
+                          f"(threshold >= {threshold_att8:.1f})")
+                else:
+                    print("    top_att8_quartile_GLA: too few valid scores to compute quartile")
+
+            # --- Top P8 quartile ---
+            if "ks4_progress8" in gla_schools.columns:
+                p8_valid = gla_schools["ks4_progress8"].dropna()
+                if len(p8_valid) >= 4:
+                    threshold_p8 = p8_valid.quantile(0.75)
+                    top_p8_idx = gla_schools.loc[
+                        gla_schools["ks4_progress8"].notna()
+                        & (gla_schools["ks4_progress8"] >= threshold_p8)
+                    ].index
+                    db.loc[top_p8_idx, "top_p8_quartile_GLA"] = 1
+                    print(f"    top_p8_quartile_GLA: {len(top_p8_idx):,} schools flagged "
+                          f"(threshold >= {threshold_p8:.2f})")
+                else:
+                    print("    top_p8_quartile_GLA: too few valid scores to compute quartile")
+    else:
+        if gla_boundary is None:
+            print("  GLA top-quartile: skipped (GLA boundary not loaded)")
+        else:
+            print("  GLA top-quartile: skipped (easting/northing missing)")
+
     return db
 
 
@@ -824,11 +1072,13 @@ def build_database():
     print(f"    data/   — parquet cache (fast reads on subsequent runs)")
 
     # Load all sources — each resolves via ensure_parquet()
-    gias   = load_gias()
-    ofsted = load_ofsted()
-    ks4    = load_ks4()
-    scap   = load_scap()
-    imd    = load_imd()
+    gias         = load_gias()
+    ofsted       = load_ofsted()
+    ks4          = load_ks4()
+    scap         = load_scap()
+    imd          = load_imd()
+    workforce    = load_workforce()
+    gla_boundary = load_gla_boundary()
 
     if gias is None or gias.empty or len(gias) <= 1:
         print(
@@ -840,9 +1090,10 @@ def build_database():
     # Merge on URN
     print("\n[Merging on URN...]")
     db = gias.copy()
-    db = merge_report(db, ofsted, "Ofsted", "overall_effectiveness")
-    db = merge_report(db, ks4,    "KS4",    "ks4_attainment8")
-    db = merge_report(db, scap,   "SCAP",   "scap_utilisation_pct")
+    db = merge_report(db, ofsted,    "Ofsted",    "overall_effectiveness")
+    db = merge_report(db, ks4,       "KS4",       "ks4_attainment8")
+    db = merge_report(db, scap,      "SCAP",      "scap_utilisation_pct")
+    db = merge_report(db, workforce, "Workforce", "wf_pupil_to_qual_unqual_teacher_ratio")
 
     # Join IMD 2025 on lsoa_code (2021 boundaries — matches GIAS directly, no lookup needed)
     if imd is not None and "lsoa_code" in db.columns:
@@ -854,7 +1105,7 @@ def build_database():
         print("\n  IMD join skipped (not loaded or lsoa_code missing from GIAS)")
 
     # Derived fields
-    db = add_derived_fields(db)
+    db = add_derived_fields(db, gla_boundary=gla_boundary)
 
     # Save outputs
     print(f"\n[Saving outputs...]")
