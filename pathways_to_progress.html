@@ -1602,7 +1602,7 @@
           <!-- School dot legend (default) -->
           <div id="s2-legend-schools">
             <div class="legend-row">
-              <div class="legend-swatch" style="background:#ffffff; border:2px solid #FF9043;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
+              <div class="legend-swatch" style="background:#ffffff;border:1.5px solid #FF9043;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
               <span>School location</span>
             </div>
           </div>
@@ -1853,11 +1853,11 @@
         <!-- Schools legend (top-left) -->
         <div id="s4-schools-legend">
           <div class="schools-legend-row">
-            <div class="schools-legend-dot" style="background:#fff6ec"></div>
+            <div class="schools-legend-dot" style="background:#ffffff;border:1.5px solid #FF9043;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
             <span style="color:var(--text-secondary)">All schools</span>
           </div>
           <div class="schools-legend-row" id="s4-schools-legend-highlight" style="display:none">
-            <div class="schools-legend-dot" style="background:#FF9043"></div>
+            <div class="schools-legend-dot" style="background:#C96820;border:1.2px solid #ffffff;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
             <span id="s4-schools-legend-label" style="color:var(--text-secondary)">Top 25% P8</span>
           </div>
         </div>
@@ -1952,11 +1952,11 @@
         <!-- Schools legend — always visible, highlight row toggles -->
         <div id="s4-explorer-schools-legend" style="position:absolute;bottom:178px;left:24px;z-index:21;background:rgba(8,12,18,0.85);border:0.5px solid var(--border-mid);padding:8px 12px;border-radius:4px;display:flex;flex-direction:column;gap:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;color:var(--text-muted)">
           <div class="schools-legend-row" id="s4-explorer-all-schools-row">
-            <div class="schools-legend-dot" style="background:#fff6ec"></div>
+            <div class="schools-legend-dot" style="background:#C96820;border:1.5px solid #ffffff;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
             <span style="color:var(--text-secondary)">All schools</span>
           </div>
           <div class="schools-legend-row" id="s4-explorer-highlight-row" style="display:none">
-            <div class="schools-legend-dot" style="background:#FF9043"></div>
+            <div class="schools-legend-dot" style="background:#C96820;border:1.5px solid #ffffff;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
             <span id="s4-explorer-highlight-label" style="color:var(--text-secondary)">Top 25% P8</span>
           </div>
         </div>
@@ -2507,8 +2507,8 @@
           // Grow slightly on hover
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
-            11, ['case', ['boolean', ['feature-state', 'hovered'], false], 4,  3],
-            15, ['case', ['boolean', ['feature-state', 'hovered'], false], 8,  5]
+            12, ['case', ['boolean', ['feature-state', 'hovered'], false], 3,  2],
+            15, ['case', ['boolean', ['feature-state', 'hovered'], false], 6,  4]
           ],
           // Brighten fill on hover
           'circle-color': [
@@ -2519,7 +2519,7 @@
           ],
           'circle-opacity': 0.9,
           // Thin stroke only on hover, invisible otherwise
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 1.5,
           'circle-stroke-color': '#c96820',
           'circle-stroke-opacity': 0.9
         }
@@ -3294,11 +3294,7 @@ const s2StepActions = {
         source:         srcId,
         'source-layer': SCHOOLS_SRC_LAYER,
         paint: {
-          'circle-radius': [
-            'interpolate', ['linear'], ['zoom'],
-            8,  ['case', ['boolean', ['feature-state', 'hovered'], false], 4,   2.5],
-            12, ['case', ['boolean', ['feature-state', 'hovered'], false], 8,   5  ]
-          ],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
           'circle-color': [
             'case',
             ['boolean', ['feature-state', 'hovered'], false],
@@ -3306,37 +3302,9 @@ const s2StepActions = {
             '#fff6ec'
           ],
           'circle-opacity':        0.8,
-          'circle-stroke-width':   ['case', ['boolean', ['feature-state', 'hovered'], false], 1.5, 0],
-          'circle-stroke-color':   '#EE4B2B',
+          'circle-stroke-width':   1.5,
+          'circle-stroke-color':   '#C96820',
           'circle-stroke-opacity': 0.9
-        }
-      });
-
-      // Hover state
-      let hoveredId = null;
-      map.on('mousemove', 'base-schools-all', (e) => {
-        if (!e.features.length) return;
-        map.getCanvas().style.cursor = 'pointer';
-        if (hoveredId !== null) {
-          map.setFeatureState(
-            { source: srcId, sourceLayer: SCHOOLS_SRC_LAYER, id: hoveredId },
-            { hovered: false }
-          );
-        }
-        hoveredId = e.features[0].id;
-        map.setFeatureState(
-          { source: srcId, sourceLayer: SCHOOLS_SRC_LAYER, id: hoveredId },
-          { hovered: true }
-        );
-      });
-      map.on('mouseleave', 'base-schools-all', () => {
-        map.getCanvas().style.cursor = '';
-        if (hoveredId !== null) {
-          map.setFeatureState(
-            { source: srcId, sourceLayer: SCHOOLS_SRC_LAYER, id: hoveredId },
-            { hovered: false }
-          );
-          hoveredId = null;
         }
       });
     }
@@ -3359,17 +3327,14 @@ const s2StepActions = {
         source:         srcId,
         'source-layer': SCHOOLS_SRC_LAYER,
         filter:         ['==', 'top_p8_quartile_GLA', true],
-        paint: {
-          'circle-radius': [
-            'interpolate', ['linear'], ['zoom'],
-            8, 4, 12, 7
-          ],
-          'circle-color':          '#FF9043',
-          'circle-opacity':        0.95,
-          'circle-stroke-width':   1.5,
-          'circle-stroke-color':   '#fff',
-          'circle-stroke-opacity': 0.7
-        }
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
+        'circle-color': '#C96820',
+        'circle-opacity': 0.9,
+        'circle-stroke-width': 1.2,
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-opacity': 0.9
+      }
       });
     }
 
@@ -3609,7 +3574,7 @@ const s2StepActions = {
 
       // Default explorer view
       const EXPLORER_CENTER = [-0.12, 51.50];
-      const EXPLORER_ZOOM   = 9.5;
+      const EXPLORER_ZOOM   = 9.25;
 
       // Per-mode stepped choropleth colour scales
       // Each ramp stays in a single hue family, dark→light mirrors slow→fast journey
@@ -3637,7 +3602,7 @@ const s2StepActions = {
         ],
       };
 
-      const s4MapExplorer = initMap('s4-map-explorer', { zoom: 9.25, extra: { minZoom: 9 } });
+      const s4MapExplorer = initMap('s4-map-explorer', { zoom: 9.25, extra: { minZoom: 9.25 } });
       let explorerLoaded = false;
 
       if (s4MapExplorer) {
@@ -3682,9 +3647,12 @@ const s2StepActions = {
             source:         'explorer-schools-src',
             'source-layer': SCHOOLS_SRC_LAYER,
             paint: {
-              'circle-radius':  ['interpolate', ['linear'], ['zoom'], 8, 2.5, 12, 5],
-              'circle-color':   '#fff6ec',
-              'circle-opacity': 0.8,
+              'circle-radius':  ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
+              'circle-color':          '#ffffff',
+              'circle-opacity':        0.95,
+              'circle-stroke-width':   1.5,
+              'circle-stroke-color':   '#C96820',
+              'circle-stroke-opacity': 0.7
             }
           });
 
@@ -3696,11 +3664,11 @@ const s2StepActions = {
             'source-layer': SCHOOLS_SRC_LAYER,
             filter:         ['==', 'top_p8_quartile_GLA', true],
             paint: {
-              'circle-radius':         ['interpolate', ['linear'], ['zoom'], 8, 4, 12, 7],
-              'circle-color':          '#FF9043',
+              'circle-radius':         ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
+              'circle-color':          '#C96820',
               'circle-opacity':        0.95,
               'circle-stroke-width':   1.5,
-              'circle-stroke-color':   '#fff',
+              'circle-stroke-color':   '#ffffff',
               'circle-stroke-opacity': 0.7
             }
           });
@@ -3861,9 +3829,9 @@ const s2StepActions = {
   }
 
   const s5StepActions = {
-    's5-0': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, center: [-0.12, 51.50], pitch: 0 }); },
-    's5-1': () => { if (s5Map) s5Map.easeTo({ zoom: 10.5, center: [-0.05, 51.47], pitch: 20 }); },
-    's5-2': () => { if (s5Map) s5Map.easeTo({ zoom: 10, center: [-0.15, 51.52], pitch: 15 }); }
+    's5-0': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, extra: { minZoom: 9 }, center: [-0.12, 51.50], pitch: 0 }); },
+    's5-1': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, extra: { minZoom: 9 }, center: [-0.05, 51.47], pitch: 20 }); },
+    's5-2': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, extra: { minZoom: 9 }, center: [-0.15, 51.52], pitch: 15 }); }
   };
 
   /* ─────────────────────────────────────────
@@ -4227,8 +4195,8 @@ const s2StepActions = {
       if (!el) return;
 
       const rect     = el.getBoundingClientRect();
-      const atTop    = rect.top > -10;                     // section top is at/above viewport
-      const atBottom = rect.bottom <= window.innerHeight + 10; // section bottom is in view
+      const atTop    = rect.top > -100;                     // section top is at/above viewport
+      const atBottom = rect.bottom <= window.innerHeight + 100; // section bottom is in view
 
       if (e.deltaY > 0 && atBottom && idx < SECTION_IDS.length - 1) {
         // Scrolling down, reached section bottom → snap to next
