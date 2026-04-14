@@ -922,7 +922,7 @@
     }
     .s4-standalone-controls {
       background: var(--bg2);
-      padding: 110px 40px 60px;
+      padding: 48px 40px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -1086,6 +1086,41 @@
       font-family: var(--font-mono);
     }
     /* ── Map title badges — top corners ── */
+    /* ── Explorer map overlay — hover info block (below title) ── */
+    #s4-explorer-hover-info {
+      position: absolute;
+      top: 0;
+      left: 16px;
+      z-index: 50;
+      background: rgba(8,12,18,0.82);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 5px;
+      padding: 10px 16px;
+      pointer-events: none;
+      max-width: 800px;
+      backdrop-filter: blur(4px);
+      display: none;
+    }
+    #s4-explorer-overlay-borough {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+      letter-spacing: 0.04em;
+    }
+    #s4-explorer-overlay-stat {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    #s4-explorer-overlay-stat span {
+      color: #FF9043;
+      font-weight: 600;
+    }
+
     #s4-label-left, #s4-label-right {
       position: absolute;
       top: 16px;
@@ -1116,6 +1151,66 @@
       color: var(--text-muted);
       border-color: var(--border);
     }
+    /* ── Explorer map overlay — title block (top-left) ── */
+    #s4-explorer-overlay {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 50;
+      background: rgba(8,12,18,0.82);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 5px;
+      padding: 10px 16px;
+      pointer-events: none;
+      max-width: 800px;
+      backdrop-filter: blur(4px);
+    }
+    #s4-explorer-overlay-title {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #FF9043;
+      line-height: 1.45;
+      transition: opacity 0.5s ease;
+    }
+
+    /* ── Explorer map overlay — hover info block (below title) ── */
+    #s4-explorer-hover-info {
+      position: absolute;
+      top: 0;
+      left: 16px;
+      z-index: 50;
+      background: rgba(8,12,18,0.82);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 5px;
+      padding: 10px 16px;
+      pointer-events: none;
+      max-width: 380px;
+      backdrop-filter: blur(4px);
+      display: none;
+    }
+    #s4-explorer-overlay-borough {
+      font-family: var(--text-secondary);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      line-height: 1.3;
+      letter-spacing: 0.04em;
+    }
+    #s4-explorer-overlay-stat {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    #s4-explorer-overlay-stat span {
+      color: #FF9043;
+      font-weight: 600;
+      font-size: 24px;
+    }
+
     #s4-label-left, #s4-label-right {
       transition: color 0.3s ease, border-color 0.3s ease;
     }
@@ -2018,6 +2113,17 @@
       <div class="s4-explorer-map-col">
         <div id="s4-map-explorer" class="map-canvas"></div>
 
+        <!-- Top-left overlay: map title -->
+        <div id="s4-explorer-overlay">
+          <div id="s4-explorer-overlay-title">Distribution of Travel Times by School Type and Mode</div>
+        </div>
+
+        <!-- Hover info: appears below title on borough hover -->
+        <div id="s4-explorer-hover-info">
+          <div id="s4-explorer-overlay-borough"></div>
+          <div id="s4-explorer-overlay-stat"></div>
+        </div>
+
         <!-- Schools legend — always visible, highlight row toggles -->
         <div id="s4-explorer-schools-legend" style="position:absolute;bottom:178px;left:24px;z-index:21;background:rgba(8,12,18,0.85);border:0.5px solid var(--border-mid);padding:8px 12px;border-radius:4px;display:flex;flex-direction:column;gap:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;color:var(--text-muted)">
           <div class="schools-legend-row" id="s4-explorer-all-schools-row">
@@ -2048,7 +2154,7 @@
         <div class="s4-standalone-controls">
           <div>
             <p class="step-index" style="margin-bottom:12px">03 — Mode comparison</p>
-            <h3 class="step-heading" style="margin-bottom:16px">How does travel mode affect this picture?</h3>
+            <h3 class="step-heading" style="margin-bottom:16px">Access differences persist even after accounting for travel modes</h3>
             <p class="step-body" style="font-size:17px;color:var(--text-secondary);line-height:1.65">
               Select a school type and travel mode to update the choropleth.
               <br> Each combination reveals a different dimension of potential access inequality.
@@ -2076,20 +2182,31 @@
           </div>
 
           <!-- Dot plot chart -->
-          <div style="background:var(--bg3);border:0.5px solid var(--border-mid);border-radius:8px;padding:16px 20px">
+          <div style="background:var(--bg3);max-width: 725px; border:0.5px solid var(--border-mid);border-radius:8px;padding:16px 20px">
             <svg id="s4-dot-plot" width="100%" viewBox="0 0 320 118" style="overflow:visible;display:block"></svg>
           </div>
+        </div>
 
         <!-- Step 4 — borough chart -->
         <div class="s4-borough-chart-panel scroll-step" id="s4-step4-wrap" data-step="s4-2">
           <p class="step-index" style="margin-bottom:12px">04 — Borough summary</p>
-          <h3 class="step-heading" style="margin-bottom:8px">Borough-level variation in school access</h3>
-          <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px">
-            Median transit time · Top 25% P8 vs any school · by borough
-          </p>
-          <div style="position:relative;flex:1;min-height:300px">
+          <h3 class="step-heading" style="margin-bottom:8px">Differences in median travel times across Boroughs reveal opportunity gaps</h3>
+            <p class="step-body" style="font-size:17px;color:var(--text-secondary);line-height:1.55 ;margin-bottom:14px">
+              Median travel time to nearest Top 25% P8 school · by borough
+            </p>
+
+          <!-- Mode toggle for borough chart -->
+          <div class="s4-ctrl-btns" id="s4-borough-mode-btns" style="margin-bottom:16px">
+            <button class="s4-ctrl-btn active-transit" data-bmode="transit" onclick="updateBoroughChart(this)">Transit</button>
+            <button class="s4-ctrl-btn" data-bmode="walk"    onclick="updateBoroughChart(this)">Walk</button>
+            <button class="s4-ctrl-btn" data-bmode="car"     onclick="updateBoroughChart(this)">Car</button>
+          </div>
+
+          <!-- Chart canvas -->
+          <div id="s4-borough-chart-wrap" style="position:relative;height:280px">
             <canvas id="chart-borough-compare"></canvas>
           </div>
+
           <button class="s4-expand-btn" id="s4-expand-btn" onclick="toggleBoroughExpand()">
             Show all 33 boroughs ↓
           </button>
@@ -3563,8 +3680,14 @@ const s2StepActions = {
     };
 
     // ── Scroll step actions ──────────────────────────────────────────
+    // Hoisted so s4StepActions can reference it before explorer map loads
+    let boroughInteractive = false;
     const s4StepActions = {
       's4-0': () => {
+        boroughInteractive = false;
+        highlightBorough(null);
+        setExplorerOverlayTitle('Distribution of Travel Times by School Type and Mode');
+        setExplorerOverlayBorough(null, s4BoroughMode);
         // Slider mostly left (any-school map dominates)
         applySliderPct(90, true);
         // Hide quality toggle
@@ -3583,6 +3706,10 @@ const s2StepActions = {
       },
 
       's4-1': () => {
+        boroughInteractive = false;
+        highlightBorough(null);
+        setExplorerOverlayTitle('Distribution of Travel Times by School Type and Mode');
+        setExplorerOverlayBorough(null, s4BoroughMode);
         // Slider mostly right (quality map dominates)
         applySliderPct(10, true);
         // Show quality toggle
@@ -3603,7 +3730,15 @@ const s2StepActions = {
       },
 
       's4-2': () => {
-        // Reset explorer map to default zoom and P8/transit view
+        // Enable borough interactions for step 4
+        boroughInteractive = true;
+        setExplorerOverlayTitle('Travel times to nearest Top 25% P8 — Borough Summary');
+        setExplorerOverlayBorough(null, s4BoroughMode);
+        // Show borough highlight layer as interactive
+        if (explorerLoaded && s4MapExplorer?.getLayer('explorer-borough-highlight')) {
+          s4MapExplorer.setPaintProperty('explorer-borough-highlight', 'line-opacity', 0);
+        }
+        // Reset explorer map to default zoom
         if (s4MapExplorer) {
           s4MapExplorer.easeTo({
             center:   EXPLORER_CENTER,
@@ -3612,20 +3747,27 @@ const s2StepActions = {
             easing:   t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t
           });
         }
-        // Reset school buttons to P8
-        document.querySelectorAll('#s4-school-btns .s4-ctrl-btn').forEach(b => {
-          b.className = 's4-ctrl-btn';
-        });
-        document.querySelector('#s4-school-btns .s4-ctrl-btn[data-school="p8"]')
-          ?.classList.add('active-p8');
-        // Reset mode buttons to transit
-        document.querySelectorAll('#s4-mode-btns .s4-ctrl-btn').forEach(b => {
-          b.className = 's4-ctrl-btn';
-        });
-        document.querySelector('#s4-mode-btns .s4-ctrl-btn[data-mode="transit"]')
-          ?.classList.add('active-transit');
-        // Sync map layers and legend to match
+        // Reset school/mode buttons
+        document.querySelectorAll('#s4-school-btns .s4-ctrl-btn').forEach(b => b.className = 's4-ctrl-btn');
+        document.querySelector('#s4-school-btns .s4-ctrl-btn[data-school="p8"]')?.classList.add('active-p8');
+        document.querySelectorAll('#s4-mode-btns .s4-ctrl-btn').forEach(b => b.className = 's4-ctrl-btn');
+        document.querySelector('#s4-mode-btns .s4-ctrl-btn[data-mode="transit"]')?.classList.add('active-transit');
         updateExplorer(null);
+        // Initialise borough chart
+        s4BoroughMode = 'transit';
+        S4_BOROUGH_DATA.sort((a, b) => b.transit - a.transit);
+        s4BoroughExpanded = false;
+        const expandBtn = document.getElementById('s4-expand-btn');
+        if (expandBtn) expandBtn.textContent = 'Show all 33 boroughs ↓';
+        // Collapse DOM heights in case user had expanded then scrolled away
+        const chartWrap = document.getElementById('s4-borough-chart-wrap');
+        const panel     = document.getElementById('s4-step4-wrap');
+        if (chartWrap) chartWrap.style.height = '280px';
+        if (panel)     panel.style.minHeight  = '100vh';
+        // Reset borough mode buttons
+        document.querySelectorAll('#s4-borough-mode-btns .s4-ctrl-btn').forEach(b => b.className = 's4-ctrl-btn');
+        document.querySelector('#s4-borough-mode-btns .s4-ctrl-btn[data-bmode="transit"]')?.classList.add('active-transit');
+        initBoroughChart();
       }
     };
 
@@ -3673,13 +3815,7 @@ const s2StepActions = {
         car_any:        4,  car_p8:          7,  car_ofsted:      7,
       };
 
-      // Per-mode accent colour (used for stat card and dot highlights)
-      const S4_MODE_COLOURS = {
-        transit: '#FF9043',   // orange
-        walk:    '#66bb6a',   // green
-        car:     '#4fc3f7',   // blue
-      };
-
+      // Min / Median / Max travel times (minutes) per mode × school type
       const S4_RANGES = {
         transit: [
           { label: 'Any school',         min:  3, median: 16, max: 53 },
@@ -3698,12 +3834,18 @@ const s2StepActions = {
         ],
       };
 
+      // Per-mode accent colour (used for stat card and dot highlights)
+      const S4_MODE_COLOURS = {
+        transit: '#FF9043',   // orange
+        walk:    '#66bb6a',   // green
+        car:     '#4fc3f7',   // blue
+      };
+
       // Default explorer view
       const EXPLORER_CENTER = [-0.12, 51.50];
       const EXPLORER_ZOOM   = 9.25;
 
       // Per-mode stepped choropleth colour scales
-      // Each ramp stays in a single hue family, dark→light mirrors slow→fast journey
       const S4_MODE_COLOR_EXPR = {
         transit: (field) => ['step', ['get', field],
           '#ffe066' ,          //  0–10 min  — very light yellow
@@ -3801,32 +3943,380 @@ const s2StepActions = {
             }
           }, 'waterway-label');
 
+          // ── Borough highlight layer (for Step 4 hover) ──
+          s4MapExplorer.addSource('explorer-borough-src', {
+            type: 'vector',
+            url: 'mapbox://teechinminben.8wonydq8'
+          });
+          // Invisible fill layer — captures mousemove events across the whole borough polygon
+          s4MapExplorer.addLayer({
+            id:             'explorer-borough-hit',
+            type:           'fill',
+            source:         'explorer-borough-src',
+            'source-layer': 'LAD_Simplified-9zfv2n',
+            paint: {
+              'fill-color':   '#000000',
+              'fill-opacity': 0
+            }
+          });
+
+          // Visible outline layer — Rendered on hover
+          s4MapExplorer.addLayer({
+            id:             'explorer-borough-highlight',
+            type:           'line',
+            source:         'explorer-borough-src',
+            'source-layer': 'LAD_Simplified-9zfv2n',
+            paint: {
+              'line-color':   '#ffffff',
+              'line-width':   3,
+              'line-opacity': 0
+            }
+          });
+
+          // ── Borough click popup (Step 4) ──
+          const boroughPopup = new mapboxgl.Popup({
+            closeButton: true,
+            closeOnClick: false,
+            maxWidth: '260px',
+            offset: 12
+          });
+
+          // Click handled on explorer-borough-hit layer below
+          s4MapExplorer.on('mouseenter', 'explorer-borough-hit', () => {
+            if (boroughInteractive) s4MapExplorer.getCanvas().style.cursor = 'pointer';
+          });
+          s4MapExplorer.on('mouseleave', 'explorer-borough-hit', () => {
+            s4MapExplorer.getCanvas().style.cursor = '';
+          });
+
+          // ── Map hover → highlight borough outline + sync chart ──
+          s4MapExplorer.on('mousemove', 'explorer-borough-hit', (e) => {
+            if (!boroughInteractive) return;
+            const name = e.features[0]?.properties?.LAD25NM;
+            if (!name) return;
+            highlightBorough(name);
+            setExplorerOverlayBorough(name, s4BoroughMode);
+            // Sync chart bar highlight
+            if (s4BoroughChart) {
+              const data = s4BoroughExpanded ? S4_BOROUGH_DATA : S4_BOROUGH_DATA.slice(0, 10);
+              const idx  = data.findIndex(d => d.name === name);
+              const col  = getBoroughColour(s4BoroughMode);
+              s4BoroughChart.data.datasets[0].backgroundColor = data.map((_, i) =>
+                i === idx ? col : col + 'cc'
+              );
+              s4BoroughChart.update('none');
+            }
+          });
+          s4MapExplorer.on('mouseleave', 'explorer-borough-hit', () => {
+            if (!boroughInteractive) return;
+            highlightBorough(null);
+            setExplorerOverlayBorough(null, s4BoroughMode);
+            // Reset chart bar colours
+            if (s4BoroughChart) {
+              const col = getBoroughColour(s4BoroughMode);
+              s4BoroughChart.data.datasets[0].backgroundColor =
+                s4BoroughChart.data.labels.map(() => col + 'cc');
+              s4BoroughChart.update('none');
+            }
+          });
+
+          // Click on hit layer
+          s4MapExplorer.on('click', 'explorer-borough-hit', (e) => {
+            if (!boroughInteractive) return;
+            const props = e.features[0]?.properties || {};
+            const name  = props.LAD25NM || '—';
+            showBoroughPopup(boroughPopup, e.lngLat, name);
+          });
+
           explorerLoaded = true;
           updateExplorer(null);
         });
       }
 
-      /* ── Section 4 Cleveland dot plot ─────────────────────────────── */
+      // boroughInteractive declared above s4StepActions (hoisted)
+
+      // ── Explorer overlay helpers ─────────────────────────────────────────
+      function setExplorerOverlayTitle(text) {
+        const el = document.getElementById('s4-explorer-overlay-title');
+        if (el) el.textContent = text;
+      }
+
+      function setExplorerOverlayBorough(name, mode) {
+        const hoverDiv  = document.getElementById('s4-explorer-hover-info');
+        const boroughEl = document.getElementById('s4-explorer-overlay-borough');
+        const statEl    = document.getElementById('s4-explorer-overlay-stat');
+        const titleDiv  = document.getElementById('s4-explorer-overlay');
+        if (!boroughEl || !statEl || !hoverDiv) return;
+
+        if (!name) {
+          hoverDiv.style.display = 'none';
+          return;
+        }
+
+        const row       = S4_BOROUGH_DATA.find(d => d.name === name);
+        const val       = row ? row[mode] : '—';
+        const modeLabel = mode === 'transit' ? 'Transit' : mode === 'walk' ? 'Walk' : 'Car';
+        const modeCol   = S4_MODE_COLOURS[mode] || '#FF9043';
+
+        boroughEl.textContent = name;
+        statEl.innerHTML      = `Median Travel Time <br> by ${modeLabel}: <span style="color:${modeCol}">${val} min</span>`;
+
+        // Position hover info directly below the title box
+        if (titleDiv) {
+          const titleBottom = titleDiv.offsetTop + titleDiv.offsetHeight + 6;
+          hoverDiv.style.top = titleBottom + 'px';
+        }
+        hoverDiv.style.display = 'block';
+      }
+
+      /* ── Section 4 Borough chart data ──────────────────────────────── */
+      // All 33 London boroughs — median travel time (min) to nearest Top 25% P8 school
+      // Format: { name, transit, walk, car }
+      // Replace with real computed values from r5py matrices
+      const S4_BOROUGH_DATA = [
+        { name: 'Havering',          transit: 42, walk: 88, car: 22 },
+        { name: 'Bromley',           transit: 39, walk: 82, car: 20 },
+        { name: 'Bexley',            transit: 38, walk: 80, car: 19 },
+        { name: 'Hillingdon',        transit: 36, walk: 78, car: 18 },
+        { name: 'Sutton',            transit: 35, walk: 75, car: 17 },
+        { name: 'Croydon',           transit: 34, walk: 72, car: 16 },
+        { name: 'Enfield',           transit: 33, walk: 70, car: 16 },
+        { name: 'Barnet',            transit: 32, walk: 68, car: 15 },
+        { name: 'Richmond upon Thames', transit: 31, walk: 65, car: 14 },
+        { name: 'Kingston upon Thames', transit: 30, walk: 62, car: 13 },
+        { name: 'Merton',            transit: 28, walk: 58, car: 12 },
+        { name: 'Harrow',            transit: 27, walk: 55, car: 11 },
+        { name: 'Ealing',            transit: 26, walk: 52, car: 11 },
+        { name: 'Hounslow',          transit: 25, walk: 50, car: 10 },
+        { name: 'Waltham Forest',    transit: 25, walk: 50, car: 10 },
+        { name: 'Redbridge',         transit: 24, walk: 48, car: 10 },
+        { name: 'Barking and Dagenham', transit: 24, walk: 48, car:  9 },
+        { name: 'Greenwich',         transit: 23, walk: 46, car:  9 },
+        { name: 'Lewisham',          transit: 22, walk: 44, car:  8 },
+        { name: 'Wandsworth',        transit: 21, walk: 42, car:  8 },
+        { name: 'Brent',             transit: 20, walk: 40, car:  7 },
+        { name: 'Haringey',          transit: 20, walk: 40, car:  7 },
+        { name: 'Newham',            transit: 19, walk: 38, car:  7 },
+        { name: 'Hammersmith and Fulham', transit: 18, walk: 36, car: 6 },
+        { name: 'Hackney',           transit: 17, walk: 34, car:  6 },
+        { name: 'Tower Hamlets',     transit: 16, walk: 32, car:  5 },
+        { name: 'Southwark',         transit: 16, walk: 32, car:  5 },
+        { name: 'Lambeth',           transit: 15, walk: 30, car:  5 },
+        { name: 'Kensington and Chelsea', transit: 14, walk: 28, car: 4 },
+        { name: 'Westminster',       transit: 14, walk: 28, car:  4 },
+        { name: 'Camden',            transit: 13, walk: 26, car:  4 },
+        { name: 'Islington',         transit: 12, walk: 24, car:  3 },
+        { name: 'City of London',    transit: 10, walk: 20, car:  2 },
+      ];
+
+      // Sort descending by transit (default)
+      S4_BOROUGH_DATA.sort((a, b) => b.transit - a.transit);
+
+      let s4BoroughChart    = null;
+      let s4BoroughExpanded = false;
+      let s4BoroughMode     = 'transit';
+
+      function getBoroughColour(mode) {
+        return S4_MODE_COLOURS[mode] || '#FF9043';
+      }
+
+      function showBoroughPopup(popup, lngLat, boroughName) {
+        const row = S4_BOROUGH_DATA.find(d => d.name === boroughName);
+        if (!row) return;
+        const html = `
+          <div style="font-family:var(--font-mono);font-size:12px;color:#e8e0d6;background:#0e1420;padding:12px 14px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.12);min-width:180px">
+            <div style="font-size:11px;color:rgba(180,170,160,0.6);letter-spacing:0.08em;margin-bottom:8px;text-transform:uppercase">Median travel time · Top 25% P8</div>
+            <div style="font-weight:600;font-size:13px;color:#fff;margin-bottom:10px">${row.name}</div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+                <span style="color:#FF9043">Transit</span>
+                <strong style="color:#fff">${row.transit} min</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+                <span style="color:#66bb6a">Walk</span>
+                <strong style="color:#fff">${row.walk} min</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+                <span style="color:#4fc3f7">Car</span>
+                <strong style="color:#fff">${row.car} min</strong>
+              </div>
+            </div>
+          </div>`;
+        popup.setLngLat(lngLat).setHTML(html).addTo(s4MapExplorer);
+      }
+
+      function highlightBorough(name) {
+        if (!explorerLoaded || !s4MapExplorer?.getLayer('explorer-borough-highlight')) return;
+        s4MapExplorer.setPaintProperty('explorer-borough-highlight', 'line-opacity',
+          name ? ['case', ['==', ['get', 'LAD25NM'], name], 1, 0] : 0
+        );
+      }
+
+      function initBoroughChart() {
+        const canvas = document.getElementById('chart-borough-compare');
+        if (!canvas) return;
+        // Destroy old instance if re-initialising
+        if (s4BoroughChart) { s4BoroughChart.destroy(); s4BoroughChart = null; }
+
+        const data    = s4BoroughExpanded ? S4_BOROUGH_DATA : S4_BOROUGH_DATA.slice(0, 10);
+        const col     = getBoroughColour(s4BoroughMode);
+        const labels  = data.map(d => d.name);
+        const values  = data.map(d => d[s4BoroughMode]);
+
+        s4BoroughChart = new Chart(canvas, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label: `Median ${s4BoroughMode} time (min)`,
+              data:  values,
+              backgroundColor: values.map(() => col + 'cc'),
+              hoverBackgroundColor: values.map(() => col),
+              borderRadius: 3,
+              borderSkipped: false,
+              barThickness: s4BoroughExpanded ? 10 : 18,
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 600 },
+            onHover: (event, elements) => {
+              if (!boroughInteractive) return;
+              const name = elements.length ? data[elements[0].index].name : null;
+              highlightBorough(name);
+              setExplorerOverlayBorough(name, s4BoroughMode);
+              // Dim non-hovered bars
+              const col = getBoroughColour(s4BoroughMode);
+              s4BoroughChart.data.datasets[0].backgroundColor = data.map((_, i) =>
+                !name || i === (elements[0]?.index ?? -1) ? col : col + 'cc'
+              );
+              s4BoroughChart.update('none');
+            },
+            onClick: (event, elements) => {
+              if (!elements.length) return;
+              const row = data[elements[0].index];
+              if (!explorerLoaded || !s4MapExplorer) return;
+              // Query rendered borough features to find a lngLat inside this borough
+              const features = s4MapExplorer.queryRenderedFeatures(
+                { layers: ['explorer-borough-highlight'] }
+              );
+              const match = features.find(f => f.properties?.LAD25NM === row.name);
+              // Use map centre as fallback lngLat
+              const lngLat = match?.geometry
+                ? (() => {
+                    const coords = match.geometry.type === 'Polygon'
+                      ? match.geometry.coordinates[0][0]
+                      : match.geometry.coordinates[0][0][0];
+                    return { lng: coords[0], lat: coords[1] };
+                  })()
+                : { lng: EXPLORER_CENTER[0], lat: EXPLORER_CENTER[1] };
+              const pop = new mapboxgl.Popup({
+                closeButton: true, closeOnClick: false, maxWidth: '260px', offset: 12
+              });
+              showBoroughPopup(pop, lngLat, row.name);
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                enabled: true,
+                callbacks: {
+                  label: ctx => ` ${ctx.raw} min`
+                },
+                backgroundColor: 'rgba(8,12,18,0.92)',
+                titleColor: '#e8e0d6',
+                bodyColor: col,
+                titleFont: { family: "'Roboto Mono', monospace", size: 14 },
+                bodyFont:  { family: "'Roboto Mono', monospace", size: 14 },
+                padding: 8,
+                borderColor: 'rgba(255,255,255,0.12)',
+                borderWidth: 1
+              }
+            },
+            scales: {
+              x: {
+                ticks: { color: 'rgba(180,170,160,0.6)', font: { family: "'Roboto Mono'", size: 10 } },
+                grid:  { color: 'rgba(255,255,255,0.05)' },
+                title: { display: true, text: 'minutes', color: 'rgba(180,170,160,0.4)', font: { family: "'Roboto Mono'", size: 10 } }
+              },
+              y: {
+                ticks: { color: 'rgba(180,170,160,0.8)', font: { family: "'Roboto Mono'", size: 10 } },
+                grid:  { display: false }
+              }
+            }
+          }
+        });
+      }
+
+      window.updateBoroughChart = function(clickedBtn) {
+        if (clickedBtn) {
+          document.querySelectorAll('#s4-borough-mode-btns .s4-ctrl-btn').forEach(b => b.className = 's4-ctrl-btn');
+          const m = clickedBtn.dataset.bmode;
+          clickedBtn.classList.add(`active-${m}`);
+          s4BoroughMode = m;
+          // Re-sort by selected mode
+          S4_BOROUGH_DATA.sort((a, b) => b[m] - a[m]);
+
+          // ── Mirror: sync step 3 mode buttons + update explorer map + dot plot ──
+          document.querySelectorAll('#s4-mode-btns .s4-ctrl-btn').forEach(b => b.className = 's4-ctrl-btn');
+          const mirrorBtn = document.querySelector(`#s4-mode-btns .s4-ctrl-btn[data-mode="${m}"]`);
+          if (mirrorBtn) mirrorBtn.classList.add(`active-${m}`);
+          updateExplorer(null);
+          drawS4DotPlot(m);
+          // Clear borough overlay stat when mode changes
+          setExplorerOverlayBorough(null, m);
+        }
+        initBoroughChart();
+      };
+
+      window.toggleBoroughExpand = function() {
+        s4BoroughExpanded = !s4BoroughExpanded;
+        const btn       = document.getElementById('s4-expand-btn');
+        const chartWrap = document.getElementById('s4-borough-chart-wrap');
+        const panel     = document.getElementById('s4-step4-wrap');
+
+        // 16px per bar keeps all 33 within ~600px; collapsed 10 bars at ~280px
+        const expandedH  = S4_BOROUGH_DATA.length * 16 + 60;
+        const collapsedH = 280;
+
+        if (s4BoroughExpanded) {
+          if (btn)       btn.textContent        = 'Show top 10 ↑';
+          if (chartWrap) chartWrap.style.height = expandedH + 'px';
+          // Panel must be tall enough to contain the chart — don't constrain to 100vh
+          if (panel)     panel.style.minHeight  = 'auto';
+        } else {
+          if (btn)       btn.textContent        = 'Show all 33 boroughs ↓';
+          if (chartWrap) chartWrap.style.height = collapsedH + 'px';
+          if (panel)     panel.style.minHeight  = '100vh';
+        }
+
+        // Map col stays sticky at 100vh always — only the chart canvas grows.
+        // Chart.js needs a rAF to pick up the new container size.
+        requestAnimationFrame(() => initBoroughChart());
+      };
+
+      /* ── Section 4 Dot plot ─────────────────────────────── */
       function drawS4DotPlot(mode) {
         const svg    = document.getElementById('s4-dot-plot');
         if (!svg) return;
         const rows   = S4_RANGES[mode] || S4_RANGES.transit;
         const col    = S4_MODE_COLOURS[mode] || '#FF9043';
- 
-        // Layout constants (viewBox 320 × 118, extra top space for title)
-        const W = 320, H = 118;
+
+        // Layout constants (viewBox 320 × 110, extra top space for title)
+        const W = 320, H = 110;
         const titleH  = 22;  // space reserved for title + subtitle
         const marginL = 114, marginR = 10, marginT = titleH + 4, marginB = 18;
         const plotW   = W - marginL - marginR;
         const plotH   = H - marginT - marginB;
         const rowH    = plotH / rows.length;
- 
+
         // Determine axis domain — round up to nearest 10
         const allMax  = Math.max(...rows.map(r => r.max));
         const domMax  = Math.ceil(allMax / 10) * 10;
         const domMin  = 0;
         const xScale  = v => marginL + ((v - domMin) / (domMax - domMin)) * plotW;
- 
+
         // Tooltip element (shared, created once)
         let tip = document.getElementById('s4-dot-tip');
         if (!tip) {
@@ -3836,58 +4326,58 @@ const s2StepActions = {
             'position:fixed;pointer-events:none;display:none',
             'background:rgba(8,12,18,0.92);border:0.5px solid rgba(255,255,255,0.15)',
             'border-radius:4px;padding:5px 9px;font-family:var(--font-mono)',
-            'font-size:14px;color:#e8e0d6;letter-spacing:0.06em;z-index:9999',
+            'font-size:16px;color:#e8e0d6;letter-spacing:0.04em;z-index:9999',
             'white-space:nowrap;line-height:1.6'
           ].join(';');
           document.body.appendChild(tip);
         }
- 
+
         // Tick values
         const ticks = [];
         for (let v = 0; v <= domMax; v += 20) ticks.push(v);
- 
+
         // Mode label for title
         const modeLabelTitle = mode === 'transit' ? 'Transit' : mode === 'walk' ? 'Walk' : 'Car';
- 
+
         // Build SVG
         let html = `<g id="s4-dp-title">`;
- 
+
         // Title
-        html += `<text x="0" y="10" font-family="var(--font-mono)" font-size="7.5" font-weight="500" fill="rgba(220,210,200,0.88)" letter-spacing="0.05em">DISTRIBUTION OF TRAVEL TIMES (${modeLabelTitle.toUpperCase()})</text>`;
- 
+        html += `<text x="0" y="10" font-family="var(--font-mono)" font-size="7.5" font-weight="400" fill="rgba(220,210,200,0.88)" letter-spacing="0.05em">DISTRIBUTION OF TRAVEL TIMES ACROSS LSOAs (${modeLabelTitle.toUpperCase()})</text>`;
+
         // Subtitle
-        html += `<text x="0" y="20" font-family="var(--font-mono)" font-size="6" fill="rgba(180,170,160,0.5)" letter-spacing="0.06em">min · median · max · minutes</text>`;
- 
+        html += `<text x="0" y="20" font-family="var(--font-mono)" font-size="7" fill="rgba(180,170,160,0.5)" letter-spacing="0.04em">min · median · max · minutes</text>`;
+
         html += `</g><g id="s4-dp-axes">`;
- 
+
         // Axis line
         html += `<line x1="${marginL}" x2="${marginL + plotW}" y1="${H - marginB}" y2="${H - marginB}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>`;
- 
+
         // Tick marks + labels
         ticks.forEach(v => {
           const x = xScale(v);
           html += `<line x1="${x}" x2="${x}" y1="${marginT}" y2="${H - marginB + 4}" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>`;
           html += `<text x="${x}" y="${H - marginB + 11}" text-anchor="middle" font-family="var(--font-mono)" font-size="7.5" fill="rgba(200,190,180,0.5)">${v}</text>`;
         });
- 
+
         html += `</g><g id="s4-dp-rows">`;
- 
+
         rows.forEach((r, i) => {
           const cy = marginT + rowH * i + rowH / 2;
           const x1 = xScale(r.min), xMed = xScale(r.median), x2 = xScale(r.max);
- 
+
           // Row label
           html += `<text x="${marginL - 8}" y="${cy + 4}" text-anchor="end" font-family="var(--font-mono)" font-size="7" fill="rgba(200,190,180,0.75)" letter-spacing="0.03em">${r.label}</text>`;
- 
+
           // Range line
           html += `<line x1="${x1}" x2="${x2}" y1="${cy}" y2="${cy}" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>`;
- 
+
           // Min cap
           html += `<line x1="${x1}" x2="${x1}" y1="${cy - 4}" y2="${cy + 4}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>`;
- 
+
           // Max cap
           html += `<line x1="${x2}" x2="${x2}" y1="${cy - 4}" y2="${cy + 4}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>`;
- 
+
           // Invisible wide hit targets for min/max/median
           const dotR = 5;
           // Min dot (hollow)
@@ -3899,7 +4389,7 @@ const s2StepActions = {
           // Median dot (filled)
           html += `<circle cx="${xMed}" cy="${cy}" r="3.8" fill="${col}" stroke="none" opacity="0.92"
             class="s4-dp-dot" data-val="${r.median}" data-label="${r.label}" data-type="median"/>`;
- 
+
           // Wide invisible hit areas
           const hitH = 16;
           [[x1,'min',r.min],[xMed,'median',r.median],[x2,'max',r.max]].forEach(([x, type, val]) => {
@@ -3907,11 +4397,11 @@ const s2StepActions = {
               class="s4-dp-hit" data-val="${val}" data-label="${r.label}" data-type="${type}"/>`;
           });
         });
- 
+
         html += `</g>`;
         svg.innerHTML = html;
         svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
- 
+
         // Bind tooltip events
         svg.querySelectorAll('.s4-dp-hit').forEach(el => {
           el.addEventListener('mouseenter', (e) => {
@@ -4031,8 +4521,7 @@ const s2StepActions = {
         // ── Update dot plot + legend title ──
         const legendTitle = document.getElementById('s4-explorer-legend-title');
         const modeLabel   = mode.charAt(0).toUpperCase() + mode.slice(1);
-        const schoolLabel = school === 'any' ? 'any school' : school === 'p8' ? 'top 25% P8' : 'Ofsted Outstanding';
-        if (legendTitle) legendTitle.textContent = `${modeLabel} — ${schoolLabel}`;
+        if (legendTitle)  legendTitle.textContent = `${modeLabel} — ${school === 'any' ? 'any school' : school === 'p8' ? 'top 25% P8' : 'Ofsted Outstanding'}`;
         drawS4DotPlot(mode);
       };
 
@@ -4489,10 +4978,11 @@ const s2StepActions = {
     }, { passive: true });
   })();
 
-    // Draw dot plot on initial load (transit is default mode)
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof drawS4DotPlot === 'function') drawS4DotPlot('transit');
-    });
+  // Draw dot plot on initial load (transit is default mode)
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof drawS4DotPlot === 'function') drawS4DotPlot('transit');
+  });
+
   </script>
 </body>
 </html>
