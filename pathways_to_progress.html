@@ -70,7 +70,7 @@
       position: fixed;
       top: 0; right: 0;
       z-index: 200;
-      padding: 18px 28px;
+      padding: 10px 28px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -83,7 +83,7 @@
       text-transform: uppercase;
       color: var(--text-muted);
       text-decoration: none;
-      padding: 0px 10px;
+      padding: 2px 7px 2px 7px;
       border-radius: 3px;
       transition: color 0.2s, background 0.2s;
     }
@@ -98,11 +98,23 @@
       height: 50px;
       z-index: 15;
       pointer-events: none;
+    }
+
+    #top-fade.fade-black {
       background: linear-gradient(to bottom,
-      rgba(0, 0, 0, 0.95) 0%, 
-      rgba(0, 0, 0, 0.75) 40%, 
-      rgba(0, 0, 0, 0.4) 70%, 
-      rgba(0, 0, 0, 0) 100%
+        rgba(2, 11, 21, 0.8) 0%, 
+        rgba(2, 11, 21, 0.8) 40%, 
+        rgba(2, 11, 21, 0.8) 70%, 
+        rgba(2, 11, 21, 0) 100%
+       );
+    }
+
+    #top-fade.fade-blue {
+      background: linear-gradient(to bottom,
+        rgba(10, 22, 34, 0.95) 0%, 
+        rgba(10, 22, 34, 0.75) 40%, 
+        rgba(10, 22, 34, 0.4) 70%, 
+        rgba(10, 22, 34, 0) 100%
       );
     }
 
@@ -1655,7 +1667,7 @@
        TOP NAV
   ═══════════════════════════════════════ -->
 
-  <div id="top-fade"></div>
+  <div id="top-fade" class="fade-black"></div>
 
   <nav id="top-nav" aria-label="Page sections">
     <a href="#s1-hero"          class="nav-link active" data-section="0">Intro</a>
@@ -4789,17 +4801,56 @@ const s2StepActions = {
     dotRail.classList.toggle('visible', idx > 0);
   }
 
+  // Top Fade per section
+  const topFade = document.getElementById('top-fade');
+  function setTopFade(sectionId) {
+    topFade.style.opacity = '1';
+    topFade.classList.remove('fade-black', 'fade-blue');
+
+    if (sectionId === 's1-hero') {
+      topFade.style.opacity = '0';
+      return;
+    }
+
+    if (
+      sectionId === 's3-travel' ||
+      sectionId === 's6-reflections' ||
+      sectionId === 's4-step3-wrap' ||
+      sectionId === 's4-step4-wrap'
+    ) {
+      topFade.classList.add('fade-blue');
+      return;
+    }
+
+    topFade.classList.add('fade-black');
+  }
+  
   // Intersection observer for section-level nav
   const sectionObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const idx = parseInt(entry.target.dataset.sectionIndex);
         updateNav(idx);
+        const sectionId = entry.target.id;
+        setTopFade(sectionId);
       }
     });
   }, { threshold: 0.1 });
   document.querySelectorAll('.page-section').forEach(el => sectionObserver.observe(el));
 
+  const fadeTargetObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        setTopFade(entry.target.id);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  ['s4-step3-wrap', 's4-step4-wrap'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) fadeTargetObserver.observe(el);
+  }); 
+  
   // Scroll-reveal observer
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
