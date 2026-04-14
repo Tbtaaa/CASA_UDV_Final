@@ -317,8 +317,8 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 40px 0;
-      border-bottom: 0.5px solid var(--border);
+      padding: 70px 0;
+      border-bottom: 0.6px solid var(--border);
       opacity: 0.35;
       transition: opacity 0.4s;
     }
@@ -352,9 +352,27 @@
       font-size: 16px;
       font-weight: 300;
       color: var(--text-muted);
+      letter-spacing: 0.05em;
       line-height: 1.75;
       padding: 14px 0px;
-      font-style: italic;
+      /* font-style: italic; */
+    }
+    @keyframes nudgeLeft {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(-8px); } /* Moves 8px to the left */
+    }
+    .step-instructions::before {
+      content: "<<"; 
+      display: inline-block;
+      margin-right: 8px;
+       color: var(--text-muted);
+      font-size: 14px;
+      animation: nudgeLeft 1.5s ease-in-out infinite;
+    }
+    
+    .spacer {
+      height: 80px; 
+      width: 100%;
     }
     .step-body p + p { margin-top: 12px; }
     .step-stat {
@@ -904,7 +922,7 @@
     }
     .s4-standalone-controls {
       background: var(--bg2);
-      padding: 48px 40px;
+      padding: 110px 40px 60px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -1677,9 +1695,11 @@
               in any given neighbourhood to reach it.
             </p>
           </div>
+          
           <div class="step-instructions">
                Click on each dot to find out more about each school.
           </div>
+          <div class="spacer"></div>
         </div>
 
         <!-- Step 2 -->
@@ -1694,6 +1714,7 @@
               fan outward in every direction.
             </p>
           </div>
+          <div class="spacer"></div>
         </div>
 
         <!-- Step 3 — Fly to Harold Hill + toggle buttons -->
@@ -1708,7 +1729,7 @@
               The transit network simply does not extend here with the same density.
             </p>
           <div class="step-instructions">
-            Click to compare the two areas:
+            Click the buttons below to compare the two areas:
           </div> 
           </div>
 
@@ -1729,6 +1750,7 @@
               </span>
             </button>
           </div>
+          <div class="spacer"></div>
         </div>
 
         <!-- Step 4 — pillar cards -->
@@ -1980,16 +2002,11 @@
               <br><strong style="color:#FF9043">Top 25% Progress 8 scores</strong> and <strong style="color:#FF9043">Ofsted Outstanding ratings</strong>.
               <br>
               <div class="step-instructions">
-                <br>Use the buttons above the map to toggle between different filters. 
-                <br>Use the slider to see how travel times compare with the baseline scenario. 
+                Use the buttons to toggle choice metrics, and the slider to compare travel times. 
               </div>
-              <br> 
-              <br>
-              <br>
-              <br>
-              <br>
             </p>
           </div>
+          <div class="spacer"></div>
         </div>
       </div>
     </div>
@@ -2058,13 +2075,10 @@
             </div>
           </div>
 
-          <!-- Stat display -->
-          <div style="background:var(--bg3);border:0.5px solid var(--border-mid);border-radius:8px;padding:20px 24px">
-            <div class="s4-ctrl-group-label" style="margin-bottom:8px">London median</div>
-            <div style="font-family:var(--font-mono);font-size:36px;font-weight:600;color:var(--accent)" id="s4-explorer-stat">16</div>
-            <div style="font-size:13px;color:var(--text-muted);margin-top:4px" id="s4-explorer-stat-label">min median · Transit · any school</div>
+          <!-- Dot plot chart -->
+          <div style="background:var(--bg3);border:0.5px solid var(--border-mid);border-radius:8px;padding:16px 20px">
+            <svg id="s4-dot-plot" width="100%" viewBox="0 0 320 118" style="overflow:visible;display:block"></svg>
           </div>
-        </div>
 
         <!-- Step 4 — borough chart -->
         <div class="s4-borough-chart-panel scroll-step" id="s4-step4-wrap" data-step="s4-2">
@@ -3666,6 +3680,24 @@ const s2StepActions = {
         car:     '#4fc3f7',   // blue
       };
 
+      const S4_RANGES = {
+        transit: [
+          { label: 'Any school',         min:  3, median: 16, max: 53 },
+          { label: 'Top 25% P8',         min:  5, median: 25, max: 61 },
+          { label: 'Ofsted Outstanding',  min:  6, median: 26, max: 65 },
+        ],
+        walk: [
+          { label: 'Any school',         min:  4, median: 17, max: 55 },
+          { label: 'Top 25% P8',         min:  8, median: 32, max: 82 },
+          { label: 'Ofsted Outstanding',  min:  9, median: 33, max: 89 },
+        ],
+        car: [
+          { label: 'Any school',         min:  1, median:  4, max: 22 },
+          { label: 'Top 25% P8',         min:  2, median:  7, max: 32 },
+          { label: 'Ofsted Outstanding',  min:  2, median:  7, max: 33 },
+        ],
+      };
+
       // Default explorer view
       const EXPLORER_CENTER = [-0.12, 51.50];
       const EXPLORER_ZOOM   = 9.25;
@@ -3774,6 +3806,129 @@ const s2StepActions = {
         });
       }
 
+      /* ── Section 4 Cleveland dot plot ─────────────────────────────── */
+      function drawS4DotPlot(mode) {
+        const svg    = document.getElementById('s4-dot-plot');
+        if (!svg) return;
+        const rows   = S4_RANGES[mode] || S4_RANGES.transit;
+        const col    = S4_MODE_COLOURS[mode] || '#FF9043';
+ 
+        // Layout constants (viewBox 320 × 118, extra top space for title)
+        const W = 320, H = 118;
+        const titleH  = 22;  // space reserved for title + subtitle
+        const marginL = 114, marginR = 10, marginT = titleH + 4, marginB = 18;
+        const plotW   = W - marginL - marginR;
+        const plotH   = H - marginT - marginB;
+        const rowH    = plotH / rows.length;
+ 
+        // Determine axis domain — round up to nearest 10
+        const allMax  = Math.max(...rows.map(r => r.max));
+        const domMax  = Math.ceil(allMax / 10) * 10;
+        const domMin  = 0;
+        const xScale  = v => marginL + ((v - domMin) / (domMax - domMin)) * plotW;
+ 
+        // Tooltip element (shared, created once)
+        let tip = document.getElementById('s4-dot-tip');
+        if (!tip) {
+          tip = document.createElement('div');
+          tip.id = 's4-dot-tip';
+          tip.style.cssText = [
+            'position:fixed;pointer-events:none;display:none',
+            'background:rgba(8,12,18,0.92);border:0.5px solid rgba(255,255,255,0.15)',
+            'border-radius:4px;padding:5px 9px;font-family:var(--font-mono)',
+            'font-size:14px;color:#e8e0d6;letter-spacing:0.06em;z-index:9999',
+            'white-space:nowrap;line-height:1.6'
+          ].join(';');
+          document.body.appendChild(tip);
+        }
+ 
+        // Tick values
+        const ticks = [];
+        for (let v = 0; v <= domMax; v += 20) ticks.push(v);
+ 
+        // Mode label for title
+        const modeLabelTitle = mode === 'transit' ? 'Transit' : mode === 'walk' ? 'Walk' : 'Car';
+ 
+        // Build SVG
+        let html = `<g id="s4-dp-title">`;
+ 
+        // Title
+        html += `<text x="0" y="10" font-family="var(--font-mono)" font-size="7.5" font-weight="500" fill="rgba(220,210,200,0.88)" letter-spacing="0.05em">DISTRIBUTION OF TRAVEL TIMES (${modeLabelTitle.toUpperCase()})</text>`;
+ 
+        // Subtitle
+        html += `<text x="0" y="20" font-family="var(--font-mono)" font-size="6" fill="rgba(180,170,160,0.5)" letter-spacing="0.06em">min · median · max · minutes</text>`;
+ 
+        html += `</g><g id="s4-dp-axes">`;
+ 
+        // Axis line
+        html += `<line x1="${marginL}" x2="${marginL + plotW}" y1="${H - marginB}" y2="${H - marginB}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>`;
+ 
+        // Tick marks + labels
+        ticks.forEach(v => {
+          const x = xScale(v);
+          html += `<line x1="${x}" x2="${x}" y1="${marginT}" y2="${H - marginB + 4}" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>`;
+          html += `<text x="${x}" y="${H - marginB + 11}" text-anchor="middle" font-family="var(--font-mono)" font-size="7.5" fill="rgba(200,190,180,0.5)">${v}</text>`;
+        });
+ 
+        html += `</g><g id="s4-dp-rows">`;
+ 
+        rows.forEach((r, i) => {
+          const cy = marginT + rowH * i + rowH / 2;
+          const x1 = xScale(r.min), xMed = xScale(r.median), x2 = xScale(r.max);
+ 
+          // Row label
+          html += `<text x="${marginL - 8}" y="${cy + 4}" text-anchor="end" font-family="var(--font-mono)" font-size="7" fill="rgba(200,190,180,0.75)" letter-spacing="0.03em">${r.label}</text>`;
+ 
+          // Range line
+          html += `<line x1="${x1}" x2="${x2}" y1="${cy}" y2="${cy}" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>`;
+ 
+          // Min cap
+          html += `<line x1="${x1}" x2="${x1}" y1="${cy - 4}" y2="${cy + 4}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>`;
+ 
+          // Max cap
+          html += `<line x1="${x2}" x2="${x2}" y1="${cy - 4}" y2="${cy + 4}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>`;
+ 
+          // Invisible wide hit targets for min/max/median
+          const dotR = 5;
+          // Min dot (hollow)
+          html += `<circle cx="${x1}" cy="${cy}" r="2.8" fill="var(--bg3)" stroke="${col}" stroke-width="1.2"
+            class="s4-dp-dot" data-val="${r.min}" data-label="${r.label}" data-type="min"/>`;
+          // Max dot (hollow)
+          html += `<circle cx="${x2}" cy="${cy}" r="2.8" fill="var(--bg3)" stroke="${col}" stroke-width="1.2"
+            class="s4-dp-dot" data-val="${r.max}" data-label="${r.label}" data-type="max"/>`;
+          // Median dot (filled)
+          html += `<circle cx="${xMed}" cy="${cy}" r="3.8" fill="${col}" stroke="none" opacity="0.92"
+            class="s4-dp-dot" data-val="${r.median}" data-label="${r.label}" data-type="median"/>`;
+ 
+          // Wide invisible hit areas
+          const hitH = 16;
+          [[x1,'min',r.min],[xMed,'median',r.median],[x2,'max',r.max]].forEach(([x, type, val]) => {
+            html += `<rect x="${x - 5}" y="${cy - hitH/2}" width="${dotR*2}" height="${hitH}" fill="transparent"
+              class="s4-dp-hit" data-val="${val}" data-label="${r.label}" data-type="${type}"/>`;
+          });
+        });
+ 
+        html += `</g>`;
+        svg.innerHTML = html;
+        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+ 
+        // Bind tooltip events
+        svg.querySelectorAll('.s4-dp-hit').forEach(el => {
+          el.addEventListener('mouseenter', (e) => {
+            const type  = el.dataset.type;
+            const val   = el.dataset.val;
+            const label = el.dataset.label;
+            tip.innerHTML = `<span style="color:rgba(180,170,160,0.7)">${label}</span><br><span style="color:${col}">${type}</span> <strong style="color:#e8e0d6">${val} min</strong>`;
+            tip.style.display = 'block';
+          });
+          el.addEventListener('mousemove', (e) => {
+            tip.style.left = (e.clientX + 14) + 'px';
+            tip.style.top  = (e.clientY - 28) + 'px';
+          });
+          el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+        });
+      }
+
       window.updateExplorer = function(clickedBtn) {
         // Update active button state within its group
         if (clickedBtn) {
@@ -3873,18 +4028,12 @@ const s2StepActions = {
         if (highlightRow)   highlightRow.style.display   = isFiltered ? 'flex' : 'none';
         if (highlightLabel) highlightLabel.textContent   = school === 'p8' ? 'Top 25% P8' : 'Ofsted Outstanding';
 
-        // ── Update stat card and legend title ──
-        const statEl      = document.getElementById('s4-explorer-stat');
-        const statLabelEl = document.getElementById('s4-explorer-stat-label');
+        // ── Update dot plot + legend title ──
         const legendTitle = document.getElementById('s4-explorer-legend-title');
-        const schoolLabel = school === 'any' ? 'any school'
-                          : school === 'p8'  ? 'top 25% P8'
-                          :                    'Ofsted Outstanding';
         const modeLabel   = mode.charAt(0).toUpperCase() + mode.slice(1);
-
-        if (statEl)      { statEl.textContent = median; statEl.style.color = modeCol; }
-        if (statLabelEl)  statLabelEl.textContent = `min median · ${modeLabel} · ${schoolLabel}`;
-        if (legendTitle)  legendTitle.textContent  = `${modeLabel} — ${schoolLabel}`;
+        const schoolLabel = school === 'any' ? 'any school' : school === 'p8' ? 'top 25% P8' : 'Ofsted Outstanding';
+        if (legendTitle) legendTitle.textContent = `${modeLabel} — ${schoolLabel}`;
+        drawS4DotPlot(mode);
       };
 
   /* ─────────────────────────────────────────
@@ -4340,6 +4489,10 @@ const s2StepActions = {
     }, { passive: true });
   })();
 
+    // Draw dot plot on initial load (transit is default mode)
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof drawS4DotPlot === 'function') drawS4DotPlot('transit');
+    });
   </script>
 </body>
 </html>
