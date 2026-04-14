@@ -1,0 +1,4509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pathways to Progress</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Mapbox GL JS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <style>
+    /* ─────────────────────────────────────────
+       DESIGN TOKENS
+    ───────────────────────────────────────── */
+    :root {
+      --bg:          #080c12;
+      --bg2:         #0e1420;
+      --bg3:         #141c2e;
+      --surface:     #1a2236;
+      --border:      rgba(255,255,255,0.08);
+      --border-mid:  rgba(255,144,67,0.22);
+
+      --text-primary:   #f0ece4;
+      --text-secondary: #d1c0ae; 
+      --text-muted:     #836e5a;
+
+      --accent:      #FF9043;      /* high-hue orange — primary */
+      --accent-dim:  #c96820;      /* darker orange for borders */
+      --accent-warm: #FF9043;      /* orange — schools */
+      --accent-red:  #ef5350;      /* LISA HH clusters */
+      --accent-green:#66bb6a;      /* walk */
+      --accent-blue: #4fc3f7;      /* transit mode */
+
+      --font-display: 'Inter', system-ui, sans-serif;
+      --font-body:    'Roboto', system-ui, sans-serif;
+      --font-mono:    'Roboto Mono', monospace;
+
+      --nav-w: 220px;
+      --dot-rail-w: 32px;
+    }
+
+    /* ─────────────────────────────────────────
+       RESET & BASE
+    ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 19.2px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    ::selection { background: rgba(255,144,67,0.28); }
+
+    /* ─────────────────────────────────────────
+       TOP NAV
+    ───────────────────────────────────────── */
+    #top-nav {
+      position: fixed;
+      top: 0; right: 0;
+      z-index: 200;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #top-nav a {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0px 10px;
+      border-radius: 3px;
+      transition: color 0.2s, background 0.2s;
+    }
+    #top-nav a:hover  { color: var(--text-secondary); }
+    #top-nav a.active { color: var(--accent); background: rgba(107,65,38,0.65); }
+
+    #top-fade {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 100%; 
+      height: 50px;
+      z-index: 15;
+      pointer-events: none;
+      background: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0.95) 0%, 
+      rgba(0, 0, 0, 0.75) 40%, 
+      rgba(0, 0, 0, 0.4) 70%, 
+      rgba(0, 0, 0, 0) 100%
+      );
+    }
+
+    /* ─────────────────────────────────────────
+       SCROLL DOT RAIL
+    ───────────────────────────────────────── */
+    #dot-rail {
+      position: fixed;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #dot-rail.visible { opacity: 1; }
+    .rail-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.25s, border-color 0.25s;
+    }
+    .rail-dot:hover { background: var(--text-secondary); transform: scale(1.3); }
+    .rail-dot.active {
+      background: var(--accent);
+      border-color: rgba(255,144,67,0.4);
+      transform: scale(1.4);
+    }
+
+    /* ─────────────────────────────────────────
+       SECTIONS — shared
+    ───────────────────────────────────────── */
+    .page-section {
+      position: relative;
+      width: 100%;
+    }
+
+    /* fade-in on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.22s; }
+    .reveal-delay-3 { transition-delay: 0.34s; }
+    .reveal-delay-4 { transition-delay: 0.46s; }
+
+    /* ─────────────────────────────────────────
+       SECTION 1 — HERO
+    ───────────────────────────────────────── */
+    #s1-hero {
+      height: 110vh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+      overflow: hidden;
+    }
+    #hero-map {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    /* dark vignette over map */
+    #s1-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(
+        120deg,
+        rgba(8,12,18,0.88) 0%,
+        rgba(8,12,18,0.55) 50%,
+        rgba(8,12,18,0.2) 100%
+      );
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 680px;
+      padding: 0 80px;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 18px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.3s forwards;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(42px, 6.5vw, 88px);
+      font-weight: 700;
+      line-height: 1.05;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.55s forwards;
+    }
+    .hero-title em {
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .hero-subtitle {
+      font-size: 20px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      max-width: 520px;
+      margin-bottom: 44px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.8s forwards;
+    }
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      opacity: 0;
+      animation: fadeUp 0.8s 1.05s forwards;
+    }
+    .hero-cta-arrow {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      animation: bounce 1.8s 1.5s ease-in-out infinite;
+    }
+    .hero-cta-arrow span {
+      display: block;
+      width: 1px;
+      height: 14px;
+      background: var(--text-muted);
+      margin: 0 auto;
+    }
+    .hero-cta-arrow::after {
+      content: '↓';
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(5px); }
+    }
+
+    /* ─────────────────────────────────────────
+       STICKY SCROLL WRAPPER — used in S2, S4, S5
+       (map stays fixed; narrative scrolls alongside)
+    ───────────────────────────────────────── */
+    .sticky-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+      position: relative;
+    }
+    .sticky-map-col {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 120;
+    }
+    .sticky-map-col .map-canvas {
+      width: 100%;
+      height: 100%;
+    }
+    .scroll-narrative-col {
+      padding: 60px 64px 60px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    #s2-motivation .scroll-narrative-col {
+      position: relative;
+    }
+    #s2-motivation .scroll-step {
+      position: relative;
+      z-index: 4;
+    }
+    #s4-map-explorer {
+      position: relative;
+      /*z-index: 120;*/
+    }
+
+    /* ─────────────────────────────────────────
+       SCROLL STEPS (narrative steps within sticky sections)
+    ───────────────────────────────────────── */
+    .scroll-step {
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 70px 10px;
+      border-bottom: 0.6px solid var(--border);
+      opacity: 0.35;
+      transition: opacity 0.4s;
+    }
+    .scroll-step:last-child { border-bottom: none; }
+    .scroll-step.active { opacity: 1; }
+
+    .step-index {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .step-heading {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 2.8vw, 38px);
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+    }
+    .step-body {
+      font-size: 20px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.75;
+    }
+    .step-instructions {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      line-height: 1.75;
+      padding: 14px 0px;
+      /* font-style: italic; */
+    }
+    @keyframes nudgeLeft {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(-8px); } /* Moves 8px to the left */
+    }
+    .step-instructions::before {
+      content: "<<"; 
+      display: inline-block;
+      margin-right: 8px;
+       color: var(--text-muted);
+      font-size: 14px;
+      animation: nudgeLeft 1.5s ease-in-out infinite;
+    }
+    
+    .spacer {
+      height: 80px; 
+      width: 100%;
+    }
+    .step-body p + p { margin-top: 12px; }
+    .step-stat {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 43px;
+      font-weight: 500;
+      color: var(--accent);
+      line-height: 1;
+      margin: 18px 0 5px;
+    }
+    .step-stat-label {
+      font-size: 13.2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* map overlay label (step label on map side) */
+    .map-step-label {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      z-index: 10;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent); 
+      background: rgba(8,12,18,0.75);
+      padding: 6px 10px;
+      border-radius: 3px;
+      border: 0.5px solid var(--border);
+    }
+
+    /* tooltip for info */
+    .tooltip-term {
+      position: relative;
+      text-decoration: underline;
+      text-decoration-color: rgba(255, 144, 67, 0.45);
+      text-underline-offset: 3px;
+      cursor: help;
+      transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    }
+    .tooltip-term:hover {
+      color: var(--text-primary);
+      text-decoration-color: var(--accent);
+    }
+    .tooltip-term::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 0;
+      top: calc(100% + 10px);
+      width: 320px;
+      max-width: 38vw;
+      background: rgba(8,12,18,0.96);
+      color: var(--text-secondary);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.5;
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 300;
+      white-space: normal;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px);
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+      z-index: 50;
+      pointer-events: none;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    }
+    .tooltip-term:hover::after {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    /* ─────────────────────────────────────────
+       MAP LEGEND
+    ───────────────────────────────────────── */
+    .map-legend {
+      position: absolute;
+      bottom: 20px;        
+      left: 24px;
+      z-index: 10;
+      background: rgba(8,12,18,0.85);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 6px;
+      padding: 12px 14px;
+      min-width: 160px;
+    }
+    .map-legend-title {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+      font-size: 13.2px;
+      color: var(--text-secondary);
+    }
+    .legend-swatch {
+      width: 28px;
+      height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    /* choropleth gradient swatches — will be set per map */
+    .swatch-low    { background: #1a1008; }
+    .swatch-mid    { background: #7a3d10; }
+    .swatch-high   { background: #c96820; }
+    .swatch-vhigh  { background: #FF9043; }
+
+    /* ─────────────────────────────────────────
+       SECTION 2 — MOTIVATION
+    ───────────────────────────────────────── */
+    #s2-motivation .section-intro {
+      padding: 80px 80px 20px;
+      min-height: 100vh;
+      max-width: 1000px;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 18px;
+    }
+    .section-headline {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 4vw, 48px);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.05em;
+      color: var(--text-primary);
+      margin-top: 18px;
+      margin-bottom: 18px;
+    }
+    .section-intro-body {
+      font-size: 22px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 900px;
+    }
+
+    /* Infographic boxes */ 
+    .metrics-row {
+      display: flex;
+      gap: 12px;
+      margin: 18px 0 22px;
+    }
+
+    .metric-box {
+      flex: 1;
+      background: var(--bg3);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+
+    .metric-value {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .metric-label {
+      font-size: 19px;
+      color: var(--text-secondary);
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Isochrone toggle buttons ───────────────────────────────────────── */
+    .iso-toggle {
+      display: flex;
+      flex-direction: row;        
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .iso-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px 18px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.2s, background 0.2s;
+      flex: 1;                    
+      min-width: 0;               /* prevents overflow in flex row */
+    }
+    .iso-btn:hover {
+      border-color: var(--accent);
+      background: rgba(255,144,67,0.06);
+    }
+    .iso-btn.active {
+      border-color: var(--accent);
+      background: rgba(255,144,67,0.10);
+    }
+    .iso-btn-name {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      line-height: 1.2;
+    }
+    .iso-btn.active .iso-btn-name {
+      color: var(--accent);
+    }
+    .iso-btn-meta {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .iso-btn-stat {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .iso-btn-num {
+      font-family: var(--font-mono);
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-right: 4px;
+      margin-bottom: 4px;
+      display: block;             /* number on its own line for emphasis */
+      line-height: 1.1;
+    }
+
+    /* Three-pillar cards */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 16px;
+      padding: 40px 80px 60px;
+    }
+    .pillar-card {
+      background: var(--bg3);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 8px;
+      padding: 24px;
+    }
+    .pillar-header {
+      display: flex;
+      align-items: baseline; 
+      gap: 10px; /* space between number and title */
+    }
+    .pillar-num {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+    .pillar-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+    .pillar-desc {
+      font-size: 19px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ── Motivation intro two-col layout ─────────────────────────────── */
+    .motivation-intro-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      min-height: 100vh;
+      gap: 0;
+    }
+
+    #s2-motivation .section-intro {
+      padding: 80px 80px 40px;
+      min-height: unset;
+      max-width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Image column */
+    .motivation-img-col {
+      position: relative;
+      height: 100vh;
+      min-height: unset;
+    }
+
+    .motivation-img-wrap {
+      position: absolute;
+      inset: 0;
+      border-radius: 0px;
+      overflow: hidden;
+    }
+
+    .motivation-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      filter: brightness(0.7) saturate(0.5);
+    }
+
+    /* Left-fade mask — bleeds into --bg */
+    .motivation-img-mask {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        #080c12 0%,
+        rgba(8,12,18,0.6) 25%,
+        rgba(8,12,18,0.1) 60%,
+        rgba(8,12,18,0.0) 100%
+      );
+    }
+
+    .motivation-img-credit {
+      position: absolute;
+      bottom: 12px;
+      right: 14px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      letter-spacing: 0.06em;
+      color: rgba(240, 236, 228, 0.35);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .motivation-intro-wrap {
+        grid-template-columns: 1fr;
+      }
+      #s2-motivation .section-intro {
+        padding: 60px 32px 40px;
+      }
+      .motivation-img-col {
+        height: 300px;
+        min-height: unset;
+        margin: 0 32px 40px;
+      }
+    }
+
+    /* ─────────────────────────────────────────
+       SECTION 3 — TRAVEL (chart-only)
+    ───────────────────────────────────────── */
+    #s3-travel {
+      padding: 80px 80px 80px;
+      background: var(--bg2);
+    }
+
+    .chart-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .chart-card {
+      background: var(--bg3);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 8px;
+      padding: 24px;
+    }
+    .chart-card-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .chart-card-title {
+      font-size: 15.6px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    .chart-card-source {
+      font-size: 13.2px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .chart-canvas-wrap {
+      position: relative;
+      width: 100%;
+      /* explicit height so Chart.js can render */
+    }
+    .chart-canvas-wrap canvas {
+      max-width: 100%;
+    }
+    .chart-placeholder {
+      width: 100%;
+      height: 160px;
+      background: var(--surface);
+      border: 1px dashed rgba(255,144,67,0.25);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 13.2px;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* stat callout for Chart 3 */
+    .stat-callout {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      margin: 20px 0 12px;
+    }
+    .stat-big {
+      font-family: var(--font-mono);
+      font-size: 56px;
+      font-weight: 500;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat-context {
+      font-size: 15.6px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 240px;
+      padding-bottom: 6px;
+    }
+    .region-bars { margin-top: 12px; }
+    .region-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+    .region-bar-label {
+      font-size: 13.2px;
+      color: var(--text-secondary);
+      width: 110px;
+      flex-shrink: 0;
+    }
+    .region-bar-track {
+      flex: 1;
+      height: 5px;
+      background: var(--surface);
+      border-radius: 2px;
+    }
+    .region-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--accent-warm);
+      transition: width 1s ease;
+    }
+    .region-bar-val {
+      font-family: var(--font-mono);
+      font-size: 13.2px;
+      color: var(--text-muted);
+      width: 40px;
+      text-align: right;
+    }
+
+    /* bridge text between sections */
+    .section-bridge {
+      padding: 60px 80px;
+      max-width: 700px;
+    }
+    .bridge-text {
+      font-family: var(--font-display);
+      font-size: clamp(20px, 2.2vw, 28px);
+      font-style: italic;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      border-left: 2px solid var(--accent);
+      padding-left: 24px;
+    }
+
+    /* ─────────────────────────────────────────
+       SECTION 4 — ACCESS (sticky scroll)
+    ───────────────────────────────────────── */
+    #s4-access {
+      padding: 0;           
+    }
+
+    /* Section intro keeps its own padding */
+    #s4-access .section-intro {
+      padding: 80px 80px 40px;
+      min-height: unset;
+      max-width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* ── Steps 3 & 4 — explorer sticky (map spans both scroll steps) ── */
+    .s4-explorer-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      position: relative;
+    }
+    .s4-explorer-map-col {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 60;
+    }
+    .s4-explorer-map-col .map-canvas {
+      width: 100%;
+      height: 100%;
+    }
+    .s4-explorer-narrative-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .s4-standalone-controls {
+      background: var(--bg2);
+      padding: 100px 60px 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 32px;
+      min-height: 100vh;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .s4-ctrl-group-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+    .s4-ctrl-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .s4-ctrl-btn {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: 1px solid var(--border-mid);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .s4-ctrl-btn:hover { color: var(--text-secondary); border-color: var(--text-secondary); }
+    .s4-ctrl-btn.active-any     { border-color: #d1c0ae; color: #d1c0ae; background: rgba(255,144,67,0.10); }
+    .s4-ctrl-btn.active-p8      { border-color: #d1c0ae; color: #d1c0ae; background: rgba(255,144,67,0.10); }
+    .s4-ctrl-btn.active-ofsted  { border-color: #d1c0ae; color: #d1c0ae; background: rgba(255,144,67,0.10); }
+    .s4-ctrl-btn.active-transit { border-color: #FF9043; color: #FF9043; background: rgba(79,195,247,0.08); }
+    .s4-ctrl-btn.active-walk    { border-color: #66bb6a; color: #66bb6a; background: rgba(102,187,106,0.08); }
+    .s4-ctrl-btn.active-car     { border-color: #4fc3f7; color: #4fc3f7; background: rgba(206,147,216,0.08); }
+
+    /* ── Step 4 — borough chart panel (map shared with step 3) ── */
+    .s4-borough-chart-panel {
+      background: var(--bg2);
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-y: auto;
+    }
+    .s4-expand-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 4px;
+      border: 1px solid var(--border-mid);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      align-self: flex-start;
+      margin-top: 12px;
+    }
+    .s4-expand-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── Quality toggle (step 2) — centred top of map-col ── */
+    .s4-quality-toggle {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;             /* shown/hidden by JS */
+      flex-direction: row;
+      gap: 6px;
+      background: rgba(8,12,18,0.88);
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,144,67,0.25);
+      white-space: nowrap;
+    }
+    .s4-quality-btn {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 7px 14px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,144,67,0.35);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .s4-quality-btn:hover { color: var(--text-secondary); border-color: var(--text-secondary); }
+    .s4-quality-btn.active { background: rgba(255,144,67,0.18); color: #FF9043; border-color: #FF9043; }
+
+    /* Mode toggle (kept for chart 6) */
+    .mode-toggle {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .mode-btn {
+      font-family: var(--font-mono);
+      font-size: 13.2px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      border-radius: 4px;
+      border: 1px solid var(--border-mid);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mode-btn:hover { color: var(--text-secondary); border-color: var(--text-secondary); }
+    .mode-btn.active-transit { border-color: #FF9043; color: #FF9043; background: rgba(79,195,247,0.08); }
+    .mode-btn.active-walk    { border-color: #66bb6a; color: #66bb6a; background: rgba(102,187,106,0.08); }
+    .mode-btn.active-car     { border-color: #4fc3f7; color: #4fc3f7; background: rgba(255,144,67,0.10); }
+
+    /* comparison slider container */
+    .map-compare-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .map-compare-wrap .map-canvas { position: absolute; inset: 0; }
+    #map-compare-slider {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 90%;                /* initial: mostly left map visible (s4-0) */
+      width: 3px;
+      background: #FF9043;
+      z-index: 20;
+      cursor: col-resize;
+      transform: translateX(-50%);
+      /* smooth scroll-driven transitions; JS disables for drag */
+      transition: left 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 50;
+    }
+    #map-compare-slider::before {
+      content: '◀ ▶';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #FF9043;
+      color: #0b0e14;
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 6px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      pointer-events: none;
+      font-family: var(--font-mono);
+    }
+    /* ── Map title badges — top corners ── */
+    #s4-label-left, #s4-label-right {
+      position: absolute;
+      top: 16px;
+      z-index: 50;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent); 
+      padding: 6px 10px;
+      border-radius: 3px;
+      background: rgba(8,12,18,0.75);
+      border: 0.5px solid var(--border);
+      pointer-events: none;
+    }
+
+    #s4-label-left  { left: 16px;  color: #FF9043; border-color: rgba(255,144,67,0.3); }
+    #s4-label-right { right: 16px; color: var(--text-muted); border-color: var(--border); }
+
+    /* Active = orange; inactive = muted — classes swap on slider cross */
+    #s4-label-left.s4-label-active,
+    #s4-label-right.s4-label-active {
+      color: #FF9043;
+      border-color: rgba(255,144,67,0.3);
+    }
+    #s4-label-left:not(.s4-label-active),
+    #s4-label-right:not(.s4-label-active) {
+      color: var(--text-muted);
+      border-color: var(--border);
+    }
+    #s4-label-left, #s4-label-right {
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* ── Bottom-left legend stack:
+          .map-legend (travel time) sits at the base,
+          #s4-schools-legend sits directly above it   ── */
+    #s4-access .map-legend {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      right: auto;          /* override any right-anchoring from global rule */
+      z-index: 50;
+    }
+    #s4-schools-legend {
+      position: absolute;
+      /* bottom is set dynamically via JS after legend height is known;
+         fallback keeps it visible even without JS measurement */
+      bottom: 178px;        /* approx: legend ~154px + 24px gap */
+      left: 24px;
+      z-index: 50;
+      background: rgba(8,12,18,0.85);
+      border: 0.5px solid var(--border-mid);
+      padding: 8px 12px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+    .schools-legend-row { display: flex; align-items: center; gap: 7px; }
+    .schools-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Borough summary table */
+    .borough-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    .borough-table th {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 6px 8px;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .borough-table td {
+      padding: 7px 8px;
+      border-bottom: 0.5px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 13.2px;
+    }
+    .borough-table tr:hover td { background: var(--surface); color: var(--text-primary); }
+    .td-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .td-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--accent);
+      min-width: 2px;
+    }
+
+    /* ─────────────────────────────────────────
+       SECTION 5 — VULNERABILITY (sticky scroll)
+    ───────────────────────────────────────── */
+
+    #s5-vulnerability .section-intro {
+      padding: 80px 80px 40px;
+      min-height: unset;
+      max-width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .vuln-stat-block {
+      background: var(--bg3);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .vuln-stat-num {
+      font-family: var(--font-mono);
+      font-size: 42px;
+      font-weight: 500;
+      color: var(--accent-red);
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .vuln-stat-desc {
+      font-size: 15.6px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* LISA legend swatches */
+    .swatch-hh  { background: var(--accent-red); }
+    .swatch-lh  { background: #ef9a9a; }
+    .swatch-hl  { background: #3d7fc4; }
+    .swatch-ll  { background: #1e3a5f; }
+    .swatch-ns  { background: var(--surface); border: 0.5px solid var(--border); }
+
+    /* ─────────────────────────────────────────
+    SECTION 6 — REFLECTIONS
+    ───────────────────────────────────────── */
+    #s6-reflections {
+      padding: 100px 80px 80px;
+      background: var(--bg2);
+    }
+
+    .reflections-header {
+      max-width: 700px;
+      margin-bottom: 56px;
+    }
+
+    /* ── Three-card image row ─────────────────────────────────────────── */
+    .reflection-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;                     /* gap between cards */
+      margin: 0 0 64px;              /* ← was: 0 -80px 64px */
+      height: 550px;
+      border-radius: 8px;            /* optional — rounds the whole group */
+      overflow: hidden;              /* clips card images to rounded corners */
+    }
+
+    .reflection-card {
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    /* Image fills card */
+    .reflection-img-wrap {
+      position: absolute;
+      inset: 0;
+    }
+    .reflection-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.6s ease;
+      filter: brightness(0.55) saturate(0.7);   /* darken + desaturate by default */
+    }
+    .reflection-card:hover .reflection-img {
+      transform: scale(1.04);
+      filter: brightness(0.45) saturate(0.6);
+    }
+
+    /* Gradient mask — dark at bottom where text sits */
+    .reflection-img-mask {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(8,12,18,0.05) 0%,
+        rgba(8,12,18,0.25) 35%,
+        rgba(8,12,18,0.75) 65%,
+        rgba(8,12,18,0.95) 100%
+      );
+    }
+
+    /* Text content — positioned at bottom of card */
+    .reflection-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 36px 36px 40px;
+      z-index: 2;
+    }
+
+    .reflection-num {
+      font-family: var(--font-mono);
+      font-size: 17px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 10px;
+      opacity: 1.0;
+    }
+
+    .reflection-title {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+      margin-bottom: 14px;
+      letter-spacing: -0.01em;
+    }
+
+    .reflection-body {
+      font-size: 18px;
+      font-weight: 300;
+      color: rgba(240,236,228,0.82);
+      line-height: 1.65;
+      max-width: 400px;
+
+      /* Hidden by default, revealed on hover */
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: max-height 0.45s ease, opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .reflection-card {
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      border-radius: 8px;            /* ← add this */
+    }
+
+    .reflection-card:hover .reflection-body {
+      max-height: 200px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reflection-credits {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 48px;
+      opacity: 0.6;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .reflection-cards {
+        grid-template-columns: 1fr;
+        height: auto;
+        margin: 0 0 48px;
+      }
+      .reflection-card {
+        height: 420px;
+      }
+      .reflection-card + .reflection-card {
+        border-left: none;
+        border-top: 1px solid rgba(255,144,67,0.2);
+      }
+      #s6-reflections {
+        padding: 60px 32px;
+      }
+    }
+
+    /* ─────────────────────────────────────────
+       SECTION 7 — ABOUT
+    ───────────────────────────────────────── */
+    #s7-about {
+      padding: 80px 80px 40px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .about-subhead {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .about-text {
+      font-size: 22px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    /* Data table */
+    .data-table {
+      display: flex;
+      flex-direction: column;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .data-row {
+      display: grid;
+      grid-template-columns: 160px 160px 1fr;
+      gap: 16px;
+      padding: 4px 0;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 16px;
+      color: var(--text-secondary);
+    }
+
+    .data-header {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--text-primary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* Team grid */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .team-card {
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .team-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 0.5px solid var(--border-mid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .team-name {
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .team-link {
+      font-size: 18px;
+      color: var(--accent);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .team-desc {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .team-link:hover {
+      text-decoration: underline;
+    }
+
+    .about-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr; /* slightly wider for table */
+      gap: 60px;
+      margin-top: 40px;
+    }
+
+    /* ─────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────── */
+    #page-footer {
+      padding: 24px 80px;
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 14.5px;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+    }
+
+    /* ─────────────────────────────────────────
+       MAPBOX OVERRIDES
+    ───────────────────────────────────────── */
+    .mapboxgl-ctrl-logo,
+    .mapboxgl-ctrl-attrib { display: none !important; }
+
+    /* Zoom controlers */
+    .mapboxgl-ctrl-group {
+      background: rgba(8, 12, 18, 0.9) !important;
+      border: 0.5px solid rgba(255, 144, 67, 0.25) !important;
+      border-radius: 6px !important;
+      box-shadow: none !important;
+      overflow: hidden;
+    }
+    /* Buttoms*/
+    .mapboxgl-ctrl-group button {
+      background: transparent !important;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+    }
+    /* Hover */
+    .mapboxgl-ctrl-group button:hover {
+      background: rgba(255, 144, 67, 0.1) !important;
+    }
+    /* Icons (+ -) */
+    .mapboxgl-ctrl-group button span {
+      filter: invert(1); /* los vuelve blancos */
+    }
+    /* Line */
+    .mapboxgl-ctrl-group button + button {
+      border-top: 0.5px solid rgba(255, 144, 67, 0.2);
+    }
+
+    /* ─────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .sticky-section   { grid-template-columns: 1fr; }
+      .sticky-map-col   { height: 50vh; position: relative; }
+      .chart-grid-2     { grid-template-columns: 1fr; }
+      .pillar-grid      { grid-template-columns: 1fr; }
+      .takeaway-grid    { grid-template-columns: 1fr; }
+      .team-data-grid   { grid-template-columns: 1fr; }
+      .hero-content     { padding: 0 32px; }
+      #s3-travel, #s6-reflections, #s7-team,
+      #s2-motivation .section-intro,
+      #s2-motivation .pillar-grid { padding-left: 32px; padding-right: 32px; }
+      .scroll-narrative-col { padding: 32px; }
+      .section-bridge   { padding: 40px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════
+       TOP NAV
+  ═══════════════════════════════════════ -->
+
+  <div id="top-fade"></div>
+
+  <nav id="top-nav" aria-label="Page sections">
+    <a href="#s1-hero"          class="nav-link active" data-section="0">Intro</a>
+    <a href="#s2-motivation"    class="nav-link"        data-section="1">Motivation</a>
+    <a href="#s3-travel"        class="nav-link"        data-section="2">Travel</a>
+    <a href="#s4-access"        class="nav-link"        data-section="3">Access</a>
+    <a href="#s5-vulnerability" class="nav-link"        data-section="4">Vulnerability</a>
+    <a href="#s6-reflections"   class="nav-link"        data-section="5">Reflections</a>
+    <a href="#s7-about"         class="nav-link"        data-section="6">About</a>
+  </nav>
+
+  <!-- Scroll dot rail -->
+  <div id="dot-rail" role="navigation" aria-label="Section progress">
+    <!-- dots injected by JS -->
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       S1 — HERO
+  ═══════════════════════════════════════ -->
+  <section id="s1-hero" class="page-section" data-section-index="0">
+    <div id="hero-map"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">UCL CASA · URBAN DATA VISUALISATION · 2026</p>
+      <h1 class="hero-title">Pathways to<br><em>Progress</em></h1>
+      <p class="hero-subtitle">
+        Investigating how transport connectivity shapes
+        secondary school choice and access to opportunities 
+        across London.
+      </p>
+      <div class="hero-cta">
+        <span>Scroll to explore</span>
+        <div class="hero-cta-arrow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       S2 — MOTIVATION
+  ═══════════════════════════════════════ -->
+  <section id="s2-motivation" class="page-section" data-section-index="1">
+
+    <div class="motivation-intro-wrap" id="s2-intro">
+    <!-- Left — existing text -->
+        <div class="section-intro reveal">
+          <p class="section-label">Motivation</p>
+          <p class="section-intro-body">
+            Every morning, close to 600,000 children travel to secondary schools across London. 
+            <br>
+          </p>
+          <h2 class="section-headline">But, how does where they live shape the schools, and opportunities, they can access?</h2>
+          <p class="section-intro-body">
+            Most students can reasonably access a secondary school near home. 
+            <br>However, not all schools offer the same opportunities.
+            <br>In reality, access to choice schools (and better opportunities) often depends on connectivity — where you live shapes what you can reach.
+            <br> 
+            <br>
+          </p>
+        </div>
+
+        <!-- Right — image with mask -->
+      <div class="motivation-img-col reveal reveal-delay-2">
+        <div class="motivation-img-wrap">
+          <img
+            src="./images/Motivation.png"
+            alt="Children travelling to school in London"
+            class="motivation-img"
+          />
+          <!-- Left-fade mask so image bleeds into background -->
+          <div class="motivation-img-mask"></div>
+        </div>
+          <p class="motivation-img-credit">Photo: Hounslow Council Images</p>
+      </div>
+    </div>
+        
+    <!-- Sticky map + scroll steps -->
+    <div class="sticky-section" id="s2-map-start">
+      <div class="sticky-map-col">
+        <div id="s2-map" class="map-canvas"></div>
+        <div class="map-step-label" id="s2-map-label">All secondary schools — London</div>
+        <div class="map-legend" id="s2-legend">
+          <div class="map-legend-title" id="s2-legend-title">Secondary schools</div>
+          <!-- School dot legend (default) -->
+          <div id="s2-legend-schools">
+            <div class="legend-row">
+              <div class="legend-swatch" style="background:#ffffff;border:1.5px solid #FF9043;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
+              <span>School location</span>
+            </div>
+          </div>
+          <!-- Travel time legend (shown during step 2) -->
+          <div id="s2-legend-tt" style="display:none">
+            <div style="height:8px;border-radius:4px;background:linear-gradient(to right,#1565c0,#64b5f6,#ffe082,#ef5350,#b71c1c);margin-bottom:4px"></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)">
+              <span>0 min</span><span>20</span><span>45 min</span>
+            </div>
+            <div class="legend-row" style="margin-top:10px;border-top:0.5px solid var(--border);padding-top:8px">
+              <div class="legend-swatch" style="background:#fcfcfc;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
+              <span>School location</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scroll-narrative-col">
+        <!-- Step 1 -->
+        <div class="scroll-step active" data-step="s2-0">
+          <p class="step-index">01 — Context</p>
+          <h3 class="step-heading">Across London, approximately 500 secondary schools serve
+              more than 560,000 students, aged 11–16</h3>
+          <div class="metrics-row">
+            <div class="metric-box">
+              <div class="metric-value">567,000</div>
+              <div class="metric-label">students</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-value">~500</div>
+              <div class="metric-label">secondary schools</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-value">~91%</div>
+              <div class="metric-label">avg utilisation</div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>
+              Mapped across the city, these schools appear to be
+              broadly distributed. But this distribution tells only part of the story.
+            </p>
+            <p>
+              Each dot represents a school. However, what it cannot show is the quality
+              of education of the school, its admissions policy, or how long it takes a child
+              in any given neighbourhood to reach it.
+            </p>
+          </div>
+          
+          <div class="step-instructions">
+               Click on each dot to find out more about each school.
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="scroll-step" data-step="s2-1">
+          <p class="step-index">02 — Connectivity</p>
+          <h3 class="step-heading">Some children have dozens of schools within reach</h3>
+          <div class="step-body">
+            <p>
+              A child living in inner London — like Clapham North in Lambeth —
+              can reach up to <strong style="color:var(--accent)">96 schools</strong> within
+              a 45-minute transit journey. Multiple tube lines and bus corridors
+              fan outward in every direction.
+            </p>
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+        <!-- Step 3 — Fly to Harold Hill + toggle buttons -->
+        <div class="scroll-step" data-step="s2-2">
+          <p class="step-index">02 — Connectivity</p>
+          <h3 class="step-heading">Others, including some in outer London, face far fewer options</h3>
+          <div class="step-body">
+            <p>
+              In a bus-only outer London neighbourhood — like Harold Hill in Havering —
+              that same 45-minute window reaches just
+              <strong style="color:var(--accent)">7 schools</strong>.
+              The transit network simply does not extend here with the same density.
+            </p>
+          <div class="step-instructions">
+            Click the buttons below to compare the two areas:
+          </div> 
+          </div>
+
+                  <!-- Toggle buttons -->
+          <div class="iso-toggle" id="iso-toggle">
+            <button class="iso-btn" data-origin="clapham" onclick="switchIsoView('clapham')">
+              <span class="iso-btn-name">Clapham North</span>
+              <span class="iso-btn-meta">Lambeth · Zone 2</span>
+              <span class="iso-btn-stat">
+                <span class="iso-btn-num">96</span>schools within 45 min
+              </span>
+            </button>
+            <button class="iso-btn active" data-origin="harold_hill" onclick="switchIsoView('harold_hill')">
+              <span class="iso-btn-name">Harold Hill</span>
+              <span class="iso-btn-meta">Havering · Bus only</span>
+              <span class="iso-btn-stat">
+                <span class="iso-btn-num">7</span>schools within 45 min
+              </span>
+            </button>
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+        <!-- Step 4 — pillar cards -->
+        <div class="scroll-step" data-step="s2-3">
+          <p class="step-index">03 — What we explore</p>
+          <h3 class="step-heading">We investigate how school access varies across London using three lenses</h3>
+          <p>
+            <br>
+          </p>
+          <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+            <div class="pillar-card" style="padding:16px 20px">
+              <div class="pillar-header">
+                <div class="pillar-num">01</div>
+                <div class="pillar-title">Baseline access</div>
+              </div>
+              <div class="pillar-desc">How easily can students reach any secondary school?</div>
+            </div>
+            <div class="pillar-card" style="padding:16px 20px">
+              <div class="pillar-header">
+                <div class="pillar-num">02</div>
+                <div class="pillar-title">Access to opportunity</div>
+              </div>
+              <div class="pillar-desc">
+                How does this change for 
+              <span class="tooltip-term" data-tooltip="Highest rating given by the UK schools inspectorate (Ofsted), indicating exceptional quality of teaching, leadership, and student outcomes.">
+                Ofsted-Outstanding schools </span>, 
+                and schools with strong 
+              <span class="tooltip-term" data-tooltip="Measures how much progress students make between primary school and GCSEs. A score above 0 indicates above-average progress.">
+                Progress 8 scores</span>?
+              </div>
+            </div>
+            <div class="pillar-card" style="padding:16px 20px">
+              <div class="pillar-header">
+                <div class="pillar-num">03</div>
+                <div class="pillar-title">Pockets of vulnerability</div>
+              </div>
+              <div class="pillar-desc">Where might poor connectivity and deprivation affecting children intersect?</div>
+            </div>
+          </div>
+          <p>
+            <br>
+            <br>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       S3 — TRAVEL TO SCHOOL
+  ═══════════════════════════════════════ -->
+  <section id="s3-travel" class="page-section" data-section-index="2">
+    <p class="section-label reveal">Travel to school</p>
+    <h2 class="section-headline reveal reveal-delay-1">How do London's children get to school?</h2>
+    <p class="section-intro-body reveal reveal-delay-2" style="max-width:900px; margin-top:12px; margin-bottom:0">
+      
+      Understanding how children travel, and the barriers they face, sets the context
+      for examining whether all children can realistically exercise school choice.
+    </p>
+
+    <div class="chart-grid-2 reveal reveal-delay-3">
+      <!-- Chart 1 — Mode share donut -->
+      <div class="chart-card">
+        <div class="chart-card-label">Chart 1</div>
+        <div class="chart-card-title">How children travel to school — mode share 2024</div>
+        <div class="chart-card-source">Source: DfT National Travel Survey 2024</div>
+        <div class="chart-canvas-wrap" style="height:220px">
+          <canvas id="chart1-mode"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 2 — Schools per borough bar -->
+      <div class="chart-card">
+        <div class="chart-card-label">Chart 2</div>
+        <div class="chart-card-title">Secondary schools per borough — top 10</div>
+        <div class="chart-card-source">Source: DfE Get Information About Schools 2024</div>
+        <div class="chart-canvas-wrap" style="height:220px">
+          <canvas id="chart2-boroughs"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-grid-2 reveal reveal-delay-1" style="margin-top:24px">
+      <!-- Chart 3 — Cross-LA stat callout -->
+      <div class="chart-card">
+        <div class="chart-card-label">Chart 3</div>
+        <div class="chart-card-title">Cross-authority secondary school attendance by region</div>
+        <div class="chart-card-source">Source: DfE Schools, Pupils and their Characteristics 2024</div>
+        <div class="stat-callout">
+          <div class="stat-big" id="stat3-counter">0%</div>
+          <div class="stat-context">
+            of London secondary students are educated <strong>outside</strong> their home local authority
+          </div>
+        </div>
+        <div class="region-bars" id="region-bars">
+          <!-- injected by JS -->
+        </div>
+        <p style="font-size:14.4px;color:var(--text-muted);margin-top:14px;line-height:1.5">
+          London has the highest rate in England — illustrating willingness to travel for
+          opportunity. But how many children have the means to do so?
+        </p>
+      </div>
+
+      <!-- Chart 4 — Barriers + incentives lollipop -->
+      <div class="chart-card">
+        <div class="chart-card-label">Chart 4</div>
+        <div class="chart-card-title">Barriers to walking &amp; what would encourage it</div>
+        <div class="chart-card-source">Source: DfT Walking and Cycling Statistics, England 2024</div>
+        <div style="margin-bottom:10px">
+          <div style="font-size:13.2px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">Barriers to walking more</div>
+          <canvas id="chart4a-barriers" style="max-height:110px"></canvas>
+        </div>
+        <div style="margin-top:16px">
+          <div style="font-size:13.2px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">What would encourage walking</div>
+          <canvas id="chart4b-incentives" style="max-height:110px"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-bridge reveal">
+      <p class="bridge-text">
+        "19.9% of London's secondary students travel outside their home borough —
+        the highest rate in England. But willingness to travel only translates
+        to opportunity when the journey is actually possible."
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       S4 — ACCESS TO OPPORTUNITY
+  ═══════════════════════════════════════ -->
+  <section id="s4-access" class="page-section" data-section-index="3">
+
+  <div class="motivation-intro-wrap" id="s4-intro">
+    <div class="section-intro reveal">
+      <p class="section-label">Access to opportunity</p>
+      <h2 class="section-headline">How does travel time change<br>when quality matters?</h2>
+      <p class="section-intro-body">
+        We layer <strong style="color:#FF9043">Progress 8 scores</strong> and 
+        <strong style="color:#FF9043">Ofsted ratings</strong> onto the accessibility
+        analysis — and find that filtering for quality significantly extends
+        the journeys many children must make.
+      </p>
+    </div>
+
+    <div class="motivation-img-col reveal reveal-delay-2">
+      <div class="motivation-img-wrap">
+        <img
+          src="./images/access-section4.png"
+          alt="School access across London"
+          class="motivation-img"
+        />
+        <div class="motivation-img-mask"></div>
+      </div>
+      <p class="motivation-img-credit">Photo: Gary John Norman / GettyImages</p>
+    </div>
+  </div>
+
+    <!-- ── Steps 1 & 2 — sticky comparison slider ──────────────────── -->
+    <div class="sticky-section" id="s4-map-start">
+      <div class="sticky-map-col">
+        <div class="map-compare-wrap">
+          <!-- Left: any school choropleth -->
+          <div id="s4-map-base"  class="map-canvas" style="position:absolute;inset:0"></div>
+          <!-- Right: quality subset choropleth — clipped by slider; initial ~85% from left -->
+          <div id="s4-map-right" class="map-canvas" style="position:absolute;inset:0;clip-path:inset(0 0 0 85%);transition:clip-path 0.7s cubic-bezier(0.4,0,0.2,1)"></div>
+          <div id="map-compare-slider"></div>
+        </div>
+
+        <!-- Schools legend (top-left) -->
+        <div id="s4-schools-legend">
+          <div class="schools-legend-row">
+            <div class="schools-legend-dot" style="background:#ffffff;border:1.5px solid #FF9043;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
+            <span style="color:var(--text-secondary)">All schools</span>
+          </div>
+          <div class="schools-legend-row" id="s4-schools-legend-highlight" style="display:none">
+            <div class="schools-legend-dot" style="background:#C96820;border:1.2px solid #ffffff;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
+            <span id="s4-schools-legend-label" style="color:var(--text-secondary)">Top 25% P8</span>
+          </div>
+        </div>
+
+        <!-- Travel-time legend (bottom-left) -->
+        <div class="map-legend" id="s4-legend">
+          <div class="map-legend-title">Travel time — Transit (min)</div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffe066"></div><span>&lt; 10</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffb347"></div><span>11–20</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ff7c2a"></div><span>21–30</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#e64400"></div><span>31–40</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#8b1a00"></div><span>41–54</span></div>
+        </div>
+
+        <!-- Slider labels (bottom corners) -->
+        <div id="s4-label-left">Nearest school</div>
+        <div id="s4-label-right">Top 25% P8</div>
+
+        <!-- Quality toggle (top-centre, shown only on step s4-1) -->
+        <div class="s4-quality-toggle" id="s4-quality-toggle" style="display:none">
+          <button class="s4-quality-btn active" data-quality="p8"     onclick="setRightQuality('p8')">Top 25% P8</button>
+          <button class="s4-quality-btn"        data-quality="ofsted" onclick="setRightQuality('ofsted')">Ofsted Outstanding</button>
+        </div>
+      </div>
+
+      <div class="scroll-narrative-col">
+        <!-- Step 1 — baseline -->
+        <div class="scroll-step active" data-step="s4-0">
+          <p class="step-index">01 — Baseline Access</p>
+          <h3 class="step-heading">Across London's LSOAs, the median travel time to the nearest secondary school appears relatively healthy</h3>
+          <div class="step-body">
+
+            <div>
+              <span class="step-stat" style="font-size:34px;color:#FF9043">16</span>  <span class="step-stat" style="font-size:20px;color:#FF9043">min</span>
+              <div class="step-stat-label">median transit time <br>Nearest school</div>
+            </div>
+            <p style="margin-top:14px">
+              The map shows travel time from each LSOA to its <strong style="color:#FF9043">nearest secondary school</strong>.
+              <br>Dots mark every secondary school in London. 
+              <br>The map's color intensity provides a sense of travel time via transit (i.e. bus & rail).
+              <br>
+              <br>
+              <br>
+              <br>
+              <br>
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 2 — quality toggle -->
+        <div class="scroll-step" data-step="s4-1">
+          <p class="step-index">02 — Quality Access</p>
+          <h3 class="step-heading">However, adding a quality threshold extends the median travel time by 50%, with larger increases in places</h3>
+          <div class="step-body">
+            <p>
+              Once we filter for non-selective, high progress schools, median travel
+              time rises — because fewer schools qualify and they are not evenly
+              distributed across the city.
+            </p>
+            <div style="display:flex;gap:24px;margin:16px 0">
+              <div>
+                <span class="step-stat" style="font-size:34px;color:#FF9043">25</span>  <span class="step-stat" style="font-size:20px;color:#FF9043">min</span>
+                <div class="step-stat-label"></div> <div class="step-stat-label">median transit time <br> Nearest Top 25% Progress 8 School</div>
+              </div>
+              <div>
+                <span class="step-stat" style="font-size:34px;color:#FF9043">26</span>  <span class="step-stat" style="font-size:20px;color:#FF9043">min</span>
+                <div class="step-stat-label"></div> <div class="step-stat-label">median transit time <br> Nearest Ofsted Outstanding School</div>
+              </div>
+            </div>
+            <p>
+              Highlighted dots show qualifying schools for the selected metric: 
+              <br><strong style="color:#FF9043">Top 25% Progress 8 scores</strong> and <strong style="color:#FF9043">Ofsted Outstanding ratings</strong>.
+              <br>
+              <div class="step-instructions">
+                Use the buttons to toggle choice metrics, and the slider to compare travel times. 
+              </div>
+            </p>
+          </div>
+          <div class="spacer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Steps 3 & 4 — explorer + borough (shared sticky map) ──────── -->
+    <div class="s4-explorer-section" id="s4-step3-wrap">
+
+      <!-- Left col: sticky map spanning both scroll steps -->
+      <div class="s4-explorer-map-col">
+        <div id="s4-map-explorer" class="map-canvas"></div>
+
+        <!-- Schools legend — always visible, highlight row toggles -->
+        <div id="s4-explorer-schools-legend" style="position:absolute;bottom:178px;left:24px;z-index:21;background:rgba(8,12,18,0.85);border:0.5px solid var(--border-mid);padding:8px 12px;border-radius:4px;display:flex;flex-direction:column;gap:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;color:var(--text-muted)">
+          <div class="schools-legend-row" id="s4-explorer-all-schools-row">
+            <div class="schools-legend-dot" style="background:#C96820;border:1.5px solid #ffffff;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
+            <span style="color:var(--text-secondary)">All schools</span>
+          </div>
+          <div class="schools-legend-row" id="s4-explorer-highlight-row" style="display:none">
+            <div class="schools-legend-dot" style="background:#C96820;border:1.5px solid #ffffff;border-radius:50%;width:10px;height:10px;flex-shrink:0"></div>
+            <span id="s4-explorer-highlight-label" style="color:var(--text-secondary)">Top 25% P8</span>
+          </div>
+        </div>
+
+        <!-- Travel-time legend -->
+        <div class="map-legend" id="s4-explorer-legend" style="bottom:24px;left:24px">
+          <div class="map-legend-title" id="s4-explorer-legend-title">Transit — any school</div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffe066"></div><span>&lt; 10 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffb347"></div><span>11–20 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ff7c2a"></div><span>21–30 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#e64400"></div><span>31–40 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#8b1a00"></div><span>41–54 min</span></div>
+        </div>
+      </div>
+
+      <!-- Right col: two scroll steps stacked -->
+      <div class="s4-explorer-narrative-col">
+
+        <!-- Step 3 — mode × school controls -->
+        <div class="s4-standalone-controls">
+          <div>
+            <p class="step-index" style="margin-bottom:12px">03 — Mode comparison</p>
+            <h3 class="step-heading" style="margin-bottom:16px">How does travel mode affect this picture?</h3>
+            <p class="step-body" style="font-size:17px;color:var(--text-secondary);line-height:1.65">
+              Select a school type and travel mode to update the choropleth.
+              <br> Each combination reveals a different dimension of potential access inequality.
+            </p>
+          </div>
+
+          <!-- School type -->
+          <div>
+            <div class="s4-ctrl-group-label">School type</div>
+            <div class="s4-ctrl-btns" id="s4-school-btns">
+              <button class="s4-ctrl-btn" data-school="any" onclick="updateExplorer(this)">Any school</button>
+              <button class="s4-ctrl-btn active-p8" data-school="p8" onclick="updateExplorer(this)">Top 25% P8</button>
+              <button class="s4-ctrl-btn" data-school="ofsted" onclick="updateExplorer(this)">Ofsted Outstanding</button>
+            </div>
+          </div>
+
+          <!-- Travel mode -->
+          <div>
+            <div class="s4-ctrl-group-label">Travel mode</div>
+            <div class="s4-ctrl-btns" id="s4-mode-btns">
+              <button class="s4-ctrl-btn active-transit" data-mode="transit" onclick="updateExplorer(this)">Transit</button>
+              <button class="s4-ctrl-btn" data-mode="walk" onclick="updateExplorer(this)">Walk</button>
+              <button class="s4-ctrl-btn" data-mode="car" onclick="updateExplorer(this)">Car</button>
+            </div>
+          </div>
+
+          <!-- Dot plot chart -->
+          <div style="background:var(--bg3); max-width:750px; border:0.5px solid var(--border-mid);border-radius:8px;padding:16px 20px">
+            <svg id="s4-dot-plot" width="100%" viewBox="0 0 320 118" style="overflow:visible;display:block"></svg>
+          </div>
+        </div>
+
+        <!-- Step 4 — borough chart -->
+        <div class="s4-borough-chart-panel scroll-step" id="s4-step4-wrap" data-step="s4-2">
+          <p class="step-index" style="margin-bottom:12px">04 — Borough summary</p>
+          <h3 class="step-heading" style="margin-bottom:8px">Borough-level variation in school access</h3>
+          <p style="font-size:16px;color:var(--text-muted);margin-bottom:12px">
+            Median travel time to nearest Top 25% P8 school · by borough
+          </p>
+
+          <!-- Mode toggle for borough chart -->
+          <div class="s4-ctrl-btns" id="s4-borough-mode-btns" style="margin-bottom:16px">
+            <button class="s4-ctrl-btn active-transit" data-bmode="transit" onclick="updateBoroughChart(this)">Transit</button>
+            <button class="s4-ctrl-btn" data-bmode="walk"    onclick="updateBoroughChart(this)">Walk</button>
+            <button class="s4-ctrl-btn" data-bmode="car"     onclick="updateBoroughChart(this)">Car</button>
+          </div>
+
+          <!-- Chart canvas -->
+          <div style="position:relative;height:400px">
+            <canvas id="chart-borough-compare"></canvas>
+          </div>
+
+          <button class="s4-expand-btn" id="s4-expand-btn" onclick="toggleBoroughExpand()">
+            Show all 33 boroughs ↓
+          </button>
+        </div>
+
+      </div><!-- /s4-explorer-narrative-col -->
+    </div><!-- /s4-explorer-section -->
+
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       S5 — VULNERABILITY
+  ═══════════════════════════════════════ -->
+  <section id="s5-vulnerability" class="page-section" data-section-index="4">
+
+    <div class="motivation-intro-wrap" id="s5-intro">
+      <div class="section-intro reveal">
+        <p class="section-label">Pockets of vulnerability</p>
+        <h2 class="section-headline">Where deprivation meets<br>long journeys</h2>
+        <p class="section-intro-body">
+          Using Local Indicators of Spatial Autocorrelation (LISA), we identify
+          neighbourhoods where high transit times to Progress 8 schools coincide
+          with elevated child deprivation — compounding barriers to opportunity.
+        </p>
+      </div>
+
+      <div class="motivation-img-col reveal reveal-delay-2">
+        <div class="motivation-img-wrap">
+          <img
+            src="./images/deprivation-section5.png"
+            alt="Vulnerable neighbourhoods in London"
+            class="motivation-img"
+          />
+          <div class="motivation-img-mask"></div>
+        </div>
+          <p class="motivation-img-credit">Photo: Matt Cardy/Getty Images</p>
+      </div>
+    </div>
+
+    <div class="sticky-section" id="s5-map-start">
+      <div class="sticky-map-col">
+        <div id="s5-map" class="map-canvas"></div>
+        <div class="map-legend">
+          <div class="map-legend-title">LISA cluster type</div>
+          <div class="legend-row"><div class="legend-swatch swatch-hh"></div><span>High–High (vulnerable)</span></div>
+          <div class="legend-row"><div class="legend-swatch swatch-lh"></div><span>Low–High</span></div>
+          <div class="legend-row"><div class="legend-swatch swatch-hl"></div><span>High–Low</span></div>
+          <div class="legend-row"><div class="legend-swatch swatch-ll"></div><span>Low–Low</span></div>
+          <div class="legend-row"><div class="legend-swatch swatch-ns"></div><span>Not significant</span></div>
+        </div>
+      </div>
+
+      <div class="scroll-narrative-col">
+        <!-- Step 1 — clusters appear -->
+        <div class="scroll-step active" data-step="s5-0">
+          <p class="step-index">01 — Spatial clustering</p>
+          <h3 class="step-heading">Identifying pockets of compounded disadvantage</h3>
+          <div class="step-body">
+            <p>
+              LISA clustering reveals LSOAs where high transit times to P8 schools
+              are spatially concentrated alongside high levels of child deprivation.
+              These High–High clusters represent neighbourhoods where the challenge
+              is greatest.
+            </p>
+            <p>
+              Red areas on the map mark these pockets. They are not random —
+              they cluster in specific outer-London corridors.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 2 — 20% stat -->
+        <div class="scroll-step" data-step="s5-1">
+          <p class="step-index">02 — Scale of the problem</p>
+          <h3 class="step-heading">1 in 5 school-age children live in these neighbourhoods</h3>
+          <div class="step-body">
+            <p>Across London's High–High LISA clusters:</p>
+          </div>
+          <div class="vuln-stat-block">
+            <div class="vuln-stat-num" id="vuln-counter">0%</div>
+            <div class="vuln-stat-desc">
+              of London school-children live in LSOAs where both
+              transit time to a P8 school and child deprivation
+              are above the London median.
+            </div>
+          </div>
+          <div class="vuln-stat-block" style="margin-top:12px;border-color:rgba(255,179,71,0.3)">
+            <div class="vuln-stat-num" style="color:#FF9043;font-size:32px">
+              <span class="chart-placeholder" style="height:80px;font-size:13px">Median travel time in HH clusters<br>PLACEHOLDER — data pending</span>
+            </div>
+          </div>
+          <div style="margin-top:16px">
+            <canvas id="chart8-cluster-compare" style="max-height:140px"></canvas>
+          </div>
+        </div>
+
+        <!-- Step 3 — income -->
+        <div class="scroll-step" data-step="s5-2">
+          <p class="step-index">03 — Income context</p>
+          <h3 class="step-heading">With incomes below the London average by up to 20%</h3>
+          <div class="step-body">
+            <p>
+              Households in these cluster LSOAs have median incomes approximately
+              <strong style="color:var(--accent-red)">30% below the London average</strong>.
+            </p>
+            <p>
+              This makes car ownership — which would substantially cut travel times —
+              or use of faster rail services financially inaccessible for many families.
+              These children are reliant on a transit system that, in these corridors,
+              leaves them furthest from opportunity.
+            </p>
+          </div>
+          <div style="margin-top:20px">
+            <div class="chart-card-label">Chart 10 — LSOA scatter: IMD vs P8 transit time</div>
+            <div class="chart-placeholder" style="height:180px;margin-top:8px">
+              Scatter plot — IMD deprivation score vs median P8 transit time<br>
+              PLACEHOLDER — awaiting final LISA + STATS19 merged dataset
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ <!-- ═══════════════════════════════════════
+      S6 — REFLECTIONS
+  ═══════════════════════════════════════ -->
+  <section id="s6-reflections" class="page-section" data-section-index="5">
+
+    <div class="reflections-header reveal">
+      <p class="section-label">Reflections</p>
+      <h2 class="section-headline">Mind the Gap:<br>Reflections on School Access and Opportunity in London</h2>
+    </div>
+
+    <!-- Three image cards in a row -->
+    <div class="reflection-cards reveal reveal-delay-1">
+
+      <!-- Card 1 -->
+      <div class="reflection-card">
+        <div class="reflection-img-wrap">
+          <img src="./images/1.png" alt="Access vs Choice" class="reflection-img" />
+          <div class="reflection-img-mask"></div>
+        </div>
+        <div class="reflection-content">
+          <div class="reflection-num">01</div>
+          <div class="reflection-title">Access vs. Choice</div>
+          <div class="reflection-body">
+            How we define access and choice shapes how we understand school
+            accessibility. After accounting for choice, subtle inequalities
+            remain — often reflecting a trade-off between where students live
+            and the opportunities they can reach.
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="reflection-card">
+        <div class="reflection-img-wrap">
+          <img src="./images/2.png" alt="Bridging the Gap" class="reflection-img" />
+          <div class="reflection-img-mask"></div>
+        </div>
+        <div class="reflection-content">
+          <div class="reflection-num">02</div>
+          <div class="reflection-title">Bridging the Gap</div>
+          <div class="reflection-body">
+            Supporting affordable and sustainable travel, targeting assistance
+            for lower-income families, and maintaining good schools in more
+            deprived areas can help ensure fair access for the next generation.
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="reflection-card">
+        <div class="reflection-img-wrap">
+            <img src="./images/3.png" alt="Securing Future Equity" class="reflection-img" />  
+          <div class="reflection-img-mask"></div>
+        </div>
+        <div class="reflection-content">
+          <div class="reflection-num">03</div>
+          <div class="reflection-title">Securing Future Equity</div>
+          <div class="reflection-body">
+            As pupil demand evolves and school closures become more likely,
+            how we think about reallocating resources must keep equitable
+            travel to schools as a planning priority for the city.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image credits -->
+    <p class="reflection-credits">
+      Image credits: Gary John Norman / Getty Images &nbsp;·&nbsp;
+      Bruno Figueiredo / Unsplash &nbsp;·&nbsp;
+      Nick David / Getty Images
+    </p>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       S7 — ABOUT
+  ═══════════════════════════════════════ -->
+  <section id="s7-about" class="page-section" data-section-index="6">
+  <p class="section-label reveal">About</p>
+  <h2 class="section-headline reveal reveal-delay-1">Pathways to Progress</h2>
+
+  <div class="about-two-col">
+
+    <!-- Acknowledgements -->
+    <div class="about-block reveal reveal-delay-2">
+      <p class="about-subhead">Acknowledgements</p>
+      <p class="about-text">
+        <strong>Pathways to Progress</strong> was developed as part of UCL CASA's MSc in Urban Spatial Science module on Urban Data Visualisation, led by Prof Duncan Smith. The 2026 theme is “Urban Analytics”.
+      </p>
+      <p class="about-text">
+        We thank Prof Duncan Smith and our PGTA Kayla McInnis for their valuable guidance and input, and extend special acknowledgment to Prof Adam Dennett for his wisdom and insights on the challenges facing secondary schools in London.
+      </p>
+    </div>
+
+    <!-- Data Sources -->
+    <div class="about-block reveal reveal-delay-3">
+      <p class="about-subhead">Data sources</p>
+
+      <div class="data-table">
+        <div class="data-row data-header">
+          <div>Agency</div>
+          <div>Dataset</div>
+          <div>Description</div>
+        </div>
+
+        <div class="data-row">
+          <div>DfE</div><div>GIAS</div>
+          <div>National register of all educational establishments in England.</div>
+        </div>
+
+        <div class="data-row">
+          <div>Ofsted</div><div>Inspections</div>
+          <div>School inspection outcomes and effectiveness ratings.</div>
+        </div>
+
+        <div class="data-row">
+          <div>DfE</div><div>KS4 Performance</div>
+          <div>Key Stage 4 attainment metrics (Attainment 8, Progress 8, EBacc).</div>
+        </div>
+
+        <div class="data-row">
+          <div>DfE</div><div>SCAP</div>
+          <div>School Capacity Survey, including pupil places and utilisation.</div>
+        </div>
+
+        <div class="data-row">
+          <div>MHCLG</div><div>IMD 2025</div>
+          <div>Index of Multiple Deprivation.</div>
+        </div>
+
+        <div class="data-row">
+          <div>DfE</div><div>Workforce</div>
+          <div>School Workforce Census and staffing data.</div>
+        </div>
+
+        <div class="data-row">
+          <div>GLA</div><div>Boundary</div>
+          <div>Official geographic boundary for London.</div>
+        </div>
+
+        <div class="data-row">
+          <div>DfT / RDG</div><div>GTFS</div>
+          <div>Public transport schedules for bus and rail networks.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team -->
+  <div class="about-block reveal reveal-delay-4">
+    <p class="about-subhead"><br> Our team</p>
+
+    <div class="team-grid">
+      
+      <!-- Benjamin -->
+      <div class="team-card">
+        <div class="team-avatar">BT</div>
+        <div class="team-name">Benjamin Tee</div>
+        <a href="https://github.com/benjamintee" class="team-link">@benjamintee</a>
+        <div class="team-desc">
+          Benjamin is a public servant and is passionate about data-driven and evidence-based policymaking. He is excited about making maps and good visualisations that tell a compelling story and motivate positive action. 
+        </div>
+      </div>
+
+      <!-- Tabata -->
+      <div class="team-card">
+        <div class="team-avatar">TP</div>
+        <div class="team-name">Tabata Parades</div>
+        <a href="https://github.com/Tbtaaa" class="team-link">@Tbtaaa</a>
+        <div class="team-desc">
+          Tabata is a transport planner with an eye for design and clarity. She enjoys using colour, typography, and visual structure to make complex ideas simple, and finds satisfaction when they come together seamlessly with precision and elegance. 
+        </div>
+      </div>
+
+      <!-- Olivia -->
+      <div class="team-card">
+        <div class="team-avatar">OX</div>
+        <div class="team-name">Olivia Xing</div>
+        <a href="https://github.com/yxing82" class="team-link">@yxing82</a>
+        <div class="team-desc">
+          Olivia is a mathematician with a curiosity for complex urban systems and a commitment to social justice. She enjoys unpacking difficult problems through logical reasoning and translating them into clear insights to make a difference.
+      </div>
+
+    </div>
+  </div>
+</section>
+
+  <!-- Footer -->
+  <footer id="page-footer">
+    <span>Pathways to Progress  <span style="color:var(--accent)">·</span> UCL CASA <span style="color:var(--accent)">·</span> 2026</span>
+    <span>Built with Mapbox GL JS <span style="color:var(--accent)">·</span> Chart.js <span style="color:var(--accent)">·</span> r5py</span>
+  </footer>
+
+
+  <!-- ═══════════════════════════════════════
+       JAVASCRIPT
+  ═══════════════════════════════════════ -->
+  <script>
+  /* ─────────────────────────────────────────
+     CONFIGURATION — edit these values
+  ───────────────────────────────────────── */
+  const MAPBOX_TOKEN = 'pk.eyJ1IjoidGVlY2hpbm1pbmJlbiIsImEiOiJjbWtmcTJldHgwMWg2M2lzYnV2cnUzN2twIn0.6iawA9W8OLSwrcV_ZHG41g'; 
+  // GeoJSON URLs — host these alongside index.html or on a CDN
+  const DATA = {
+    schools:          './data/schools.geojson',
+    lsoa_transit_any: './data/lsoa_transit_any.geojson',   // property: travel_min
+    lsoa_transit_p8:  './data/lsoa_transit_p8.geojson',    // property: travel_min
+    lsoa_transit_walk:'./data/lsoa_transit_walk.geojson',  // property: travel_min
+    lsoa_transit_car: './data/lsoa_transit_car.geojson',   // property: travel_min
+    lsoa_lisa:        './data/lsoa_lisa.geojson',          // property: cluster_type ("HH","LH","HL","LL","NS")
+  };
+
+  /* ─────────────────────────────────────────
+     COLOUR HELPERS
+  ───────────────────────────────────────── */
+  const TRANSIT_COLOR_EXPR = [
+    'interpolate', ['linear'], ['get', 'travel_min'],
+    0,  '#1a1008',
+    10, '#2e1e0a',
+    20, '#7a3d10',
+    30, '#c96820',
+    45, '#FF9043'
+  ];
+  const LISA_COLOR_EXPR = [
+    'match', ['get', 'cluster_type'],
+    'HH', '#ef5350',
+    'LH', '#ef9a9a',
+    'HL', '#3d7fc4',
+    'LL', '#1e3a5f',
+    '#1a2236'
+  ];
+
+  /* ─────────────────────────────────────────
+     SAFE STUB — overwritten inside on('load')
+     Prevents ReferenceError when s2StepActions
+     calls setCustomLabelOpacity before map loads
+  ───────────────────────────────────────── */
+  window.setCustomLabelOpacity = () => {};
+
+  /* ─────────────────────────────────────────
+     MAPBOX INIT HELPER
+  ───────────────────────────────────────── */
+  function initMap(containerId, options = {}) {
+    if (!mapboxgl || MAPBOX_TOKEN === 'YOUR_MAPBOX_TOKEN_HERE') {
+      console.warn('Mapbox token not set — map will not render. Set MAPBOX_TOKEN in script.');
+      const el = document.getElementById(containerId);
+      if (el) {
+        el.style.background = '#0e1420';
+        el.innerHTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Roboto Mono',monospace;font-size:13px;letter-spacing:0.1em;color:#6a5a4a;text-align:center;padding:20px">
+          MAPBOX TOKEN REQUIRED<br><span style="font-size:13px;margin-top:6px;display:block;color:#FF9043">Set MAPBOX_TOKEN in &lt;script&gt; to render map</span>
+        </div>`;
+      }
+      return null;
+    }
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+    return new mapboxgl.Map({
+      container: containerId,
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: options.center || [-0.12, 51.50],
+      zoom:   options.zoom   || 9.8,
+      pitch:  options.pitch  || 0,
+      bearing: options.bearing || 0,
+      attributionControl: false,
+      antialias: true,
+      ...options.extra
+    });
+  }
+
+  /* ─────────────────────────────────────────
+     MAP 1 — HERO (atmospheric background)
+  ───────────────────────────────────────── */
+  const heroMap = initMap('hero-map', {
+    zoom: 10.2,
+    pitch: 30,
+    bearing: -10,
+    extra: { interactive: false }
+  });
+  if (heroMap) {
+    heroMap.on('load', () => {
+      // Slow pan effect
+      heroMap.easeTo({ bearing: 5, duration: 30000, easing: t => t });
+    });
+  }
+
+  /* ─────────────────────────────────────────
+     MAP 2 — MOTIVATION (schools + isochrones)
+  ───────────────────────────────────────── */
+  const s2Map = initMap('s2-map', { zoom: 9.25, extra: { minZoom: 9 } });
+
+  if (s2Map) {
+    s2Map.on('load', () => {
+      // Add controls
+      s2Map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      s2Map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+
+      // ── Darken the basemap ──────────────────────────────────────────
+      // Land background — the base canvas colour
+      s2Map.setPaintProperty('land', 'background-color', '#171717');
+      // Landuse polygons (parks, residential, commercial, industrial etc.)
+      // dark-v11 uses a single 'landuse' fill layer
+      s2Map.setPaintProperty('landuse', 'fill-color', '#171717');
+      s2Map.setPaintProperty('landuse', 'fill-opacity', 0.9);
+      // National park / protected area fill
+      s2Map.setPaintProperty('national-park', 'fill-color', '#1c1c1c');
+      s2Map.setPaintProperty('national-park', 'fill-opacity', 0.9);
+      // Roads 
+      s2Map.setPaintProperty('road-simple', 'line-color', '#2a2a2a');
+      // Water
+      s2Map.setPaintProperty('water', 'fill-color', '#080808');
+
+      //Customise text for city / state / settlement labels to improve visibility 
+        const labelLayers = [
+            'settlement-label',
+            'settlement-major-label', 
+            'settlement-minor-label',
+            'state-label',
+            'country-label'
+        ];
+        
+        labelLayers.forEach(layerId => {
+            if (s2Map.getLayer(layerId)) {
+                s2Map.setPaintProperty(layerId, 'text-color', '#FFFFFF'); // White text
+                s2Map.setPaintProperty(layerId, 'text-halo-color', '#000000'); // Black halo
+                s2Map.setPaintProperty(layerId, 'text-halo-width', 1.7); // Thick halo
+                s2Map.setPaintProperty(layerId, 'text-halo-blur', 0.2); // Slight 
+                
+            }
+        });
+
+        // Hide non-essential layers 
+        const layersToHide = [
+        'settlement-subdivision-label',
+        ];
+
+        layersToHide.forEach(layerId => {
+        if (s2Map.getLayer(layerId)) {
+            s2Map.setLayoutProperty(layerId, 'visibility', 'none');
+        }
+        });
+
+      // Greater London Borough Layer
+      s2Map.addSource('la_source', { type: 'vector', url: 'mapbox://teechinminben.8wonydq8' });
+      s2Map.addLayer({
+        id: 'la-boundaries',
+        type: 'line',
+        source: 'la_source',
+        'source-layer': 'LAD_Simplified-9zfv2n', 
+        paint: {
+          'line-color': '#a4a2a2',   // light grey for dark map
+          'line-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            8, 0.7,
+            12, 1.5
+          ],
+          'line-opacity': 0.8
+        }
+      }, 'waterway-label');
+      // Schools dot layer
+      s2Map.addSource('schools', { type: 'vector', url: 'mapbox://teechinminben.ch76fhhr', promoteId: { 'London_secondary_schools-bricou': 'establishment_name' }});
+      
+      // ── Schools base layer (hover state built in) ───────────────────
+      s2Map.addLayer({
+        id: 'schools-dots',
+        type: 'circle',
+        source: 'schools',
+        'source-layer': 'London_secondary_schools-bricou',
+        paint: {
+          // Grow slightly on hover
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            12, ['case', ['boolean', ['feature-state', 'hovered'], false], 3,  2],
+            15, ['case', ['boolean', ['feature-state', 'hovered'], false], 6,  4]
+          ],
+          // Brighten fill on hover
+          'circle-color': [
+            'case',
+            ['boolean', ['feature-state', 'hovered'], false],
+            '#EE4B2B',   // hover — brighter red
+            '#ffffff'    // default
+          ],
+          'circle-opacity': 0.9,
+          // Thin stroke only on hover, invisible otherwise
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': '#c96820',
+          'circle-stroke-opacity': 0.9
+        }
+      }, 'waterway-label');
+
+      // ── Hover state tracking ────────────────────────────────────────
+      let hoveredSchoolId = null;
+
+      s2Map.on('mousemove', 'schools-dots', (e) => {
+        if (e.features.length === 0) return;
+        s2Map.getCanvas().style.cursor = 'pointer';
+        if (hoveredSchoolId !== null) {
+          s2Map.setFeatureState(
+            { source: 'schools', sourceLayer: 'London_secondary_schools-bricou', id: hoveredSchoolId },
+            { hovered: false }
+          );
+        }
+        hoveredSchoolId = e.features[0].id;
+        s2Map.setFeatureState(
+          { source: 'schools', sourceLayer: 'London_secondary_schools-bricou', id: hoveredSchoolId },
+          { hovered: true }
+        );
+      });
+
+      s2Map.on('mouseleave', 'schools-dots', () => {
+        s2Map.getCanvas().style.cursor = '';
+        if (hoveredSchoolId !== null) {
+          s2Map.setFeatureState(
+            { source: 'schools', sourceLayer: 'London_secondary_schools-bricou', id: hoveredSchoolId },
+            { hovered: false }
+          );
+        }
+        hoveredSchoolId = null;
+      });
+
+      // ── Click: popup ───────────────────────────────────────────────
+      // London averages for the bar charts (update these when you have borough-level data)
+      const LONDON_AVG = {
+        att8: 51.6,    // London average Attainment 8
+        prog8: 0.31    // London average Progress 8
+      };
+
+      function genderIcon(gender) {
+        if (!gender) return '';
+        const g = gender.toLowerCase();
+        if (g.includes('boy') || g === 'male') {
+          return `<span style="color:#4fc3f7;font-size:15px" title="Boys">&#9794;</span> Boys`;
+        }
+        if (g.includes('girl') || g === 'female') {
+          return `<span style="color:#f48fb1;font-size:15px" title="Girls">&#9792;</span> Girls`;
+        }
+        // Mixed / all-through
+        return `<span style="color:#4fc3f7;font-size:15px">&#9794;</span><span style="color:#f48fb1;font-size:15px">&#9792;</span> Mixed`;
+      }
+
+      function ofstedColour(rating) {
+        if (!rating) return '#555';
+        const r = rating.toLowerCase();
+        if (r.includes('outstanding'))         return '#66bb6a';
+        if (r.includes('good'))                return '#4fc3f7';
+        if (r.includes('requires'))            return '#FF9043';
+        if (r.includes('inadequate'))          return '#ef5350';
+        return '#888';
+      }
+
+      function formatYear(dateStr) {
+        if (!dateStr) return '—';
+        // handles "2023-05-12", "2023/05/12", "12/05/2023"
+        const d = new Date(dateStr);
+        if (!isNaN(d)) return d.getFullYear();
+        // fallback: grab first 4-digit sequence
+        const m = String(dateStr).match(/\d{4}/);
+        return m ? m[0] : dateStr;
+      }
+
+      function barChart(label, value, average, min, max, unit = '') {
+        if (value === null || value === undefined || value === '') {
+          return `
+            <div class="sp-metric">
+              <div class="sp-metric-header">
+                <span class="sp-metric-label">${label}</span>
+                <span class="sp-metric-val sp-na">No data</span>
+              </div>
+            </div>`;
+        }
+        const val = parseFloat(value);
+        const avg = parseFloat(average);
+        const pctVal = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
+        const pctAvg = Math.max(0, Math.min(100, ((avg - min) / (max - min)) * 100));
+        const aboveAvg = val >= avg;
+        const barColour = aboveAvg ? '#66bb6a' : '#ef5350';
+        const diff = (val - avg).toFixed(1);
+        const diffLabel = aboveAvg ? `+${diff}` : `${diff}`;
+        const diffColour = aboveAvg ? '#66bb6a' : '#ef5350';
+
+        return `
+          <div class="sp-metric">
+            <div class="sp-metric-header">
+              <span class="sp-metric-label">${label}</span>
+              <span class="sp-metric-val">${val.toFixed(1)}${unit}
+                <span class="sp-diff" style="color:${diffColour}">(${diffLabel})</span>
+              </span>
+            </div>
+            <div class="sp-bar-track">
+              <div class="sp-bar-fill" style="width:${pctVal}%;background:${barColour}"></div>
+              <div class="sp-bar-avg"  style="left:${pctAvg}%"></div>
+            </div>
+            <div class="sp-bar-legend">
+              <span>London avg: ${avg}${unit}</span>
+            </div>
+          </div>`;
+      }
+
+      if (!document.getElementById('school-popup-style')) {
+      const style = document.createElement('style');
+      style.id = 'school-popup-style';
+      style.textContent = `
+        /* Override Mapbox popup chrome */
+        .mapboxgl-popup-content {
+          background: #0e1420 !important;
+          border: 0.5px solid rgba(255,144,67,0.35) !important;
+          border-radius: 8px !important;
+          padding: 0 !important;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+          min-width: 280px;
+          max-width: 320px;
+        }
+        .mapboxgl-popup-tip {
+          border-top-color: rgba(255,144,67,0.35) !important;
+          border-bottom-color: rgba(255,144,67,0.35) !important;
+        }
+        .mapboxgl-popup-close-button {
+          color: #6a5a4a !important;
+          font-size: 18px !important;
+          padding: 6px 10px !important;
+          line-height: 1 !important;
+        }
+        .mapboxgl-popup-close-button:hover { color: #FF9043 !important; }
+
+        /* Popup inner layout */
+        .sp-wrap { padding: 16px 18px 14px; font-family: 'Roboto', sans-serif; }
+
+        .sp-borough {
+          font-family: 'Roboto Mono', monospace;
+          font-size: 17px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #FF9043;
+          margin-bottom: 4px;
+        }
+        .sp-name {
+          font-size: 18px;
+          font-weight: 600;
+          color: #f0ece4;
+          line-height: 1.3;
+          margin-bottom: 10px;
+        }
+
+        .sp-meta {
+          border-top: 0.5px solid rgba(255,255,255,0.08);
+          padding-top: 13px;
+          margin-bottom: 10px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 6px 10px;
+        }
+        .sp-meta-item { display: flex; flex-direction: column; gap: 2px; }
+        .sp-meta-key {
+          font-size: 11px;
+          font-family: 'Roboto Mono', monospace;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #6a5a4a;
+        }
+        .sp-meta-val {
+          font-size: 15px;
+          color: #b8a898;
+          line-height: 1.3;
+        }
+
+        .sp-ofsted-pill {
+          display: inline-block;
+          font-size: 13px;
+          font-weight: 500;
+          padding: 2px 8px;
+          border-radius: 3px;
+          color: #0d0d0d;
+        }
+
+        /* Bar chart metrics */
+        .sp-metrics-heading {
+          font-family: 'Roboto Mono', monospace;
+          font-size: 11px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #6a5a4a;
+          margin-bottom: 8px;
+          border-top: 0.5px solid rgba(255,255,255,0.08);
+          padding-top: 10px;
+        }
+        .sp-metric { margin-bottom: 10px; }
+        .sp-metric-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          margin-bottom: 4px;
+        }
+        .sp-metric-label {
+          font-size: 15px;
+          color: #b8a898;
+        }
+        .sp-metric-val {
+          font-family: 'Roboto Mono', monospace;
+          font-size: 15px;
+          font-weight: 500;
+          color: #f0ece4;
+        }
+        .sp-na { color: #6a5a4a !important; font-style: italic; }
+        .sp-diff { font-size: 13px; margin-left: 4px; }
+
+        .sp-bar-track {
+          position: relative;
+          height: 5px;
+          background: #1a2236;
+          border-radius: 3px;
+          overflow: visible;
+        }
+        .sp-bar-fill {
+          height: 100%;
+          border-radius: 3px;
+          transition: width 0.5s ease;
+        }
+        .sp-bar-avg {
+          position: absolute;
+          top: -3px;
+          width: 1.5px;
+          height: 11px;
+          background: rgba(255,255,255,0.8);
+          transform: translateX(-50%);
+          border-radius: 1px;
+        }
+        .sp-bar-legend {
+          font-size: 13px;
+          color: #6a5a4a;
+          margin-top: 3px;
+          text-align: right;
+        }
+
+        .sp-capacity-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 15px;
+          color: #b8a898;
+          margin-top: -2px;
+          margin-bottom: 10px;
+        }
+        .sp-util-bar-track {
+          flex: 1;
+          height: 4px;
+          background: #1a2236;
+          border-radius: 2px;
+          overflow: hidden;
+        }
+        .sp-util-bar-fill {
+          height: 100%;
+          border-radius: 2px;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+       // Reusable popup instance (one at a time)
+      const schoolPopup = new mapboxgl.Popup({
+        closeButton: true,
+        closeOnClick: false,
+        maxWidth: '340px',
+        offset: 12
+      });
+
+      s2Map.on('click', 'schools-dots', (e) => {
+        if (!e.features.length) return;
+        const p = e.features[0].properties;
+
+        // Utilisation bar colour
+        const util = parseFloat(p.Utilisation);
+        const utilPct = isNaN(util) ? 0 : Math.min(util, 120);  // cap display at 120%
+        const utilColour = util > 100 ? '#ef5350' : util > 90 ? '#FF9043' : '#66bb6a';
+        const utilDisplay = isNaN(util) ? '—' : `${util.toFixed(0)}%`;
+
+        const html = `
+          <div class="sp-wrap">
+            <div class="sp-borough">${p.la_name || '—'}</div>
+            <div class="sp-name">${p.establishment_name || '—'}</div>
+
+            <div class="sp-meta">
+              <div class="sp-meta-item">
+                <span class="sp-meta-key">Type</span>
+                <span class="sp-meta-val">${p.type_of_establishment || '—'}</span>
+              </div>
+              <div class="sp-meta-item">
+                <span class="sp-meta-key">Admissions</span>
+                <span class="sp-meta-val">${p.admissions_policy || '—'}</span>
+              </div>
+              <div class="sp-meta-item">
+                <span class="sp-meta-key">Gender</span>
+                <span class="sp-meta-val">${genderIcon(p.gender)}</span>
+              </div>
+              <div class="sp-meta-item">
+                <span class="sp-meta-key">Ofsted</span>
+                <span class="sp-meta-val">
+                  <span class="sp-ofsted-pill" style="background:${ofstedColour(p.ofsted_overall_label)}">
+                    ${p.ofsted_overall_label || '—'}
+                  </span>
+                  <span style="font-size:10px;color:#6a5a4a;margin-left:4px">${formatYear(p.publication_date)}</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="sp-meta-key" style="margin-bottom:6px">Capacity &amp; Subscription</div>
+            <div class="sp-capacity-row">
+              <span style="font-family:'Roboto Mono',monospace;font-size:12px;color:#f0ece4;min-width:52px">
+                ${p.school_capacity ? Number(p.school_capacity).toLocaleString() : '—'}
+              </span>
+              <div class="sp-util-bar-track">
+                <div class="sp-util-bar-fill"
+                     style="width:${Math.min(utilPct, 100)}%;background:${utilColour}">
+                </div>
+              </div>
+              <span style="font-family:'Roboto Mono',monospace;font-size:12px;color:${utilColour};min-width:36px;text-align:right">
+                ${utilDisplay}
+              </span>
+            </div>
+
+            <div class="sp-metrics-heading">KS4 Performance vs London Average</div>
+            ${barChart('Attainment 8', p.ks4_attainment8, LONDON_AVG.att8, 20, 80)}
+            ${barChart('Progress 8',   p.ks4_progress8,  LONDON_AVG.prog8, -1.5, 1.5)}
+          </div>`;
+
+        schoolPopup
+          .setLngLat(e.lngLat)
+          .setHTML(html)
+          .addTo(s2Map);
+      });
+
+      // ── Isochrone layers ─────────────────────
+      // Colour expression: blue (fast/near) → red (slow/far)
+      const TT_COLOR_EXPR = [
+        'interpolate', ['linear'], ['get', 'travel_time'],
+        0,  '#1565c0',   // deep blue    — 0 min
+        10,  '#1e88e5',   // blue         — 10 min
+        20,  '#64b5f6',   // light blue   — 20 min
+        30,  '#ffe082',   // pale amber   — 30 min
+        40,  '#ef5350',   // red          — 40 min
+        45,  '#b71c1c',   // deep red     — 45 min
+      ];
+
+      const TT_RADIUS_EXPR = [
+        'interpolate', ['linear'], ['zoom'],
+        8,   1.5,
+        9,   2.5,
+        10,  4.5,
+        11,  8,
+        12,  14,
+      ];
+
+      // Clapham North tileset
+      s2Map.addSource('tt-clapham', {
+        type: 'vector',
+        url: 'mapbox://teechinminben.169sfi6b'
+      });
+      s2Map.addLayer({
+        id: 'tt-clapham-grid',
+        type: 'circle',
+        source: 'tt-clapham',
+        'source-layer': 'tt_grid_clapham_45min-0xjjid',
+        layout: { visibility: 'none' },
+        paint: {
+          'circle-radius':        TT_RADIUS_EXPR,
+          'circle-color':         TT_COLOR_EXPR,
+          'circle-opacity':       0.75,
+          'circle-blur':          0.35,
+          'circle-stroke-width':  0,
+        }
+      }, 'la-boundaries');
+
+      // Harold Hill tileset
+      s2Map.addSource('tt-harold', {
+        type: 'vector',
+        url: 'mapbox://teechinminben.c4eue9ft'
+      });
+      s2Map.addLayer({
+        id: 'tt-harold-grid',
+        type: 'circle',
+        source: 'tt-harold',
+        'source-layer': 'tt_grid_harold_hill_45min-60mkij', 
+        layout: { visibility: 'none' },
+        paint: {
+          'circle-radius':        TT_RADIUS_EXPR,
+          'circle-color':         TT_COLOR_EXPR,
+          'circle-opacity':       0.6,
+          'circle-blur':          0.3,
+          'circle-stroke-width':  0,
+        }
+      }, 'la-boundaries');
+
+      // Origin marker — pulsing dot at each LSOA centroid
+      s2Map.addSource('iso-origins', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: { id: 'clapham',     label: 'Clapham North' },
+              geometry:   { type: 'Point', coordinates: [-0.1323, 51.4627] }
+            },
+            {
+              type: 'Feature',
+              properties: { id: 'harold_hill', label: 'Harold Hill' },
+              geometry:   { type: 'Point', coordinates: [0.220865, 51.600122] }
+            }
+          ]
+        }
+      });
+
+      s2Map.addSource('custom-labels', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: { name: 'Clapham North', origin: 'clapham' },
+              geometry: { type: 'Point', coordinates: [-0.1323, 51.4627] }
+            },
+            {
+              type: 'Feature',
+              properties: { name: 'Harold Hill', origin: 'harold_hill' },
+              geometry: { type: 'Point', coordinates: [0.220865, 51.600122] }
+            }
+          ]
+        }
+      });
+
+      s2Map.addLayer({
+        id: 'custom-place-labels',
+        type: 'symbol',
+        source: 'custom-labels',
+        layout: {
+          'text-field':            ['get', 'name'],
+          'text-font':             ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+          'text-size':             14,
+          'text-anchor':           'top',
+          'text-offset':           [0, 0.8],
+          'text-allow-overlap':    true,
+          'text-ignore-placement': true,
+        },
+        paint: {
+          'text-color':      '#ffffff',
+          'text-halo-color': '#171717',
+          'text-halo-width': 1.5,
+          'text-opacity':    1,              // hidden by default, shown per scroll step
+        }
+      });
+
+      s2Map.addLayer({
+        id: 'iso-origin-halo',
+        type: 'circle',
+        source: 'iso-origins',
+        layout: { visibility: 'none' },
+        paint: {
+          'circle-radius':       14,
+          'circle-color':        'transparent',
+          'circle-stroke-color': '#000',
+          'circle-stroke-width': 1.5,
+          'circle-opacity':      0.5,
+        }
+      });
+      s2Map.addLayer({
+        id: 'iso-origin-dot',
+        type: 'circle',
+        source: 'iso-origins',
+        layout: { visibility: 'none' },
+        paint: {
+          'circle-radius':       7,
+          'circle-color':        '#32CD32',
+          'circle-stroke-color': '#000',
+          'circle-stroke-width': 1,
+        }
+      });
+
+
+
+      // ── View configs for each origin ────────────────────────────────────────────
+      const ISO_VIEWS = {
+        clapham: {
+          center:  [-0.1323, 51.4627],
+          zoom:    10.8,
+          pitch:   20,
+          bearing: -10,
+          label:   'Clapham North — 45-min transit reach',
+          filter:  ['==', ['get', 'id'], 'clapham'],
+        },
+        harold_hill: {
+          center:  [0.2183, 51.5876],
+          zoom:    11.2,
+          pitch:   20,
+          bearing: 10,
+          label:   'Harold Hill — 45-min transit reach',
+          filter:  ['==', ['get', 'id'], 'harold_hill'],
+        }
+      };
+
+      let currentIsoView = 'clapham';
+
+      // ── switchIsoView — called by toggle buttons and scroll steps ────────────────
+
+      // ── Custom label opacity helper ─────────────────────────────────────────────
+      window.setCustomLabelOpacity = function(originId) {
+        try {
+          let expr;
+          if (!originId) {
+            expr = 0;                          // hide all
+          } else if (originId === 'both') {
+            expr = 1;                          // show all
+          } else {
+            expr = [                           // show one
+              'match', ['get', 'origin'],
+              originId, 1,
+              0
+            ];
+          }
+          if (s2Map.getLayer('custom-place-labels'))
+            s2Map.setPaintProperty('custom-place-labels', 'text-opacity', expr);
+        } catch(e) {
+          console.warn('setCustomLabelOpacity error:', e);
+        }
+      };
+
+      window.switchIsoView = function(originId) {
+        currentIsoView = originId;
+        const view = ISO_VIEWS[originId];
+
+        // Update button states
+        document.querySelectorAll('.iso-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.origin === originId);
+        });
+
+        // Switch legend ← ADD HERE
+        document.getElementById('s2-legend-schools').style.display = 'none';
+        document.getElementById('s2-legend-tt').style.display      = 'block';
+        document.getElementById('s2-legend-title').textContent     = 'Transit travel time';
+
+        // Show correct grid layer, hide the other
+        const showClapham = originId === 'clapham';
+        s2Map.setLayoutProperty('tt-clapham-grid', 'visibility', showClapham ? 'visible' : 'none');
+        s2Map.setLayoutProperty('tt-harold-grid',  'visibility', showClapham ? 'none' : 'visible');
+
+        // Filter origin markers to show only active one
+        s2Map.setFilter('iso-origin-halo', ['==', ['get', 'id'], originId]);
+        s2Map.setFilter('iso-origin-dot',  ['==', ['get', 'id'], originId]);
+
+        window.setCustomLabelOpacity(originId); 
+
+        // Fly to origin
+        s2Map.flyTo({
+          center:   view.center,
+          zoom:     view.zoom,
+          pitch:    view.pitch,
+          bearing:  view.bearing,
+          duration: 1600,
+          easing:   t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t,   // ease-in-out
+        });
+
+        // Update map label
+        document.getElementById('s2-map-label').textContent = view.label;
+      };
+
+
+    });  // end s2Map.on('load')
+  }      // end if (s2Map)
+
+    /* Step-by-step scroll → map reactions for S2 */
+const s2StepActions = {
+
+  // Step 1 — London overview, schools only
+  's2-0': () => {
+    if (!s2Map) return;
+    s2Map.setLayoutProperty('tt-clapham-grid', 'visibility', 'none');
+    s2Map.setLayoutProperty('tt-harold-grid',  'visibility', 'none');
+    s2Map.setLayoutProperty('iso-origin-halo', 'visibility', 'none');
+    s2Map.setLayoutProperty('iso-origin-dot',  'visibility', 'none');
+
+    document.getElementById('s2-legend-schools').style.display = 'block';
+    document.getElementById('s2-legend-tt').style.display      = 'none';
+    document.getElementById('s2-legend-title').textContent     = 'Secondary schools';
+
+    window.setCustomLabelOpacity(null);   
+
+    s2Map.easeTo({
+      zoom: 9.25, center: [-0.12, 51.50], extra: { minZoom: 9 },
+      pitch: 0, bearing: 0, duration: 1000
+    });
+    document.getElementById('s2-map-label').textContent =
+      'All secondary schools — London';
+  },
+
+  // Step 2 — zoom to Clapham, show its travel time grid
+  's2-1': () => {
+    if (!s2Map) return;
+
+    s2Map.setLayoutProperty('tt-harold-grid',  'visibility', 'none');
+    s2Map.setLayoutProperty('tt-clapham-grid', 'visibility', 'visible');
+    s2Map.setLayoutProperty('iso-origin-halo', 'visibility', 'visible');
+    s2Map.setLayoutProperty('iso-origin-dot',  'visibility', 'visible');
+
+    s2Map.setFilter('iso-origin-halo', ['==', ['get', 'id'], 'clapham']);
+    s2Map.setFilter('iso-origin-dot',  ['==', ['get', 'id'], 'clapham']);
+
+    document.getElementById('s2-legend-schools').style.display = 'none';
+    document.getElementById('s2-legend-tt').style.display      = 'block';
+    document.getElementById('s2-legend-title').textContent     = 'Transit travel time';
+
+    window.setCustomLabelOpacity('clapham');
+
+    s2Map.flyTo({
+      center:   [-0.1323, 51.4627],
+      zoom:     10.8,
+      pitch:    20,
+      bearing:  -10,
+      duration: 1600,
+      easing:   t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t,
+    });
+    document.getElementById('s2-map-label').textContent =
+      'Clapham North — 45-min transit reach';
+  },
+
+  // Step 3 — fly to Harold Hill, show toggle buttons
+  's2-2': () => {
+    if (!s2Map) return;
+
+    s2Map.setLayoutProperty('tt-clapham-grid', 'visibility', 'none');
+    s2Map.setLayoutProperty('tt-harold-grid',  'visibility', 'visible');
+    s2Map.setLayoutProperty('iso-origin-halo', 'visibility', 'visible');
+    s2Map.setLayoutProperty('iso-origin-dot',  'visibility', 'visible');
+
+    s2Map.setFilter('iso-origin-halo', ['==', ['get', 'id'], 'harold_hill']);
+    s2Map.setFilter('iso-origin-dot',  ['==', ['get', 'id'], 'harold_hill']);
+
+    document.querySelectorAll('.iso-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.origin === 'harold_hill');
+    });
+
+    window.setCustomLabelOpacity('harold_hill');
+
+    s2Map.flyTo({
+      center:   [0.2183, 51.5876],
+      zoom:     11.2,
+      pitch:    20,
+      bearing:  10,
+      duration: 2000,
+      easing:   t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t,
+    });
+    document.getElementById('s2-map-label').textContent =
+      'Harold Hill — 45-min transit reach';
+  },
+
+  // Step 4 — zoom out, both grids visible
+  's2-3': () => {
+    if (!s2Map) return;
+
+    s2Map.setLayoutProperty('tt-clapham-grid', 'visibility', 'visible');
+    s2Map.setLayoutProperty('tt-harold-grid',  'visibility', 'visible');
+    s2Map.setLayoutProperty('iso-origin-halo', 'visibility', 'visible');
+    s2Map.setLayoutProperty('iso-origin-dot',  'visibility', 'visible');
+
+    s2Map.setFilter('iso-origin-halo', null);
+    s2Map.setFilter('iso-origin-dot',  null);
+
+    document.querySelectorAll('.iso-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+
+     window.setCustomLabelOpacity('both');
+    
+    s2Map.flyTo({
+      zoom:     9.25,
+      center:   [-0.12, 51.50],
+      pitch:    0,
+      bearing:  0,
+      duration: 1800,
+      easing:   t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t,
+    });
+
+    document.getElementById('s2-map-label').textContent =
+      'Transit reach — Clapham North vs Harold Hill';
+  }
+
+};  
+
+   /* ──────────────────────────────────────────
+      MAP 4 — ACCESS (comparison slider + schools)
+    ───────────────────────────────────────────── */
+    
+    const S4_TILESET   = 'mapbox://teechinminben.3mu72ju3';
+    const S4_SRC_LAYER = 'lsoa_travel_times';
+    const SCHOOLS_TILESET   = 'mapbox://teechinminben.ch76fhhr';
+    const SCHOOLS_SRC_LAYER = 'London_secondary_schools-bricou';
+
+    // Yellow → deep orange stepped colour scale
+    const S4_COLOR_EXPR = (field) => [
+      'step', ['get', field],
+      '#ffe066',          //  0–10 min
+      11, '#ffb347',      // 11–20 min
+      21, '#ff7c2a',      // 21–30 min
+      31, '#e64400',      // 31–40 min
+      41, '#8b1a00'       // 41–54 min
+    ];
+
+    // ── Initialise both comparison maps ────────────────────────────
+    const s4MapBase  = initMap('s4-map-base',  { zoom: 9.25 });
+    const s4MapRight = initMap('s4-map-right', { zoom: 9.25 });
+
+     // Reusable basemap darkening — applied to both S4 maps
+    function darkenBasemap(map) {
+      map.setPaintProperty('land', 'background-color', '#171717');
+      map.setPaintProperty('landuse', 'fill-color', '#171717');
+      map.setPaintProperty('landuse', 'fill-opacity', 0.9);
+      map.setPaintProperty('national-park', 'fill-color', '#1c1c1c');
+      map.setPaintProperty('national-park', 'fill-opacity', 0.9);
+      map.setPaintProperty('road-simple', 'line-color', '#2a2a2a');
+      map.setPaintProperty('water', 'fill-color', '#080808');
+
+      ['settlement-label', 'settlement-major-label', 'settlement-minor-label',
+       'state-label', 'country-label'].forEach(id => {
+        if (map.getLayer(id)) {
+          map.setPaintProperty(id, 'text-color', '#FFFFFF');
+          map.setPaintProperty(id, 'text-halo-color', '#000000');
+          map.setPaintProperty(id, 'text-halo-width', 1.7);
+          map.setPaintProperty(id, 'text-halo-blur', 0.2);
+        }
+      });
+
+      if (map.getLayer('settlement-subdivision-label', 'poi-label', 'airport-label'))
+        map.setLayoutProperty('settlement-subdivision-label', 'visibility', 'none');
+        map.setLayoutProperty('poi-label', 'visibility', 'none');
+        map.setLayoutProperty('airport-label', 'visibility', 'none');
+    }
+
+    // ── LSOA choropleth helper ──────────────────────────────────────
+    function addS4ChoroLayer(map, srcId, field) {
+      if (!map) return;
+      map.addSource(srcId, { type: 'vector', url: S4_TILESET });
+      map.addLayer({
+        id:             srcId + '-fill',
+        type:           'fill',
+        source:         srcId,
+        'source-layer': S4_SRC_LAYER,
+        paint: {
+          'fill-color':         S4_COLOR_EXPR(field),
+          'fill-opacity':       0.8,
+          'fill-outline-color': 'rgba(0,0,0,0.02)'
+        }
+      }, 'waterway-label');
+    }
+
+    // ── Borough boundary helper ─────────────────────────────────────
+    function addS4BoroughLayer(map, prefix) {
+      if (!map) return;
+      map.addSource(prefix + '-la', { type: 'vector', url: 'mapbox://teechinminben.8wonydq8' });
+      map.addLayer({
+        id:             prefix + '-la-boundaries',
+        type:           'line',
+        source:         prefix + '-la',
+        'source-layer': 'LAD_Simplified-9zfv2n',
+        paint: {
+          'line-color':   '#a4a2a2',
+          'line-width':   ['interpolate', ['linear'], ['zoom'], 8, 0.7, 12, 1.5],
+          'line-opacity': 0.9
+        }
+      }, 'waterway-label');
+    }
+
+    // ── Left map: all schools as dim white dots (with hover) ───────
+    // Only added to s4MapBase — gives the "unfiltered" picture.
+    function addS4AllSchoolsLayer(map) {
+      if (!map) return;
+      const srcId = 'base-schools-src';
+      map.addSource(srcId, {
+        type: 'vector',
+        url:  SCHOOLS_TILESET,
+        promoteId: { [SCHOOLS_SRC_LAYER]: 'establishment_name' }
+      });
+      map.addLayer({
+        id:             'base-schools-all',
+        type:           'circle',
+        source:         srcId,
+        'source-layer': SCHOOLS_SRC_LAYER,
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
+          'circle-color': [
+            'case',
+            ['boolean', ['feature-state', 'hovered'], false],
+            '#EE4B2B',
+            '#fff6ec'
+          ],
+          'circle-opacity':        0.8,
+          'circle-stroke-width':   1.5,
+          'circle-stroke-color':   '#C96820',
+          'circle-stroke-opacity': 0.9
+        }
+      }, 'waterway-label');
+    }
+
+    // ── Right map: quality-filtered dots only ───────────────────────
+    // Only added to s4MapRight — initially hidden, shown at s4-1.
+    // The visual effect: dragging the slider left "reveals" filtered dots
+    // replacing the unfiltered ones from the left map.
+    function addS4HighlightLayer(map) {
+      if (!map) return;
+      const srcId = 'right-schools-src';
+      map.addSource(srcId, {
+        type: 'vector',
+        url:  SCHOOLS_TILESET,
+        promoteId: { [SCHOOLS_SRC_LAYER]: 'establishment_name' }
+      });
+      map.addLayer({
+        id:             'right-schools-highlight',
+        type:           'circle',
+        source:         srcId,
+        'source-layer': SCHOOLS_SRC_LAYER,
+        filter:         ['==', 'top_p8_quartile_GLA', true],
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
+        'circle-color': '#C96820',
+        'circle-opacity': 0.9,
+        'circle-stroke-width': 1.2,
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-opacity': 0.9
+      }
+      }, 'waterway-label');
+    }
+
+    // ── Single load handler per map: choro → borough → schools ─────
+    // Explicit ordering ensures dots always render above fill + boundaries.
+    if (s4MapBase) {
+      s4MapBase.on('load', () => {
+        darkenBasemap(s4MapBase);
+        addS4ChoroLayer(s4MapBase,  'base-lsoa',  'tt_transit_nearest_any');
+        addS4BoroughLayer(s4MapBase,  'base');
+        addS4AllSchoolsLayer(s4MapBase);    // left: all schools (white dots)
+      });
+    }
+    if (s4MapRight) {
+      s4MapRight.on('load', () => {
+        darkenBasemap(s4MapRight);
+        addS4ChoroLayer(s4MapRight, 'right-lsoa', 'tt_transit_nearest_top25_p8');
+        addS4BoroughLayer(s4MapRight, 'right');
+        addS4HighlightLayer(s4MapRight);    // right: filtered dots only (orange)
+      });
+    }
+
+    // ── Keep maps in sync ───────────────────────────────────────────
+    function syncMaps(source, targets) {
+      source.on('move', () => {
+        const c = source.getCenter(), z = source.getZoom(),
+              b = source.getBearing(), p = source.getPitch();
+        targets.forEach(t => { if (t) t.jumpTo({ center: c, zoom: z, bearing: b, pitch: p }); });
+      });
+    }
+    if (s4MapBase && s4MapRight) {
+      syncMaps(s4MapBase,  [s4MapRight]);
+      syncMaps(s4MapRight, [s4MapBase]);
+    }
+
+    // ── Comparison slider ────────────────────────────────────────────
+    // currentSliderPct is the % of the wrap width where the divider sits.
+    // Low % = mostly right map; High % = mostly left map.
+    let currentSliderPct = 90;   // initial for s4-0
+    const s4SliderEl  = document.getElementById('map-compare-slider');
+    const s4RightDiv  = document.getElementById('s4-map-right');
+    const s4WrapEl    = s4SliderEl && s4SliderEl.closest('.map-compare-wrap');
+
+    function applySliderPct(pct, animate) {
+      const p = Math.max(5, Math.min(95, pct));
+      currentSliderPct = p;
+      const transition = animate
+        ? 'left 0.7s cubic-bezier(0.4,0,0.2,1)'
+        : 'none';
+      if (s4SliderEl) {
+        s4SliderEl.style.transition = transition;
+        s4SliderEl.style.left = p + '%';
+      }
+      if (s4RightDiv) {
+        s4RightDiv.style.transition = animate
+          ? 'clip-path 0.7s cubic-bezier(0.4,0,0.2,1)'
+          : 'none';
+        s4RightDiv.style.clipPath = `inset(0 0 0 ${p}%)`;
+      }
+      // Light up whichever map's label is dominant (occupies >50% of width).
+      // p > 50 → left map dominates → light left label
+      // p < 50 → right map dominates → light right label
+      const lblL = document.getElementById('s4-label-left');
+      const lblR = document.getElementById('s4-label-right');
+      if (lblL && lblR) {
+        lblL.classList.toggle('s4-label-active', p >= 50);
+        lblR.classList.toggle('s4-label-active', p <  50);
+      }
+    }
+
+    // Manual drag (disables CSS transition while dragging for responsiveness)
+    (function initCompareSlider() {
+      if (!s4SliderEl || !s4WrapEl) return;
+      let dragging = false;
+      const onMove = (x) => {
+        if (!dragging) return;
+        applySliderPct(
+          ((x - s4WrapEl.getBoundingClientRect().left) / s4WrapEl.offsetWidth) * 100,
+          false
+        );
+      };
+      s4SliderEl.addEventListener('mousedown',  () => dragging = true);
+      s4SliderEl.addEventListener('touchstart', () => dragging = true, { passive: true });
+      document.addEventListener('mousemove',    e => onMove(e.clientX));
+      document.addEventListener('touchmove',    e => onMove(e.touches[0].clientX), { passive: true });
+      document.addEventListener('mouseup',      () => dragging = false);
+      document.addEventListener('touchend',     () => dragging = false);
+      // Set initial position after layout
+      setTimeout(() => applySliderPct(currentSliderPct, false), 200);
+    })();
+
+    // ── Quality toggle ───────────────────────────────────────────────
+    window.setRightQuality = function(quality) {
+      if (!s4MapRight) return;
+      const isP8 = quality === 'p8';
+      const lsoaField    = isP8 ? 'tt_transit_nearest_top25_p8' : 'tt_transit_nearest_outstanding';
+      const schoolFilter = isP8
+        ? ['==', 'top_p8_quartile_GLA', true]
+        : ['==', 'Ofsted_outstanding',  true];
+      const label = isP8 ? 'Top 25% P8' : 'Ofsted Outstanding';
+
+      // Button states
+      document.querySelectorAll('.s4-quality-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.quality === quality)
+      );
+      // Right-map label
+      const lbl = document.getElementById('s4-label-right');
+      if (lbl) lbl.textContent = label;
+      // Schools legend badge
+      const legendLabel = document.getElementById('s4-schools-legend-label');
+      if (legendLabel) legendLabel.textContent = label;
+      // LSOA choropleth on right map
+      if (s4MapRight.getLayer('right-lsoa-fill')) {
+        s4MapRight.setPaintProperty('right-lsoa-fill', 'fill-color', S4_COLOR_EXPR(lsoaField));
+      }
+      // Highlight dots — right map only
+      if (s4MapRight.getLayer('right-schools-highlight')) {
+        s4MapRight.setFilter('right-schools-highlight', schoolFilter);
+      }
+    };
+
+    // ── Scroll step actions ──────────────────────────────────────────
+    const s4StepActions = {
+      's4-0': () => {
+        // Slider mostly left (any-school map dominates)
+        applySliderPct(90, true);
+        // Hide quality toggle
+        const tog = document.getElementById('s4-quality-toggle');
+        if (tog) tog.style.display = 'none';
+        // Reset right map choropleth to P8
+        if (s4MapRight && s4MapRight.getLayer('right-lsoa-fill')) {
+          s4MapRight.setPaintProperty('right-lsoa-fill', 'fill-color',
+            S4_COLOR_EXPR('tt_transit_nearest_top25_p8'));
+        }
+        const lbl = document.getElementById('s4-label-right');
+        if (lbl) lbl.textContent = 'Top 25% P8';
+        // Hide schools legend highlight row
+        const legendRow = document.getElementById('s4-schools-legend-highlight');
+        if (legendRow) legendRow.style.display = 'none';
+      },
+
+      's4-1': () => {
+        // Slider mostly right (quality map dominates)
+        applySliderPct(10, true);
+        // Show quality toggle
+        const tog = document.getElementById('s4-quality-toggle');
+        if (tog) tog.style.display = 'flex';
+        // Show filtered dots on right map only, default to P8
+        if (s4MapRight && s4MapRight.getLayer('right-schools-highlight')) {
+          s4MapRight.setLayoutProperty('right-schools-highlight', 'visibility', 'visible');
+          s4MapRight.setFilter('right-schools-highlight', ['==', 'top_p8_quartile_GLA', true]);
+        }
+        // Show schools legend highlight row
+        const legendRow = document.getElementById('s4-schools-legend-highlight');
+        if (legendRow) legendRow.style.display = 'flex';
+        // Reset buttons to P8
+        document.querySelectorAll('.s4-quality-btn').forEach(b =>
+          b.classList.toggle('active', b.dataset.quality === 'p8')
+        );
+      },
+
+      's4-2': () => {
+        // Reset explorer map to default zoom and P8/transit view
+        if (s4MapExplorer) {
+          s4MapExplorer.easeTo({
+            center:   EXPLORER_CENTER,
+            zoom:     EXPLORER_ZOOM,
+            duration: 1000,
+            easing:   t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t
+          });
+        }
+        // Reset school buttons to P8
+        document.querySelectorAll('#s4-school-btns .s4-ctrl-btn').forEach(b => {
+          b.className = 's4-ctrl-btn';
+        });
+        document.querySelector('#s4-school-btns .s4-ctrl-btn[data-school="p8"]')
+          ?.classList.add('active-p8');
+        // Reset mode buttons to transit
+        document.querySelectorAll('#s4-mode-btns .s4-ctrl-btn').forEach(b => {
+          b.className = 's4-ctrl-btn';
+        });
+        document.querySelector('#s4-mode-btns .s4-ctrl-btn[data-mode="transit"]')
+          ?.classList.add('active-transit');
+        // Sync map layers and legend to match
+        updateExplorer(null);
+      }
+    };
+
+    // Fire initial state
+    // (deferred so maps have a moment to attach to DOM)
+    setTimeout(() => s4StepActions['s4-0'](), 300);
+
+    // ── Pin schools-legend directly above travel-time legend ────────
+    (function stackS4Legends() {
+      const GAP = 8;
+
+      // Stacks legendB directly above legendA, with GAP px between them
+      function stackAbove(legendAId, legendBId) {
+        const a = document.getElementById(legendAId);
+        const b = document.getElementById(legendBId);
+        if (!a || !b) return;
+        const baseBottom = parseInt(getComputedStyle(a).bottom) || 24;
+        b.style.bottom = (baseBottom + a.offsetHeight + GAP) + 'px';
+        b.style.left   = (parseInt(getComputedStyle(a).left) || 24) + 'px';
+      }
+
+      function positionAll() {
+        // Comparison map (steps 1 & 2)
+        stackAbove('s4-legend', 's4-schools-legend');
+        // Explorer map (steps 3 & 4)
+        stackAbove('s4-explorer-legend', 's4-explorer-schools-legend');
+      }
+
+      setTimeout(positionAll, 400);
+
+      // Re-run when either highlight row shows/hides
+      const observer = new MutationObserver(positionAll);
+      ['s4-schools-legend-highlight', 's4-explorer-highlight-row'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el, { attributes: true, attributeFilter: ['style'] });
+      });
+    })();
+
+    /* ─────────────────────────────────────────
+        MAP 4b — EXPLORER (steps 3 & 4)
+      ───────────────────────────────────────── */
+      const S4_MEDIANS = {
+        transit_any:    16,  transit_p8:    25,  transit_ofsted: 26,
+        walk_any:       17,  walk_p8:       32,  walk_ofsted:    33,
+        car_any:        4,  car_p8:          7,  car_ofsted:      7,
+      };
+
+      // Per-mode accent colour (used for stat card and dot highlights)
+      const S4_MODE_COLOURS = {
+        transit: '#FF9043',   // orange
+        walk:    '#66bb6a',   // green
+        car:     '#4fc3f7',   // blue
+      };
+
+      const S4_RANGES = {
+        transit: [
+          { label: 'Any school',         min:  3, median: 16, max: 53 },
+          { label: 'Top 25% P8',         min:  5, median: 25, max: 61 },
+          { label: 'Ofsted Outstanding',  min:  6, median: 26, max: 65 },
+        ],
+        walk: [
+          { label: 'Any school',         min:  4, median: 17, max: 55 },
+          { label: 'Top 25% P8',         min:  8, median: 32, max: 82 },
+          { label: 'Ofsted Outstanding',  min:  9, median: 33, max: 89 },
+        ],
+        car: [
+          { label: 'Any school',         min:  1, median:  4, max: 22 },
+          { label: 'Top 25% P8',         min:  2, median:  7, max: 32 },
+          { label: 'Ofsted Outstanding',  min:  2, median:  7, max: 33 },
+        ],
+      };
+
+      // Default explorer view
+      const EXPLORER_CENTER = [-0.12, 51.50];
+      const EXPLORER_ZOOM   = 9.25;
+
+      // Per-mode stepped choropleth colour scales
+      // Each ramp stays in a single hue family, dark→light mirrors slow→fast journey
+      const S4_MODE_COLOR_EXPR = {
+        transit: (field) => ['step', ['get', field],
+          '#ffe066' ,          //  0–10 min  — very light yellow
+          11, '#ffb347',      // 11–20 min  — light yellow
+          21, '#ff7c2a',      // 21–30 min  — mid orange
+          31, '#e64400',      // 31–40 min  — dark orange
+          41, '#8b1a00'       // 41–54 min  — brown
+        ],
+        walk: (field) => ['step', ['get', field],
+          '#f1f8e9',          //  0–10 min  — very light green
+          11, '#aed581',      // 11–20 min  — light green
+          21, '#66bb6a',      // 21–30 min  — mid green
+          31, '#2e7d32',      // 31–40 min  — deep green
+          41, '#1a3d1a'       // 41–54 min  — forest
+        ],
+        car: (field) => ['step', ['get', field],
+          '#e3f2fd',          //  0–5 min  — very light blue
+          6, '#81d4fa',       // 6–10 min  — sky blue
+          11, '#29b6f6',      // 11–15min  — mid blue
+          16, '#0277bd',      // 16–20 min  — deep blue
+          21, '#01396e'       // 21–54 min  — navy
+        ],
+      };
+
+      const s4MapExplorer = initMap('s4-map-explorer', { zoom: 9.25, extra: { minZoom: 9.25 } });
+      let explorerLoaded = false;
+
+      if (s4MapExplorer) {
+        s4MapExplorer.on('load', () => {
+          // Darken Basemap
+          darkenBasemap(s4MapExplorer);
+          // Choropleth 
+          s4MapExplorer.addSource('explorer-lsoa', { type: 'vector', url: S4_TILESET });
+          s4MapExplorer.addLayer({
+            id:             'explorer-fill',
+            type:           'fill',
+            source:         'explorer-lsoa',
+            'source-layer': S4_SRC_LAYER,
+            paint: {
+              'fill-color':         S4_COLOR_EXPR('tt_transit_nearest_any'),
+              'fill-opacity':       0.8,
+              'fill-outline-color': 'rgba(0,0,0,0.02)'
+            }
+          }, 'waterway-label');
+
+          // ── Borough boundaries ──
+          s4MapExplorer.addSource('explorer-la', { type: 'vector', url: 'mapbox://teechinminben.8wonydq8' });
+          s4MapExplorer.addLayer({
+            id:             'explorer-la-boundaries',
+            type:           'line',
+            source:         'explorer-la',
+            'source-layer': 'LAD_Simplified-9zfv2n',
+            paint: {
+              'line-color':   '#a4a2a2',
+              'line-width':   ['interpolate', ['linear'], ['zoom'], 8, 0.7, 12, 1.5],
+              'line-opacity': 0.9
+            }
+          }, 'waterway-label');
+
+          // ── All schools (white dots) ──
+          s4MapExplorer.addSource('explorer-schools-src', {
+            type: 'vector',
+            url:  SCHOOLS_TILESET,
+            promoteId: { [SCHOOLS_SRC_LAYER]: 'establishment_name' }
+          });
+          s4MapExplorer.addLayer({
+            id:             'explorer-schools-all',
+            type:           'circle',
+            source:         'explorer-schools-src',
+            'source-layer': SCHOOLS_SRC_LAYER,
+            paint: {
+              'circle-radius':  ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
+              'circle-color':          '#ffffff',
+              'circle-opacity':        0.95,
+              'circle-stroke-width':   1.5,
+              'circle-stroke-color':   '#C96820',
+              'circle-stroke-opacity': 0.7
+            }
+          }, 'waterway-label');
+
+          // ── Quality-filtered dots ──
+          s4MapExplorer.addLayer({
+            id:             'explorer-schools-highlight',
+            type:           'circle',
+            source:         'explorer-schools-src',
+            'source-layer': SCHOOLS_SRC_LAYER,
+            filter:         ['==', 'top_p8_quartile_GLA', true],
+            paint: {
+              'circle-radius':         ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
+              'circle-color':          '#C96820',
+              'circle-opacity':        0.95,
+              'circle-stroke-width':   1.5,
+              'circle-stroke-color':   '#ffffff',
+              'circle-stroke-opacity': 0.7
+            }
+          }, 'waterway-label');
+
+          explorerLoaded = true;
+          updateExplorer(null);
+        });
+      }
+
+      /* ── Section 4 Cleveland dot plot ─────────────────────────────── */
+      function drawS4DotPlot(mode) {
+        const svg    = document.getElementById('s4-dot-plot');
+        if (!svg) return;
+        const rows   = S4_RANGES[mode] || S4_RANGES.transit;
+        const col    = S4_MODE_COLOURS[mode] || '#FF9043';
+ 
+        // Layout constants (viewBox 320 × 118, extra top space for title)
+        const W = 320, H = 118;
+        const titleH  = 22;  // space reserved for title + subtitle
+        const marginL = 114, marginR = 10, marginT = titleH + 4, marginB = 18;
+        const plotW   = W - marginL - marginR;
+        const plotH   = H - marginT - marginB;
+        const rowH    = plotH / rows.length;
+ 
+        // Determine axis domain — round up to nearest 10
+        const allMax  = Math.max(...rows.map(r => r.max));
+        const domMax  = Math.ceil(allMax / 10) * 10;
+        const domMin  = 0;
+        const xScale  = v => marginL + ((v - domMin) / (domMax - domMin)) * plotW;
+ 
+        // Tooltip element (shared, created once)
+        let tip = document.getElementById('s4-dot-tip');
+        if (!tip) {
+          tip = document.createElement('div');
+          tip.id = 's4-dot-tip';
+          tip.style.cssText = [
+            'position:fixed;pointer-events:none;display:none',
+            'background:rgba(8,12,18,0.92);border:0.5px solid rgba(255,255,255,0.15)',
+            'border-radius:4px;padding:5px 9px;font-family:var(--font-mono)',
+            'font-size:14px;color:#e8e0d6;letter-spacing:0.06em;z-index:9999',
+            'white-space:nowrap;line-height:1.6'
+          ].join(';');
+          document.body.appendChild(tip);
+        }
+ 
+        // Tick values
+        const ticks = [];
+        for (let v = 0; v <= domMax; v += 20) ticks.push(v);
+ 
+        // Mode label for title
+        const modeLabelTitle = mode === 'transit' ? 'Transit' : mode === 'walk' ? 'Walk' : 'Car';
+ 
+        // Build SVG
+        let html = `<g id="s4-dp-title">`;
+ 
+        // Title
+        html += `<text x="0" y="10" font-family="var(--font-mono)" font-size="7.5" font-weight="500" fill="rgba(220,210,200,0.88)" letter-spacing="0.05em">DISTRIBUTION OF TRAVEL TIMES (${modeLabelTitle.toUpperCase()})</text>`;
+ 
+        // Subtitle
+        html += `<text x="0" y="20" font-family="var(--font-mono)" font-size="6" fill="rgba(180,170,160,0.5)" letter-spacing="0.06em">min · median · max · minutes</text>`;
+ 
+        html += `</g><g id="s4-dp-axes">`;
+ 
+        // Axis line
+        html += `<line x1="${marginL}" x2="${marginL + plotW}" y1="${H - marginB}" y2="${H - marginB}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>`;
+ 
+        // Tick marks + labels
+        ticks.forEach(v => {
+          const x = xScale(v);
+          html += `<line x1="${x}" x2="${x}" y1="${marginT}" y2="${H - marginB + 4}" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>`;
+          html += `<text x="${x}" y="${H - marginB + 11}" text-anchor="middle" font-family="var(--font-mono)" font-size="7.5" fill="rgba(200,190,180,0.5)">${v}</text>`;
+        });
+ 
+        html += `</g><g id="s4-dp-rows">`;
+ 
+        rows.forEach((r, i) => {
+          const cy = marginT + rowH * i + rowH / 2;
+          const x1 = xScale(r.min), xMed = xScale(r.median), x2 = xScale(r.max);
+ 
+          // Row label
+          html += `<text x="${marginL - 8}" y="${cy + 4}" text-anchor="end" font-family="var(--font-mono)" font-size="7" fill="rgba(200,190,180,0.75)" letter-spacing="0.03em">${r.label}</text>`;
+ 
+          // Range line
+          html += `<line x1="${x1}" x2="${x2}" y1="${cy}" y2="${cy}" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>`;
+ 
+          // Min cap
+          html += `<line x1="${x1}" x2="${x1}" y1="${cy - 4}" y2="${cy + 4}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>`;
+ 
+          // Max cap
+          html += `<line x1="${x2}" x2="${x2}" y1="${cy - 4}" y2="${cy + 4}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>`;
+ 
+          // Invisible wide hit targets for min/max/median
+          const dotR = 5;
+          // Min dot (hollow)
+          html += `<circle cx="${x1}" cy="${cy}" r="2.8" fill="var(--bg3)" stroke="${col}" stroke-width="1.2"
+            class="s4-dp-dot" data-val="${r.min}" data-label="${r.label}" data-type="min"/>`;
+          // Max dot (hollow)
+          html += `<circle cx="${x2}" cy="${cy}" r="2.8" fill="var(--bg3)" stroke="${col}" stroke-width="1.2"
+            class="s4-dp-dot" data-val="${r.max}" data-label="${r.label}" data-type="max"/>`;
+          // Median dot (filled)
+          html += `<circle cx="${xMed}" cy="${cy}" r="3.8" fill="${col}" stroke="none" opacity="0.92"
+            class="s4-dp-dot" data-val="${r.median}" data-label="${r.label}" data-type="median"/>`;
+ 
+          // Wide invisible hit areas
+          const hitH = 16;
+          [[x1,'min',r.min],[xMed,'median',r.median],[x2,'max',r.max]].forEach(([x, type, val]) => {
+            html += `<rect x="${x - 5}" y="${cy - hitH/2}" width="${dotR*2}" height="${hitH}" fill="transparent"
+              class="s4-dp-hit" data-val="${val}" data-label="${r.label}" data-type="${type}"/>`;
+          });
+        });
+ 
+        html += `</g>`;
+        svg.innerHTML = html;
+        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+ 
+        // Bind tooltip events
+        svg.querySelectorAll('.s4-dp-hit').forEach(el => {
+          el.addEventListener('mouseenter', (e) => {
+            const type  = el.dataset.type;
+            const val   = el.dataset.val;
+            const label = el.dataset.label;
+            tip.innerHTML = `<span style="color:rgba(180,170,160,0.7)">${label}</span><br><span style="color:${col}">${type}</span> <strong style="color:#e8e0d6">${val} min</strong>`;
+            tip.style.display = 'block';
+          });
+          el.addEventListener('mousemove', (e) => {
+            tip.style.left = (e.clientX + 14) + 'px';
+            tip.style.top  = (e.clientY - 28) + 'px';
+          });
+          el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+        });
+      }
+
+      window.updateExplorer = function(clickedBtn) {
+        // Update active button state within its group
+        if (clickedBtn) {
+          const group = clickedBtn.closest('.s4-ctrl-btns');
+          if (group) {
+            group.querySelectorAll('.s4-ctrl-btn').forEach(b => { b.className = 's4-ctrl-btn'; });
+            const dt = clickedBtn.dataset;
+            if (dt.school) clickedBtn.classList.add(`active-${dt.school}`);
+            if (dt.mode)   clickedBtn.classList.add(`active-${dt.mode}`);
+          }
+        }
+
+        // Read current active selections
+        const schoolEl = document.querySelector('#s4-school-btns .s4-ctrl-btn[class*="active-"]');
+        const modeEl   = document.querySelector('#s4-mode-btns   .s4-ctrl-btn[class*="active-"]');
+        const school   = schoolEl?.dataset.school || 'any';
+        const mode     = modeEl?.dataset.mode     || 'transit';
+
+        const fieldMap = {
+          transit_any:    'tt_transit_nearest_any',
+          transit_p8:     'tt_transit_nearest_top25_p8',
+          transit_ofsted: 'tt_transit_nearest_outstanding',
+          walk_any:       'tt_walk_nearest_any',
+          walk_p8:        'tt_walk_nearest_top25_p8',
+          walk_ofsted:    'tt_walk_nearest_outstanding',
+          car_any:        'tt_car_nearest_any',
+          car_p8:         'tt_car_nearest_top25_p8',
+          car_ofsted:     'tt_car_nearest_outstanding',
+        };
+
+        const field     = fieldMap[`${mode}_${school}`] || 'tt_transit_nearest_any';
+        const medianKey = `${mode}_${school}`;
+        const median    = S4_MEDIANS[medianKey] ?? '—';
+        const modeCol   = S4_MODE_COLOURS[mode] || '#FF9043';
+        const colorExpr = (S4_MODE_COLOR_EXPR[mode] || S4_MODE_COLOR_EXPR.transit)(field);
+
+        // ── Update choropleth with mode-specific colour scale ──
+        if (explorerLoaded && s4MapExplorer?.getLayer('explorer-fill')) {
+          s4MapExplorer.setPaintProperty('explorer-fill', 'fill-color', colorExpr);
+        }
+
+        // ── Reset to default view on every button toggle ──
+        if (clickedBtn && s4MapExplorer) {
+          s4MapExplorer.easeTo({
+            center:   EXPLORER_CENTER,
+            zoom:     EXPLORER_ZOOM,
+            duration: 800,
+            easing:   t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t
+          });
+        }
+
+        // ── Update school dots ──
+        // 'any'           → show all-schools layer, hide highlight layer
+        // 'p8' / 'ofsted' → hide all-schools layer, show only filtered subset
+        const isFiltered = school !== 'any';
+        if (explorerLoaded) {
+          if (s4MapExplorer?.getLayer('explorer-schools-all')) {
+            s4MapExplorer.setLayoutProperty(
+              'explorer-schools-all', 'visibility',
+              isFiltered ? 'none' : 'visible'
+            );
+          }
+          if (s4MapExplorer?.getLayer('explorer-schools-highlight')) {
+            const schoolFilter = school === 'p8'
+              ? ['==', 'top_p8_quartile_GLA', true]
+              : ['==', 'Ofsted_outstanding',  true];
+            s4MapExplorer.setLayoutProperty(
+              'explorer-schools-highlight', 'visibility',
+              isFiltered ? 'visible' : 'none'
+            );
+            if (isFiltered) {
+              s4MapExplorer.setFilter('explorer-schools-highlight', schoolFilter);
+            }
+          }
+        }
+
+        // ── Update legend swatches to match mode colour scale ──
+        const LEGEND_STOPS = S4_MODE_COLOR_EXPR[mode]
+          ? S4_MODE_COLOR_EXPR[mode]('').slice(1).filter((v, i) => i % 2 === 0 && typeof v === 'string')
+          : ['#ffe066', '#ffb347', '#ff7c2a', '#e64400', '#8b1a00'];
+        // LEGEND_STOPS extracts the colour strings from the step expression
+        const SWATCH_COLOURS = {
+          transit: ['#ffe066', '#ffb347', '#ff7c2a', '#e64400', '#8b1a00'],
+          walk:    ['#f1f8e9','#aed581','#66bb6a','#2e7d32','#1a3d1a'],
+          car:     ['#e3f2fd','#81d4fa','#29b6f6','#0277bd','#01396e'],
+        };
+        const swatches = SWATCH_COLOURS[mode] || SWATCH_COLOURS.transit;
+        document.querySelectorAll('#s4-explorer-legend .legend-swatch').forEach((el, i) => {
+          if (swatches[i]) el.style.background = swatches[i];
+        });
+
+        // ── Update schools legend ──
+        const allSchoolsRow  = document.getElementById('s4-explorer-all-schools-row');
+        const highlightRow   = document.getElementById('s4-explorer-highlight-row');
+        const highlightLabel = document.getElementById('s4-explorer-highlight-label');
+        if (allSchoolsRow)  allSchoolsRow.style.display  = isFiltered ? 'none' : 'flex';
+        if (highlightRow)   highlightRow.style.display   = isFiltered ? 'flex' : 'none';
+        if (highlightLabel) highlightLabel.textContent   = school === 'p8' ? 'Top 25% P8' : 'Ofsted Outstanding';
+
+        // ── Update dot plot + legend title ──
+        const legendTitle = document.getElementById('s4-explorer-legend-title');
+        const modeLabel   = mode.charAt(0).toUpperCase() + mode.slice(1);
+        const schoolLabel = school === 'any' ? 'any school' : school === 'p8' ? 'top 25% P8' : 'Ofsted Outstanding';
+        if (legendTitle) legendTitle.textContent = `${modeLabel} — ${schoolLabel}`;
+        drawS4DotPlot(mode);
+      };
+
+  /* ─────────────────────────────────────────
+     MAP 5 — VULNERABILITY (LISA clusters)
+  ───────────────────────────────────────── */
+  const s5Map = initMap('s5-map', { zoom: 9.25, extra: { minZoom: 9 } });
+  if (s5Map) {
+    s5Map.on('load', () => {
+      s5Map.addSource('lisa', { type: 'geojson', data: DATA.lsoa_lisa });
+      s5Map.addLayer({
+        id: 'lisa-fill',
+        type: 'fill',
+        source: 'lisa',
+        paint: {
+          'fill-color': LISA_COLOR_EXPR,
+          'fill-opacity': 0.8,
+          'fill-outline-color': 'rgba(0,0,0,0.15)'
+        }
+      });
+      // Tooltip
+      const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
+      s5Map.on('mousemove', 'lisa-fill', e => {
+        s5Map.getCanvas().style.cursor = 'pointer';
+        const p = e.features[0].properties;
+        popup.setLngLat(e.lngLat)
+          .setHTML(`<div style="font-family:'Roboto Mono',monospace;font-size:12px;color:#f0ece4;background:#0e1420;padding:8px 10px;border-radius:4px;border:0.5px solid rgba(255,144,67,0.3)">
+            <strong style="color:#FF9043">${p.lsoa_name || p.LSOA21NM || 'LSOA'}</strong><br>
+            Cluster: ${p.cluster_type}<br>
+            P8 time: ${p.travel_min ? p.travel_min + ' min' : '—'}
+          </div>`)
+          .addTo(s5Map);
+      });
+      s5Map.on('mouseleave', 'lisa-fill', () => {
+        s5Map.getCanvas().style.cursor = '';
+        popup.remove();
+      });
+    });
+  }
+
+  const s5StepActions = {
+    's5-0': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, extra: { minZoom: 9 }, center: [-0.12, 51.50], pitch: 0 }); },
+    's5-1': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, extra: { minZoom: 9 }, center: [-0.05, 51.47], pitch: 20 }); },
+    's5-2': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, extra: { minZoom: 9 }, center: [-0.15, 51.52], pitch: 15 }); }
+  };
+
+  /* ─────────────────────────────────────────
+     CHART.JS CHARTS
+  ───────────────────────────────────────── */
+  const CHART_DEFAULTS = {
+    color: '#b8a898',
+    plugins: {
+      legend: { labels: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 12 }, boxWidth: 12, padding: 14 } },
+      tooltip: {
+        backgroundColor: '#0e1420',
+        borderColor: 'rgba(255,144,67,0.25)',
+        borderWidth: 1,
+        titleColor: '#f0ece4',
+        bodyColor: '#b8a898',
+        padding: 11,
+        titleFont: { family: "'Roboto Mono'", size: 12 },
+        bodyFont:  { family: "'Roboto Mono'", size: 12 }
+      }
+    },
+    scales: {
+      x: { ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+    }
+  };
+
+  function chartDefaults(overrides = {}) {
+    return Object.assign(JSON.parse(JSON.stringify(CHART_DEFAULTS)), overrides);
+  }
+
+  // Chart 1 — Mode share donut
+  new Chart(document.getElementById('chart1-mode'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Walk / cycle', 'Transit', 'Car'],
+      datasets: [{
+        data: [57, 24, 19],
+        backgroundColor: ['#66bb6a', '#4fc3f7', '#FF9043'],
+        borderColor: '#0e1420',
+        borderWidth: 3,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: '62%',
+      animation: { animateRotate: true, duration: 1200 },
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 12 }, padding: 14, boxWidth: 12 } },
+        tooltip: CHART_DEFAULTS.plugins.tooltip
+      }
+    }
+  });
+
+  // Chart 2 — Schools per borough (placeholder data — replace with real values)
+  const BOROUGH_DATA = [
+    // [ borough_name, count ] — replace with real data
+    ['Barnet',          19],
+    ['Bromley',         18],
+    ['Croydon',         17],
+    ['Southwark',       16],
+    ['Lambeth',         16],
+    ['Ealing',          15],
+    ['Greenwich',       14],
+    ['Lewisham',        14],
+    ['Newham',          13],
+    ['Brent',           13],
+  ];
+  new Chart(document.getElementById('chart2-boroughs'), {
+    type: 'bar',
+    data: {
+      labels: BOROUGH_DATA.map(d => d[0]),
+      datasets: [{
+        label: 'Secondary schools',
+        data: BOROUGH_DATA.map(d => d[1]),
+        backgroundColor: BOROUGH_DATA.map((_, i) => i < 3 ? '#FF9043' : '#3d2a18'),
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: true,
+      animation: { duration: 1000, delay: (ctx) => ctx.dataIndex * 60 },
+      plugins: { legend: { display: false }, tooltip: CHART_DEFAULTS.plugins.tooltip },
+      scales: {
+        x: { ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+
+  // Chart 3 — Cross-LA region bars
+  const REGION_BARS_DATA = [
+    { label: 'London',     val: 19.9, highlight: true },
+    { label: 'South East', val: 12.3, highlight: false },
+    { label: 'East',       val: 10.8, highlight: false },
+    { label: 'England',    val:  8.4, highlight: false },
+    { label: 'North West', val:  6.2, highlight: false },
+  ];
+  const rbEl = document.getElementById('region-bars');
+  if (rbEl) {
+    REGION_BARS_DATA.forEach(d => {
+      rbEl.innerHTML += `<div class="region-bar-row">
+        <div class="region-bar-label">${d.label}</div>
+        <div class="region-bar-track"><div class="region-bar-fill" style="width:${d.val * 4}px;background:${d.highlight ? 'var(--accent-warm)' : 'var(--accent)'}"></div></div>
+        <div class="region-bar-val">${d.val}%</div>
+      </div>`;
+    });
+  }
+
+  // Animated counter for stat3
+  function animateCounter(el, target, suffix='%', duration=1400) {
+    let start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = (eased * target).toFixed(1) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // Chart 4a — Barriers
+  new Chart(document.getElementById('chart4a-barriers'), {
+    type: 'bar',
+    data: {
+      labels: ['Too far', 'Takes too long', 'Children too young'],
+      datasets: [{ data: [39, 15, 10], backgroundColor: '#ef5350', borderRadius: 3 }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: CHART_DEFAULTS.plugins.tooltip },
+      scales: {
+        x: { max: 50, ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 }, callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+
+  // Chart 4b — Incentives
+  new Chart(document.getElementById('chart4b-incentives'), {
+    type: 'bar',
+    data: {
+      labels: ['No change needed', 'Safer roads', 'Safer crossings'],
+      datasets: [{ data: [54, 22, 9], backgroundColor: '#66bb6a', borderRadius: 3 }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: CHART_DEFAULTS.plugins.tooltip },
+      scales: {
+        x: { max: 65, ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 }, callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+
+  // Chart 8 — Cluster vs London average comparison
+  new Chart(document.getElementById('chart8-cluster-compare'), {
+    type: 'bar',
+    data: {
+      labels: ['HH clusters', 'London median'],
+      datasets: [{
+        label: 'Median P8 transit time (min)',
+        data: [0, 25],   // PLACEHOLDER — first value: HH cluster median travel time
+        backgroundColor: ['#ef5350aa', '#FF904344'],
+        borderColor: ['#ef5350', '#FF9043'],
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: CHART_DEFAULTS.plugins.tooltip,
+        annotation: {}
+      },
+      scales: {
+        x: { ticks: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 12 } }, grid: { display: false } },
+        y: {
+          ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 }, callback: v => v + 'm' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          title: { display: true, text: 'minutes', color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 } }
+        }
+      }
+    }
+  });
+
+  /* ─────────────────────────────────────────
+     SCROLL ENGINE
+  ───────────────────────────────────────── */
+  const SECTIONS = [
+    { id: 's1-hero' },
+    { id: 's2-motivation' },
+    { id: 's3-travel' },
+    { id: 's4-access' },
+    { id: 's5-vulnerability' },
+    { id: 's6-reflections' },
+    { id: 's7-about' }
+  ];
+
+  // Build dot rail
+  const dotRail = document.getElementById('dot-rail');
+  SECTIONS.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'rail-dot' + (i === 0 ? ' active' : '');
+    d.title = s.id;
+    d.addEventListener('click', () => document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' }));
+    dotRail.appendChild(d);
+  });
+
+  let currentSection = 0;
+  function updateNav(idx) {
+    if (idx === currentSection) return;
+    currentSection = idx;
+    document.querySelectorAll('.nav-link').forEach((a, i) => a.classList.toggle('active', i === idx));
+    document.querySelectorAll('.rail-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    // Show dot rail only after hero
+    dotRail.classList.toggle('visible', idx > 0);
+  }
+
+  // Intersection observer for section-level nav
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = parseInt(entry.target.dataset.sectionIndex);
+        updateNav(idx);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.page-section').forEach(el => sectionObserver.observe(el));
+
+  // Scroll-reveal observer
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Trigger counter animations
+        if (entry.target.querySelector('#stat3-counter')) {
+          animateCounter(document.getElementById('stat3-counter'), 19.9);
+        }
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // Vulnerability counter
+  const vulnCounterEl = document.getElementById('vuln-counter');
+  const vulnObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) animateCounter(vulnCounterEl, 20, '%', 1200);
+    });
+  }, { threshold: 0.5 });
+  if (vulnCounterEl) vulnObserver.observe(vulnCounterEl);
+
+  // Scroll-step observer (for sticky sections)
+  // Each .scroll-step activates when it passes ~25% from top of viewport
+  const stepObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const step = entry.target;
+        const section = step.closest('.sticky-section');
+        // Deactivate siblings
+        section?.querySelectorAll('.scroll-step').forEach(s => s.classList.remove('active'));
+        step.classList.add('active');
+        const stepId = step.dataset.step;
+        // Fire map reactions
+        if (stepId && s2StepActions[stepId]) s2StepActions[stepId]();
+        if (stepId && s4StepActions[stepId]) s4StepActions[stepId]();
+        if (stepId && s5StepActions[stepId]) s5StepActions[stepId]();
+      }
+    });
+  }, {
+    rootMargin: '-10% 0px -40% 0px',
+    threshold: 0
+  });
+  document.querySelectorAll('.scroll-step').forEach(el => stepObserver.observe(el));
+
+  /* ─────────────────────────────────────────
+    SECTION SNAP
+    Snaps between top-level sections on wheel/swipe.
+    Does NOT interfere with within-section scrolling
+    (sticky narrative columns, charts, etc.)
+  ───────────────────────────────────────── */
+  (function initSectionSnap() {
+    const SECTION_IDS = [
+      's1-hero',
+      's2-intro',       // S2 intro wrap  (100vh)
+      's2-map-start',   // S2 sticky maps
+      's3-travel',
+      's4-intro',       // S4 intro wrap  (100vh)
+      's4-map-start',   // S4 sticky map-1
+      's4-step3-wrap',   // S4 sticky maps-2
+      's5-intro',       // S5 intro wrap  (100vh)
+      's5-map-start',   // S5 sticky maps
+      's6-reflections',
+      's7-about'
+    ];
+
+    // Intro snap targets — these are 100vh single screens.
+    // When the current target is one of these we skip the
+    // insideStickyWithStepsRemaining check entirely.
+    const INTRO_IDS = new Set(['s2-intro','s4-intro','s5-intro']);
+
+    const SNAP_COOLDOWN = 900;
+    let snapping   = false;
+    let lastWheelY = 0;
+
+    function getSection(id) {return document.getElementById(id);}
+
+    // Returns the index of the section whose top is closest to
+    function currentSectionIdx() {
+      const scrollY = window.scrollY + window.innerHeight * 0.15;
+      let idx = 0;
+      SECTION_IDS.forEach((id, i) => {
+        const el = getSection(id);
+        if (el && el.getBoundingClientRect().top + window.scrollY <= scrollY) idx = i;
+      });
+      return idx;
+    }
+
+    function snapTo(idx) {
+      const el = getSection(SECTION_IDS[idx]);
+      if (!el) return;
+      snapping = true;
+      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY, behavior: 'smooth' });
+      setTimeout(() => { snapping = false; }, SNAP_COOLDOWN);
+    }
+
+    // Block snap if inside a panel with its own scrollbar that still has content
+    function insideScrollableContent(e) {
+      let node = e.target;
+      while (node && node !== document.body) {
+        const ov = getComputedStyle(node).overflowY;
+        if ((ov === 'auto' || ov === 'scroll') && node.scrollHeight > node.clientHeight) {
+          const atTop    = node.scrollTop === 0;
+          const atBottom = node.scrollTop + node.clientHeight >= node.scrollHeight - 1;
+          if (!(atTop && e.deltaY < 0) && !(atBottom && e.deltaY > 0)) return true;
+        }
+        node = node.parentElement;
+      }
+      return false;
+    }
+
+    // Block downward snap if we are inside a sticky section that still
+    // has narrative steps to scroll through.
+    // NOT called when the current snap target is an intro wrap.
+    function insideStickyWithStepsRemaining(currentEl) {
+      if (!currentEl) return false;
+      const sec = currentEl.closest('.sticky-section, .s4-explorer-section') || currentEl;
+      const r = sec.getBoundingClientRect();
+      if (r.top >= window.innerHeight || r.bottom <= 0) return false;
+      const steps = sec.querySelectorAll('.scroll-step, .s4-standalone-controls, .s4-borough-chart-panel');
+      if (!steps.length) return false;
+      const lastRect = steps[steps.length - 1].getBoundingClientRect();
+      return lastRect.top > window.innerHeight * 0.1;
+    }
+
+    // Wheel handler
+    window.addEventListener('wheel', (e) => {
+      if (snapping) return;
+      if (insideScrollableContent(e)) return;
+
+      const idx    = currentSectionIdx();
+      const currId = SECTION_IDS[idx];
+
+      const el = getSection(currId);
+
+      // Only apply the sticky-steps guard when we are NOT on an intro screen
+      if (!INTRO_IDS.has(currId)) {
+        if (e.deltaY > 0 && insideStickyWithStepsRemaining(el)) return;
+      }
+      if (!el) return;
+
+      const rect     = el.getBoundingClientRect();
+      const atTop    = rect.top > -100;                     // section top is at/above viewport
+      const atBottom = rect.bottom <= window.innerHeight + 100; // section bottom is in view
+
+      if (e.deltaY > 0 && atBottom && idx < SECTION_IDS.length - 1) {
+        e.preventDefault();
+        snapTo(idx + 1);
+      } else if (e.deltaY < 0 && atTop && idx > 0) {
+        e.preventDefault();
+        snapTo(idx - 1);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchstart', (e) => {
+      lastWheelY = e.touches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      if (snapping) return;
+      const deltaY = lastWheelY - e.changedTouches[0].clientY;
+      if (Math.abs(deltaY) < 40) return;
+
+      const idx  = currentSectionIdx();
+      const el   = getSection(SECTION_IDS[idx]);
+      if (!el) return;
+
+      const rect     = el.getBoundingClientRect();
+      const atBottom = rect.bottom <= window.innerHeight + 10;
+      const atTop    = rect.top > -10;
+
+      if (deltaY > 0 && atBottom && idx < SECTION_IDS.length - 1) snapTo(idx + 1);
+      else if (deltaY < 0 && atTop && idx > 0) snapTo(idx - 1);
+    }, { passive: true });
+  })();
+
+    // Draw dot plot on initial load (transit is default mode)
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof drawS4DotPlot === 'function') drawS4DotPlot('transit');
+    });
+  </script>
+</body>
+</html>
