@@ -2029,12 +2029,12 @@
 
         <!-- Travel-time legend (bottom-left) -->
         <div class="map-legend" id="s4-legend">
-          <div class="map-legend-title">Travel time — Transit (min)</div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#ffe066"></div><span>&lt; 10</span></div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#ffb347"></div><span>11–20</span></div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#ff7c2a"></div><span>21–30</span></div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#e64400"></div><span>31–40</span></div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#8b1a00"></div><span>41–54</span></div>
+          <div class="map-legend-title">Travel time — Transit</div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffe066"></div><span>&lt; 10 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffb347"></div><span>11–20 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ff7c2a"></div><span>21–30 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#e64400"></div><span>31–40 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#8b1a00"></div><span>More than 40 min</span></div>
         </div>
 
         <!-- Slider labels (bottom corners) -->
@@ -2143,7 +2143,7 @@
           <div class="legend-row"><div class="legend-swatch" style="background:#ffb347"></div><span>11–20 min</span></div>
           <div class="legend-row"><div class="legend-swatch" style="background:#ff7c2a"></div><span>21–30 min</span></div>
           <div class="legend-row"><div class="legend-swatch" style="background:#e64400"></div><span>31–40 min</span></div>
-          <div class="legend-row"><div class="legend-swatch" style="background:#8b1a00"></div><span>41–54 min</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#8b1a00"></div><span>More than 40 min</span></div>
         </div>
       </div>
 
@@ -2154,7 +2154,7 @@
         <div class="s4-standalone-controls">
           <div>
             <p class="step-index" style="margin-bottom:12px">03 — Mode comparison</p>
-            <h3 class="step-heading" style="margin-bottom:16px">Access differences persist even after accounting for travel modes</h3>
+            <h3 class="step-heading" style="margin-bottom:16px"> Access differences become even more apparent after accounting for travel modes</h3>
             <p class="step-body" style="font-size:17px;color:var(--text-secondary);line-height:1.65">
               Select a school type and travel mode to update the choropleth.
               <br> Each combination reveals a different dimension of potential access inequality.
@@ -2227,9 +2227,9 @@
         <p class="section-label">Pockets of vulnerability</p>
         <h2 class="section-headline">Where deprivation meets<br>long journeys</h2>
         <p class="section-intro-body">
-          Using Local Indicators of Spatial Autocorrelation (LISA), we identify
-          neighbourhoods where high transit times to Progress 8 schools coincide
-          with elevated child deprivation — compounding barriers to opportunity.
+          Using spatial clustering methods, we identify neighbourhoods where high 
+          transit times to Progress 8 schools coincide with elevated child deprivation — 
+          compounding barriers to opportunity.
         </p>
       </div>
 
@@ -3501,8 +3501,7 @@ const s2StepActions = {
       }, 'waterway-label');
     }
 
-    // ── Left map: all schools as dim white dots (with hover) ───────
-    // Only added to s4MapBase — gives the "unfiltered" picture.
+    // Schools Layer to show all schools and quality schools
     function addS4AllSchoolsLayer(map) {
       if (!map) return;
       const srcId = 'base-schools-src';
@@ -3549,7 +3548,7 @@ const s2StepActions = {
         type:           'circle',
         source:         srcId,
         'source-layer': SCHOOLS_SRC_LAYER,
-        filter:         ['==', 'top_p8_quartile_GLA', true],
+        filter: ['all', ['==', 'top_p8_quartile_GLA', true], ['==', 'admissions_policy', 'Non-selective']],
       paint: {
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
         'circle-color': '#C96820',
@@ -3655,8 +3654,8 @@ const s2StepActions = {
       const isP8 = quality === 'p8';
       const lsoaField    = isP8 ? 'tt_transit_nearest_top25_p8' : 'tt_transit_nearest_outstanding';
       const schoolFilter = isP8
-        ? ['==', 'top_p8_quartile_GLA', true]
-        : ['==', 'Ofsted_outstanding',  true];
+        ? ['all', ['==', 'top_p8_quartile_GLA', true], ['==', 'admissions_policy', 'Non-selective']]
+        : ['all', ['==', 'Ofsted_outstanding',   true], ['==', 'admissions_policy', 'Non-selective']];
       const label = isP8 ? 'Top 25% P8' : 'Ofsted Outstanding';
 
       // Button states
@@ -3718,7 +3717,7 @@ const s2StepActions = {
         // Show filtered dots on right map only, default to P8
         if (s4MapRight && s4MapRight.getLayer('right-schools-highlight')) {
           s4MapRight.setLayoutProperty('right-schools-highlight', 'visibility', 'visible');
-          s4MapRight.setFilter('right-schools-highlight', ['==', 'top_p8_quartile_GLA', true]);
+          s4MapRight.setFilter('right-schools-highlight', ['all', ['==', 'top_p8_quartile_GLA', true], ['==', 'admissions_policy', 'Non-selective']]);
         }
         // Show schools legend highlight row
         const legendRow = document.getElementById('s4-schools-legend-highlight');
@@ -3732,7 +3731,7 @@ const s2StepActions = {
       's4-2': () => {
         // Enable borough interactions for step 4
         boroughInteractive = true;
-        setExplorerOverlayTitle('Travel times to nearest Top 25% P8 — Borough Summary');
+        setExplorerOverlayTitle('Borough Summary - Travel times to nearest Top 25% P8 Schools');
         setExplorerOverlayBorough(null, s4BoroughMode);
         // Show borough highlight layer as interactive
         if (explorerLoaded && s4MapExplorer?.getLayer('explorer-borough-highlight')) {
@@ -3818,19 +3817,19 @@ const s2StepActions = {
       // Min / Median / Max travel times (minutes) per mode × school type
       const S4_RANGES = {
         transit: [
-          { label: 'Any school',         min:  3, median: 16, max: 53 },
-          { label: 'Top 25% P8',         min:  5, median: 25, max: 61 },
-          { label: 'Ofsted Outstanding',  min:  6, median: 26, max: 65 },
+          { label: 'Any school',         min:  1, median: 16, max: 54 },
+          { label: 'Top 25% P8',         min:  1, median: 25, max: 85 },
+          { label: 'Ofsted Outstanding',  min:  1, median: 26, max: 73 },
         ],
         walk: [
-          { label: 'Any school',         min:  4, median: 17, max: 55 },
-          { label: 'Top 25% P8',         min:  8, median: 32, max: 82 },
-          { label: 'Ofsted Outstanding',  min:  9, median: 33, max: 89 },
+          { label: 'Any school',         min:  1, median: 17, max: 75 },
+          { label: 'Top 25% P8',         min:  1, median: 32, max: 95 },
+          { label: 'Ofsted Outstanding',  min:  1, median: 33, max: 92 },
         ],
         car: [
           { label: 'Any school',         min:  1, median:  4, max: 22 },
-          { label: 'Top 25% P8',         min:  2, median:  7, max: 32 },
-          { label: 'Ofsted Outstanding',  min:  2, median:  7, max: 33 },
+          { label: 'Top 25% P8',         min:  1, median:  7, max: 30 },
+          { label: 'Ofsted Outstanding',  min:  1, median:  7, max: 23 },
         ],
       };
 
@@ -3932,7 +3931,7 @@ const s2StepActions = {
             type:           'circle',
             source:         'explorer-schools-src',
             'source-layer': SCHOOLS_SRC_LAYER,
-            filter:         ['==', 'top_p8_quartile_GLA', true],
+            filter: ['all', ['==', 'top_p8_quartile_GLA', true], ['==', 'admissions_policy', 'Non-selective']],
             paint: {
               'circle-radius':         ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
               'circle-color':          '#C96820',
@@ -4072,41 +4071,40 @@ const s2StepActions = {
       /* ── Section 4 Borough chart data ──────────────────────────────── */
       // All 33 London boroughs — median travel time (min) to nearest Top 25% P8 school
       // Format: { name, transit, walk, car }
-      // Replace with real computed values from r5py matrices
       const S4_BOROUGH_DATA = [
-        { name: 'Havering',          transit: 42, walk: 88, car: 22 },
-        { name: 'Bromley',           transit: 39, walk: 82, car: 20 },
-        { name: 'Bexley',            transit: 38, walk: 80, car: 19 },
-        { name: 'Hillingdon',        transit: 36, walk: 78, car: 18 },
-        { name: 'Sutton',            transit: 35, walk: 75, car: 17 },
-        { name: 'Croydon',           transit: 34, walk: 72, car: 16 },
-        { name: 'Enfield',           transit: 33, walk: 70, car: 16 },
-        { name: 'Barnet',            transit: 32, walk: 68, car: 15 },
-        { name: 'Richmond upon Thames', transit: 31, walk: 65, car: 14 },
-        { name: 'Kingston upon Thames', transit: 30, walk: 62, car: 13 },
-        { name: 'Merton',            transit: 28, walk: 58, car: 12 },
-        { name: 'Harrow',            transit: 27, walk: 55, car: 11 },
-        { name: 'Ealing',            transit: 26, walk: 52, car: 11 },
-        { name: 'Hounslow',          transit: 25, walk: 50, car: 10 },
-        { name: 'Waltham Forest',    transit: 25, walk: 50, car: 10 },
-        { name: 'Redbridge',         transit: 24, walk: 48, car: 10 },
-        { name: 'Barking and Dagenham', transit: 24, walk: 48, car:  9 },
-        { name: 'Greenwich',         transit: 23, walk: 46, car:  9 },
-        { name: 'Lewisham',          transit: 22, walk: 44, car:  8 },
-        { name: 'Wandsworth',        transit: 21, walk: 42, car:  8 },
-        { name: 'Brent',             transit: 20, walk: 40, car:  7 },
-        { name: 'Haringey',          transit: 20, walk: 40, car:  7 },
-        { name: 'Newham',            transit: 19, walk: 38, car:  7 },
-        { name: 'Hammersmith and Fulham', transit: 18, walk: 36, car: 6 },
-        { name: 'Hackney',           transit: 17, walk: 34, car:  6 },
-        { name: 'Tower Hamlets',     transit: 16, walk: 32, car:  5 },
-        { name: 'Southwark',         transit: 16, walk: 32, car:  5 },
-        { name: 'Lambeth',           transit: 15, walk: 30, car:  5 },
-        { name: 'Kensington and Chelsea', transit: 14, walk: 28, car: 4 },
-        { name: 'Westminster',       transit: 14, walk: 28, car:  4 },
-        { name: 'Camden',            transit: 13, walk: 26, car:  4 },
-        { name: 'Islington',         transit: 12, walk: 24, car:  3 },
-        { name: 'City of London',    transit: 10, walk: 20, car:  2 },
+        { name: 'Bromley',                transit: 42,   walk: 52,   car: 12 },
+        { name: 'Croydon',                transit: 40,   walk: 56,   car: 12 },
+        { name: 'Havering',               transit: 35,   walk: 58,   car: 9  },
+        { name: 'Lewisham',               transit: 33.5, walk: 54,   car: 9  },
+        { name: 'Enfield',                transit: 32,   walk: 44,   car: 9  },
+        { name: 'Bexley',                 transit: 31,   walk: 54,   car: 9  },
+        { name: 'Greenwich',              transit: 31,   walk: 50,   car: 8.5},
+        { name: 'Sutton',                 transit: 30,   walk: 36,   car: 6  },
+        { name: 'Haringey',               transit: 28,   walk: 37,   car: 8  },
+        { name: 'Hillingdon',             transit: 28,   walk: 35,   car: 7  },
+        { name: 'Waltham Forest',         transit: 28,   walk: 50,   car: 10 },
+        { name: 'Islington',              transit: 27,   walk: 40,   car: 10 },
+        { name: 'Richmond upon Thames',   transit: 26,   walk: 35,   car: 8  },
+        { name: 'Barnet',                 transit: 25,   walk: 31,   car: 5  },
+        { name: 'Newham',                 transit: 25,   walk: 35,   car: 7.5},
+        { name: 'Camden',                 transit: 24,   walk: 36,   car: 8  },
+        { name: 'Kingston upon Thames',   transit: 24,   walk: 29,   car: 6  },
+        { name: 'Wandsworth',             transit: 24,   walk: 29,   car: 6  },
+        { name: 'City of London',         transit: 23.5, walk: 43,   car: 10.5},
+        { name: 'Barking and Dagenham',   transit: 23,   walk: 30,   car: 6  },
+        { name: 'Lambeth',                transit: 23,   walk: 27,   car: 6  },
+        { name: 'Redbridge',              transit: 23,   walk: 28.5, car: 6  },
+        { name: 'Harrow',                 transit: 22,   walk: 25,   car: 5  },
+        { name: 'Hounslow',               transit: 22,   walk: 28,   car: 6  },
+        { name: 'Brent',                  transit: 21,   walk: 29,   car: 6  },
+        { name: 'Ealing',                 transit: 21,   walk: 27,   car: 6  },
+        { name: 'Tower Hamlets',          transit: 21,   walk: 26,   car: 7  },
+        { name: 'Merton',                 transit: 20.5, walk: 23,   car: 5  },
+        { name: 'Southwark',              transit: 20.5, walk: 26,   car: 6  },
+        { name: 'Kensington and Chelsea', transit: 19,   walk: 25,   car: 6  },
+        { name: 'Hackney',                transit: 18,   walk: 21,   car: 6  },
+        { name: 'Westminster',            transit: 17,   walk: 19,   car: 5  },
+        { name: 'Hammersmith and Fulham', transit: 16,   walk: 18,   car: 4  }
       ];
 
       // Sort descending by transit (default)
@@ -4483,8 +4481,8 @@ const s2StepActions = {
           }
           if (s4MapExplorer?.getLayer('explorer-schools-highlight')) {
             const schoolFilter = school === 'p8'
-              ? ['==', 'top_p8_quartile_GLA', true]
-              : ['==', 'Ofsted_outstanding',  true];
+              ? ['all', ['==', 'top_p8_quartile_GLA', true], ['==', 'admissions_policy', 'Non-selective']]
+              : ['all', ['==', 'Ofsted_outstanding',   true], ['==', 'admissions_policy', 'Non-selective']];
             s4MapExplorer.setLayoutProperty(
               'explorer-schools-highlight', 'visibility',
               isFiltered ? 'visible' : 'none'
@@ -4508,6 +4506,17 @@ const s2StepActions = {
         const swatches = SWATCH_COLOURS[mode] || SWATCH_COLOURS.transit;
         document.querySelectorAll('#s4-explorer-legend .legend-swatch').forEach((el, i) => {
           if (swatches[i]) el.style.background = swatches[i];
+        });
+
+        // ── Update legend labels to match mode breakpoints ──        <-- ADD HERE
+        const LEGEND_LABELS = {
+          transit: ['< 10 min', '11–20 min', '21–30 min', '31–40 min', 'More than 40 min'],
+          walk:    ['< 10 min', '11–20 min', '21–30 min', '31–40 min', 'More than 40 min'],
+          car:     ['< 5 min',  '6–10 min',  '11–15 min', '16–20 min', 'More than 20 min'],
+        };
+        const labels = LEGEND_LABELS[mode] || LEGEND_LABELS.transit;
+        document.querySelectorAll('#s4-explorer-legend .legend-row span').forEach((el, i) => {
+          if (labels[i]) el.textContent = labels[i];
         });
 
         // ── Update schools legend ──
