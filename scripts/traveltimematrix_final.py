@@ -1,0 +1,260 @@
+"""
+r5py travel time matrix — London secondary schools accessibility
+================================================================
+Modes:       TRANSIT+WALK, WALK only, CYCLE only, CAR only (free-flow)
+Origins:     4,994 London LSOA population weighted centroids
+Destinations: All non-selective secondary schools within GLA boundary
+Departure:   Tuesday 17 March 2026, 08:30, 60-min window, median
+Targets:
+  (1) Nearest any school
+  (2) Nearest Outstanding school          [thresholds = London schools only]
+  (3) Nearest top-25% Attainment 8 school [thresholds = London schools only]
+  (4) Nearest top-25% Progress 8 school   [thresholds = London schools only]
+
+Note: schools with admissions_policy of "Selective" or "Not applicable"
+are excluded. The destination pool uses the exact GLA boundary (no buffer).
+Car times are free-flow (OSM speed limits, no congestion).
+AM peak actual times likely 1.3–1.5x longer. Use with caveat.
+"""
+
+import geopandas as gpd
+import pandas as pd
+import numpy as np
+from datetime import datetime
+from tqdm import tqdm
+import os
+
+os.environ["JAVA_HOME"] = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home"
+import r5py
+
+
+os.makedirs("data", exist_ok=True)
+os.makedirs("large", exist_ok=True)
+os.makedirs("outputs/figures", exist_ok=True)
+
+# ── 0. Paths ──────────────────────────────────────────────────────────────────
+
+OSM_PATH   = "large/greater-london-latest.osm.pbf"
+GTFS_PATHS = [
+    "large/itm_london_gtfs.zip",
+    "large/national_rail_fixed_gtfs.zip",
+]
+LSOA_PATH    = "data/london_lsoa_pwc.gpkg"
+SCHOOLS_PATH = "england_secondary_schools.parquet"
+GLA_PATH     = "data/London_GLA_Boundary.shp"
+OUTPUT_PATH  = "data/lsoa_travel_times.parquet"
+
+DEPARTURE  = datetime(2026, 3, 17, 8, 30)
+MAX_MINS   = 90
+PERCENTILE = 50
+BATCH_SIZE = 200   # origins per batch
+
+# ── 1. Load origins ───────────────────────────────────────────────────────────
+
+print("Loading LSOA centroids...")
+origins = gpd.read_file(LSOA_PATH)[["LSOA21CD", "geometry"]].copy()
+origins = origins.rename(columns={"LSOA21CD": "id"})
+origins = origins.to_crs("EPSG:4326")
+print(f"  {len(origins):,} origins")
+
+# ── 2. Load destinations ──────────────────────────────────────────────────────
+
+print("Loading GLA boundary...")
+gla = gpd.read_file(GLA_PATH).to_crs("EPSG:27700")
+
+# Dissolved GLA union — geopandas >=1.0 uses union_all, older uses unary_union
+try:
+    gla_union = gla.union_all()
+except AttributeError:
+    gla_union = gla.unary_union  # older geopandas fallback
+
+# buffer(0) = exact GLA boundary, no spatial expansion
+gla_buffered = gla.copy()
+gla_buffered["geometry"] = gla.buffer(0)
+print("  Using exact GLA boundary (no buffer) for school clipping")
+
+print("Loading schools...")
+schools_raw   = pd.read_parquet(SCHOOLS_PATH)
+schools_gdf_all = gpd.GeoDataFrame(
+    schools_raw,
+    geometry=gpd.points_from_xy(schools_raw["easting"], schools_raw["northing"]),
+    crs="EPSG:27700",
+)
+
+# Clip to exact GLA boundary
+schools_buffered = gpd.clip(schools_gdf_all, gla_buffered).copy()
+print(f"  {len(schools_buffered):,} schools within GLA boundary")
+
+# Filter out selective / non-applicable admissions policies
+excluded_policies = ["Selective", "Not applicable"]
+schools_buffered = schools_buffered[
+    ~schools_buffered["admissions_policy"].isin(excluded_policies)
+].copy()
+print(f"  {len(schools_buffered):,} schools remaining after excluding Selective/NA policies")
+
+# London schools only — used for threshold calculation
+london_mask  = schools_buffered["london_sub_region"].isin(["Inner London", "Outer London"])
+london_schools = schools_buffered[london_mask]
+print(f"  of which {len(london_schools):,} are London schools (used for thresholds)")
+
+# ── 3. Build destinations GeoDataFrame ───────────────────────────────────────
+
+destinations = schools_buffered[[
+    "URN", "geometry", "ofsted_overall_label", "ks4_attainment8", "ks4_progress8"
+]].copy()
+destinations = destinations.rename(columns={"URN": "urn"})
+destinations["id"] = destinations["urn"].astype(str)
+destinations = destinations.to_crs("EPSG:4326")
+
+# ── 4. Tag destination tiers (thresholds from London schools only) ────────────
+
+att8_threshold = london_schools["ks4_attainment8"].quantile(0.75)
+p8_threshold   = london_schools["ks4_progress8"].quantile(0.75)
+
+print(f"\nDestination thresholds (London schools only):")
+print(f"  Top 25% Attainment 8 cutoff : {att8_threshold:.1f}")
+print(f"  Top 25% Progress 8 cutoff   : {p8_threshold:.2f}")
+print(f"  Outstanding schools         : {(destinations['ofsted_overall_label'] == 'Outstanding').sum()}")
+print(f"  Top 25% Att8                : {(destinations['ks4_attainment8'] >= att8_threshold).sum()}")
+print(f"  Top 25% P8                  : {(destinations['ks4_progress8'] >= p8_threshold).sum()}")
+
+school_tags = destinations.set_index("id")[[
+    "ofsted_overall_label", "ks4_attainment8", "ks4_progress8",
+]].copy()
+school_tags["is_outstanding"]  = school_tags["ofsted_overall_label"] == "Outstanding"
+school_tags["is_top25_att8"]   = school_tags["ks4_attainment8"] >= att8_threshold
+school_tags["is_top25_p8"]     = school_tags["ks4_progress8"]   >= p8_threshold
+
+dest_gdf = destinations[["id", "geometry"]].copy()
+
+# ── 5. Build transport network ────────────────────────────────────────────────
+
+print("\nBuilding transport network (this takes a few minutes)...")
+transport_network = r5py.TransportNetwork(OSM_PATH, GTFS_PATHS)
+print("✓ Network built")
+
+# ── 6. Compute travel time matrices in batches ────────────────────────────────
+
+def run_matrix_batched(network, origins, destinations, mode_label):
+    n       = len(origins)
+    batches = [origins.iloc[i:i + BATCH_SIZE] for i in range(0, n, BATCH_SIZE)]
+    print(
+        f"\nComputing {mode_label} matrix "
+        f"({n:,} origins x {len(destinations):,} destinations) "
+        f"in {len(batches)} batches of {BATCH_SIZE}..."
+    )
+
+    if mode_label == "transit":
+        modes = [r5py.TransportMode.TRANSIT, r5py.TransportMode.WALK]
+    elif mode_label == "cycle":
+        modes = [r5py.TransportMode.BICYCLE]
+    elif mode_label == "car":
+        modes = [r5py.TransportMode.CAR]
+    else:
+        modes = [r5py.TransportMode.WALK]
+
+    results = []
+    for batch_origins in tqdm(batches, desc=mode_label, unit="batch"):
+        computer = r5py.TravelTimeMatrix(
+            network,
+            origins=batch_origins,
+            destinations=destinations,
+            departure=DEPARTURE,
+            departure_time_window=pd.Timedelta(hours=1),
+            max_time=pd.Timedelta(minutes=MAX_MINS),
+            transport_modes=modes,
+            percentiles=[PERCENTILE],
+        )
+        results.append(computer[["from_id", "to_id", "travel_time"]])
+
+    full      = pd.concat(results, ignore_index=True)
+    nan_count = full["travel_time"].isna().sum()
+    print(
+        f"  ✓ {len(full):,} pairs | "
+        f"NaN (unreachable): {nan_count:,} ({nan_count / len(full) * 100:.1f}%)"
+    )
+    return full
+
+
+transit_tt = run_matrix_batched(transport_network, origins, dest_gdf, "transit")
+transit_tt.to_parquet("large/raw_transit_tt.parquet", index=False)
+print("✓ raw transit saved")
+
+walk_tt = run_matrix_batched(transport_network, origins, dest_gdf, "walk")
+walk_tt.to_parquet("large/raw_walk_tt.parquet", index=False)
+print("✓ raw walk saved")
+
+cycle_tt = run_matrix_batched(transport_network, origins, dest_gdf, "cycle")
+cycle_tt.to_parquet("large/raw_cycle_tt.parquet", index=False)
+print("✓ raw cycle saved")
+
+car_tt = run_matrix_batched(transport_network, origins, dest_gdf, "car")
+car_tt.to_parquet("large/raw_car_tt.parquet", index=False)
+print("✓ raw car saved")
+
+# ── 7. Summarise into per-LSOA metrics ───────────────────────────────────────
+
+def summarise(tt_matrix, school_tags, mode_label):
+    df = tt_matrix.rename(columns={
+        "from_id":     "lsoa_id",
+        "to_id":       "school_id",
+        "travel_time": "tt",
+    })
+    df = df.dropna(subset=["tt"])
+    df = df.join(school_tags, on="school_id", how="left")
+
+    records = []
+    for lsoa_id, grp in tqdm(
+        df.groupby("lsoa_id"),
+        desc=f"summarise {mode_label}",
+        unit="LSOA",
+    ):
+        row = {"lsoa_id": lsoa_id}
+
+        row[f"tt_{mode_label}_nearest_any"] = grp["tt"].min()
+
+        sub = grp[grp["is_outstanding"]]
+        row[f"tt_{mode_label}_nearest_outstanding"] = (
+            sub["tt"].min() if len(sub) else np.nan
+        )
+
+        sub = grp[grp["is_top25_att8"]]
+        row[f"tt_{mode_label}_nearest_top25_att8"] = (
+            sub["tt"].min() if len(sub) else np.nan
+        )
+
+        sub = grp[grp["is_top25_p8"]]
+        row[f"tt_{mode_label}_nearest_top25_p8"] = (
+            sub["tt"].min() if len(sub) else np.nan
+        )
+
+        records.append(row)
+
+    result = pd.DataFrame(records)
+    print(f"\n{mode_label} summary ({len(result):,} LSOAs):")
+    print(result.describe().round(1))
+    return result
+
+
+transit_metrics = summarise(transit_tt, school_tags, "transit")
+walk_metrics    = summarise(walk_tt,    school_tags, "walk")
+cycle_metrics   = summarise(cycle_tt,   school_tags, "cycle")
+car_metrics     = summarise(car_tt,     school_tags, "car")
+
+# ── 8. Merge and save ─────────────────────────────────────────────────────────
+
+# Anchor on all 4,994 LSOAs; left join so unroutable LSOAs appear as NaN
+lsoa_metrics = origins[["id"]].rename(columns={"id": "lsoa_id"})
+
+lsoa_metrics = (
+    lsoa_metrics
+    .merge(transit_metrics, on="lsoa_id", how="left")
+    .merge(walk_metrics,    on="lsoa_id", how="left")
+    .merge(cycle_metrics,   on="lsoa_id", how="left")
+    .merge(car_metrics,     on="lsoa_id", how="left")
+)
+
+lsoa_metrics.to_parquet(OUTPUT_PATH, index=False)
+print(f"\n✓ Saved to {OUTPUT_PATH}")
+print(f"  Shape:   {lsoa_metrics.shape}")
+print(f"  Columns: {lsoa_metrics.columns.tolist()}")

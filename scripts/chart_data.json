@@ -1,0 +1,781 @@
+{
+  "boroughData": [
+    {
+      "borough": "Barnet",
+      "schoolCount": 22,
+      "totalPupils": 23497,
+      "utilisationPct": 87.5,
+      "p8Schools": 10,
+      "ofsted": {
+        "outstanding": 4,
+        "good": 17,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 1
+      },
+      "medianFsm": 26.1,
+      "medianP8": 0.61
+    },
+    {
+      "borough": "Hillingdon",
+      "schoolCount": 20,
+      "totalPupils": 22416,
+      "utilisationPct": 91.4,
+      "p8Schools": 6,
+      "ofsted": {
+        "outstanding": 4,
+        "good": 10,
+        "ri": 1,
+        "inadequate": 0,
+        "notInspected": 5
+      },
+      "medianFsm": 25.9,
+      "medianP8": 0.29
+    },
+    {
+      "borough": "Enfield",
+      "schoolCount": 19,
+      "totalPupils": 22766,
+      "utilisationPct": 88.4,
+      "p8Schools": 2,
+      "ofsted": {
+        "outstanding": 1,
+        "good": 14,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 4
+      },
+      "medianFsm": 41.6,
+      "medianP8": 0.2
+    },
+    {
+      "borough": "Hounslow",
+      "schoolCount": 19,
+      "totalPupils": 20833,
+      "utilisationPct": 91.8,
+      "p8Schools": 6,
+      "ofsted": {
+        "outstanding": 5,
+        "good": 9,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 5
+      },
+      "medianFsm": 29.9,
+      "medianP8": 0.47
+    },
+    {
+      "borough": "Newham",
+      "schoolCount": 19,
+      "totalPupils": 24683,
+      "utilisationPct": 89.7,
+      "p8Schools": 2,
+      "ofsted": {
+        "outstanding": 4,
+        "good": 10,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 5
+      },
+      "medianFsm": 48.1,
+      "medianP8": 0.17
+    },
+    {
+      "borough": "Southwark",
+      "schoolCount": 19,
+      "totalPupils": 18739,
+      "utilisationPct": 92.8,
+      "p8Schools": 5,
+      "ofsted": {
+        "outstanding": 6,
+        "good": 10,
+        "ri": 1,
+        "inadequate": 0,
+        "notInspected": 2
+      },
+      "medianFsm": 46.9,
+      "medianP8": 0.4
+    },
+    {
+      "borough": "Croydon",
+      "schoolCount": 18,
+      "totalPupils": 17491,
+      "utilisationPct": 81.8,
+      "p8Schools": 0,
+      "ofsted": {
+        "outstanding": 1,
+        "good": 12,
+        "ri": 3,
+        "inadequate": 0,
+        "notInspected": 2
+      },
+      "medianFsm": 37.6,
+      "medianP8": 0.04
+    },
+    {
+      "borough": "Ealing",
+      "schoolCount": 16,
+      "totalPupils": 22713,
+      "utilisationPct": 93.5,
+      "p8Schools": 7,
+      "ofsted": {
+        "outstanding": 8,
+        "good": 5,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 3
+      },
+      "medianFsm": 34.3,
+      "medianP8": 0.6
+    },
+    {
+      "borough": "Redbridge",
+      "schoolCount": 16,
+      "totalPupils": 25209,
+      "utilisationPct": 95.2,
+      "p8Schools": 7,
+      "ofsted": {
+        "outstanding": 5,
+        "good": 9,
+        "ri": 1,
+        "inadequate": 0,
+        "notInspected": 1
+      },
+      "medianFsm": 24.1,
+      "medianP8": 0.43
+    },
+    {
+      "borough": "Brent",
+      "schoolCount": 16,
+      "totalPupils": 21536,
+      "utilisationPct": 92.8,
+      "p8Schools": 6,
+      "ofsted": {
+        "outstanding": 5,
+        "good": 8,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 3
+      },
+      "medianFsm": 29.6,
+      "medianP8": 0.45
+    },
+    {
+      "borough": "Waltham Forest",
+      "schoolCount": 16,
+      "totalPupils": 16101,
+      "utilisationPct": 93.9,
+      "p8Schools": 0,
+      "ofsted": {
+        "outstanding": 1,
+        "good": 13,
+        "ri": 1,
+        "inadequate": 0,
+        "notInspected": 1
+      },
+      "medianFsm": 32.3,
+      "medianP8": -0.16
+    },
+    {
+      "borough": "Tower Hamlets",
+      "schoolCount": 16,
+      "totalPupils": 18350,
+      "utilisationPct": 92.0,
+      "p8Schools": 2,
+      "ofsted": {
+        "outstanding": 3,
+        "good": 11,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 2
+      },
+      "medianFsm": 48.8,
+      "medianP8": 0.18
+    },
+    {
+      "borough": "Bromley",
+      "schoolCount": 16,
+      "totalPupils": 21684,
+      "utilisationPct": 96.5,
+      "p8Schools": 1,
+      "ofsted": {
+        "outstanding": 3,
+        "good": 11,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 2
+      },
+      "medianFsm": 18.4,
+      "medianP8": 0.04
+    },
+    {
+      "borough": "Lambeth",
+      "schoolCount": 15,
+      "totalPupils": 14135,
+      "utilisationPct": 87.9,
+      "p8Schools": 3,
+      "ofsted": {
+        "outstanding": 3,
+        "good": 8,
+        "ri": 1,
+        "inadequate": 0,
+        "notInspected": 3
+      },
+      "medianFsm": 49.3,
+      "medianP8": 0.03
+    },
+    {
+      "borough": "Hackney",
+      "schoolCount": 15,
+      "totalPupils": 13568,
+      "utilisationPct": 91.8,
+      "p8Schools": 5,
+      "ofsted": {
+        "outstanding": 3,
+        "good": 12,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 0
+      },
+      "medianFsm": 50.1,
+      "medianP8": 0.48
+    },
+    {
+      "borough": "Havering",
+      "schoolCount": 15,
+      "totalPupils": 15088,
+      "utilisationPct": 96.2,
+      "p8Schools": 1,
+      "ofsted": {
+        "outstanding": 2,
+        "good": 10,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 3
+      },
+      "medianFsm": 22.5,
+      "medianP8": 0.24
+    },
+    {
+      "borough": "Greenwich",
+      "schoolCount": 14,
+      "totalPupils": 17070,
+      "utilisationPct": 96.3,
+      "p8Schools": 2,
+      "ofsted": {
+        "outstanding": 2,
+        "good": 9,
+        "ri": 3,
+        "inadequate": 0,
+        "notInspected": 0
+      },
+      "medianFsm": 34.3,
+      "medianP8": -0.08
+    },
+    {
+      "borough": "Lewisham",
+      "schoolCount": 14,
+      "totalPupils": 14378,
+      "utilisationPct": 86.0,
+      "p8Schools": 0,
+      "ofsted": {
+        "outstanding": 1,
+        "good": 10,
+        "ri": 1,
+        "inadequate": 0,
+        "notInspected": 2
+      },
+      "medianFsm": 33.5,
+      "medianP8": 0.18
+    },
+    {
+      "borough": "Harrow",
+      "schoolCount": 13,
+      "totalPupils": 16592,
+      "utilisationPct": 95.2,
+      "p8Schools": 6,
+      "ofsted": {
+        "outstanding": 3,
+        "good": 6,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 4
+      },
+      "medianFsm": 28.5,
+      "medianP8": 0.56
+    },
+    {
+      "borough": "Barking and Dagenham",
+      "schoolCount": 11,
+      "totalPupils": 20074,
+      "utilisationPct": 90.8,
+      "p8Schools": 3,
+      "ofsted": {
+        "outstanding": 5,
+        "good": 6,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 0
+      },
+      "medianFsm": 30.3,
+      "medianP8": 0.21
+    },
+    {
+      "borough": "Haringey",
+      "schoolCount": 11,
+      "totalPupils": 13879,
+      "utilisationPct": 103.3,
+      "p8Schools": 1,
+      "ofsted": {
+        "outstanding": 2,
+        "good": 7,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 2
+      },
+      "medianFsm": 29.7,
+      "medianP8": 0.37
+    },
+    {
+      "borough": "Hammersmith and Fulham",
+      "schoolCount": 10,
+      "totalPupils": 8323,
+      "utilisationPct": 94.7,
+      "p8Schools": 6,
+      "ofsted": {
+        "outstanding": 4,
+        "good": 5,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 1
+      },
+      "medianFsm": 35.9,
+      "medianP8": 0.68
+    },
+    {
+      "borough": "Bexley",
+      "schoolCount": 10,
+      "totalPupils": 11212,
+      "utilisationPct": 88.5,
+      "p8Schools": 1,
+      "ofsted": {
+        "outstanding": 0,
+        "good": 7,
+        "ri": 2,
+        "inadequate": 0,
+        "notInspected": 1
+      },
+      "medianFsm": 24.1,
+      "medianP8": -0.14
+    },
+    {
+      "borough": "Camden",
+      "schoolCount": 10,
+      "totalPupils": 9976,
+      "utilisationPct": 90.4,
+      "p8Schools": 1,
+      "ofsted": {
+        "outstanding": 1,
+        "good": 7,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 2
+      },
+      "medianFsm": 48.0,
+      "medianP8": -0.18
+    },
+    {
+      "borough": "Wandsworth",
+      "schoolCount": 10,
+      "totalPupils": 11957,
+      "utilisationPct": 89.2,
+      "p8Schools": 3,
+      "ofsted": {
+        "outstanding": 2,
+        "good": 7,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 1
+      },
+      "medianFsm": 30.4,
+      "medianP8": 0.45
+    },
+    {
+      "borough": "Sutton",
+      "schoolCount": 10,
+      "totalPupils": 15123,
+      "utilisationPct": 103.1,
+      "p8Schools": 3,
+      "ofsted": {
+        "outstanding": 1,
+        "good": 6,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 3
+      },
+      "medianFsm": 21.3,
+      "medianP8": 0.33
+    },
+    {
+      "borough": "Westminster",
+      "schoolCount": 10,
+      "totalPupils": 10634,
+      "utilisationPct": 94.6,
+      "p8Schools": 5,
+      "ofsted": {
+        "outstanding": 3,
+        "good": 5,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 2
+      },
+      "medianFsm": 49.5,
+      "medianP8": 0.48
+    },
+    {
+      "borough": "Islington",
+      "schoolCount": 10,
+      "totalPupils": 7439,
+      "utilisationPct": 75.9,
+      "p8Schools": 0,
+      "ofsted": {
+        "outstanding": 3,
+        "good": 3,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 4
+      },
+      "medianFsm": 57.3,
+      "medianP8": 0.21
+    },
+    {
+      "borough": "Kingston upon Thames",
+      "schoolCount": 9,
+      "totalPupils": 10107,
+      "utilisationPct": 101.7,
+      "p8Schools": 5,
+      "ofsted": {
+        "outstanding": 3,
+        "good": 6,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 0
+      },
+      "medianFsm": 16.3,
+      "medianP8": 0.7
+    },
+    {
+      "borough": "Merton",
+      "schoolCount": 9,
+      "totalPupils": 9624,
+      "utilisationPct": 81.7,
+      "p8Schools": 6,
+      "ofsted": {
+        "outstanding": 5,
+        "good": 3,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 1
+      },
+      "medianFsm": 37.0,
+      "medianP8": 0.67
+    },
+    {
+      "borough": "Richmond upon Thames",
+      "schoolCount": 9,
+      "totalPupils": 10961,
+      "utilisationPct": 104.4,
+      "p8Schools": 5,
+      "ofsted": {
+        "outstanding": 4,
+        "good": 3,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 2
+      },
+      "medianFsm": 15.9,
+      "medianP8": 0.66
+    },
+    {
+      "borough": "Kensington and Chelsea",
+      "schoolCount": 5,
+      "totalPupils": 4761,
+      "utilisationPct": 103.3,
+      "p8Schools": 2,
+      "ofsted": {
+        "outstanding": 3,
+        "good": 2,
+        "ri": 0,
+        "inadequate": 0,
+        "notInspected": 0
+      },
+      "medianFsm": 41.9,
+      "medianP8": 0.46
+    }
+  ],
+  "timeSeries": [
+    {
+      "year": "2002 to 2003",
+      "yearShort": "2003",
+      "walkCycle": 45.3,
+      "walk": 44.6,
+      "cycle": 0.7,
+      "car": 28.0,
+      "bus": 20.2,
+      "rail": 2.4,
+      "transit": 22.6,
+      "sampleSize": 712
+    },
+    {
+      "year": "2003 to 2004",
+      "yearShort": "2004",
+      "walkCycle": 40.5,
+      "walk": 39.4,
+      "cycle": 1.1,
+      "car": 29.4,
+      "bus": 25.7,
+      "rail": 1.9,
+      "transit": 27.5,
+      "sampleSize": 858
+    },
+    {
+      "year": "2004 to 2005",
+      "yearShort": "2005",
+      "walkCycle": 41.5,
+      "walk": 41.0,
+      "cycle": 0.6,
+      "car": 29.8,
+      "bus": 25.5,
+      "rail": 1.7,
+      "transit": 27.2,
+      "sampleSize": 758
+    },
+    {
+      "year": "2005 to 2006",
+      "yearShort": "2006",
+      "walkCycle": 47.3,
+      "walk": 46.8,
+      "cycle": 0.5,
+      "car": 25.1,
+      "bus": 24.1,
+      "rail": 2.2,
+      "transit": 26.3,
+      "sampleSize": 693
+    },
+    {
+      "year": "2006 to 2007",
+      "yearShort": "2007",
+      "walkCycle": 46.6,
+      "walk": 45.5,
+      "cycle": 1.1,
+      "car": 23.7,
+      "bus": 25.1,
+      "rail": 1.8,
+      "transit": 26.9,
+      "sampleSize": 736
+    },
+    {
+      "year": "2007 to 2008",
+      "yearShort": "2008",
+      "walkCycle": 42.4,
+      "walk": 41.8,
+      "cycle": 0.6,
+      "car": 25.9,
+      "bus": 27.3,
+      "rail": 1.3,
+      "transit": 28.6,
+      "sampleSize": 738
+    },
+    {
+      "year": "2008 to 2009",
+      "yearShort": "2009",
+      "walkCycle": 40.9,
+      "walk": 40.2,
+      "cycle": 0.7,
+      "car": 25.7,
+      "bus": 28.1,
+      "rail": 3.1,
+      "transit": 31.2,
+      "sampleSize": 789
+    },
+    {
+      "year": "2009 to 2010",
+      "yearShort": "2010",
+      "walkCycle": 44.3,
+      "walk": 42.7,
+      "cycle": 1.6,
+      "car": 22.0,
+      "bus": 28.2,
+      "rail": 2.7,
+      "transit": 31.0,
+      "sampleSize": 824
+    },
+    {
+      "year": "2010 to 2011",
+      "yearShort": "2011",
+      "walkCycle": 46.3,
+      "walk": 44.6,
+      "cycle": 1.7,
+      "car": 20.5,
+      "bus": 28.8,
+      "rail": 1.7,
+      "transit": 30.5,
+      "sampleSize": 747
+    },
+    {
+      "year": "2011 to 2012",
+      "yearShort": "2012",
+      "walkCycle": 44.6,
+      "walk": 43.4,
+      "cycle": 1.2,
+      "car": 23.9,
+      "bus": 25.6,
+      "rail": 2.3,
+      "transit": 27.9,
+      "sampleSize": 724
+    },
+    {
+      "year": "2012 to 2013",
+      "yearShort": "2013",
+      "walkCycle": 40.0,
+      "walk": 38.9,
+      "cycle": 1.1,
+      "car": 26.4,
+      "bus": 28.3,
+      "rail": 2.6,
+      "transit": 30.9,
+      "sampleSize": 782
+    },
+    {
+      "year": "2013 to 2014",
+      "yearShort": "2014",
+      "walkCycle": 42.1,
+      "walk": 40.1,
+      "cycle": 1.9,
+      "car": 24.3,
+      "bus": 28.3,
+      "rail": 2.9,
+      "transit": 31.2,
+      "sampleSize": 849
+    },
+    {
+      "year": "2014 to 2015",
+      "yearShort": "2015",
+      "walkCycle": 43.9,
+      "walk": 41.1,
+      "cycle": 2.8,
+      "car": 24.2,
+      "bus": 26.5,
+      "rail": 2.3,
+      "transit": 28.8,
+      "sampleSize": 850
+    },
+    {
+      "year": "2015 to 2016",
+      "yearShort": "2016",
+      "walkCycle": 46.7,
+      "walk": 43.9,
+      "cycle": 2.9,
+      "car": 23.0,
+      "bus": 26.1,
+      "rail": 2.8,
+      "transit": 28.9,
+      "sampleSize": 853
+    },
+    {
+      "year": "2016 to 2017",
+      "yearShort": "2017",
+      "walkCycle": 51.8,
+      "walk": 50.2,
+      "cycle": 1.7,
+      "car": 19.2,
+      "bus": 23.5,
+      "rail": 3.7,
+      "transit": 27.3,
+      "sampleSize": 818
+    },
+    {
+      "year": "2017 to 2018",
+      "yearShort": "2018",
+      "walkCycle": 52.2,
+      "walk": 51.9,
+      "cycle": 0.3,
+      "car": 20.8,
+      "bus": 21.0,
+      "rail": 3.0,
+      "transit": 24.0,
+      "sampleSize": 665
+    },
+    {
+      "year": "2018 to 2019",
+      "yearShort": "2019",
+      "walkCycle": 53.9,
+      "walk": 52.7,
+      "cycle": 1.2,
+      "car": 20.3,
+      "bus": 20.8,
+      "rail": 2.8,
+      "transit": 23.6,
+      "sampleSize": 619
+    },
+    {
+      "year": "2020",
+      "yearShort": "2020",
+      "walkCycle": 71.3,
+      "walk": 66.2,
+      "cycle": 5.1,
+      "car": 19.2,
+      "bus": 9.5,
+      "rail": 0.0,
+      "transit": 9.5,
+      "sampleSize": 98
+    },
+    {
+      "year": "2021",
+      "yearShort": "2021",
+      "walkCycle": 61.4,
+      "walk": 61.0,
+      "cycle": 0.4,
+      "car": 14.2,
+      "bus": 23.8,
+      "rail": 0.6,
+      "transit": 24.4,
+      "sampleSize": 193
+    },
+    {
+      "year": "2022",
+      "yearShort": "2022",
+      "walkCycle": 51.2,
+      "walk": 51.2,
+      "cycle": 0.0,
+      "car": 24.5,
+      "bus": 22.3,
+      "rail": 1.2,
+      "transit": 23.6,
+      "sampleSize": 165
+    },
+    {
+      "year": "2023 to 2024",
+      "yearShort": "2024",
+      "walkCycle": 56.8,
+      "walk": 54.8,
+      "cycle": 2.0,
+      "car": 19.2,
+      "bus": 18.8,
+      "rail": 2.7,
+      "transit": 21.5,
+      "sampleSize": 797
+    }
+  ],
+  "donutLatest": {
+    "year": "2023 to 2024",
+    "walkCycle": 56.8,
+    "car": 19.2,
+    "transit": 21.5
+  },
+  "meta": {
+    "p8Threshold": 0.62,
+    "totalLondonSchools": 442,
+    "dataSource": "DfE Get Information About Schools 2024; NTS 9908 2024"
+  }
+}

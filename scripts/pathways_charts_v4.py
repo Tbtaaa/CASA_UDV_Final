@@ -291,12 +291,12 @@ df  = la.sort_values("school_count", ascending=True)
 fig, ax = plt.subplots(figsize=(9, 10))
 left = np.zeros(len(df))
 
-for grade in ["Outstanding", "Good", "Requires improvement", "Inadequate", "Not yet inspected"]:
-    if grade in df.columns:
-        vals = df[grade].fillna(0).values
-        ax.barh(df["borough_short"], vals, left=left,
-                color=OFSTED_COLORS.get(grade, GRAY), label=grade, height=0.65)
-        left += vals
+# for grade in ["Outstanding", "Good", "Requires improvement", "Inadequate", "Not yet inspected"]:
+#     if grade in df.columns:
+#         vals = df[grade].fillna(0).values
+#         ax.barh(df["borough_short"], vals, left=left,
+#                 color=OFSTED_COLORS.get(grade, GRAY), label=grade, height=0.65)
+#         left += vals
 
 ax.set_xlabel("Number of open, non-selective schools")
 ax.set_title("Secondary schools per London borough\n(open, non-selective only — coloured by Ofsted rating)",
@@ -305,9 +305,9 @@ handles = [mpatches.Patch(color=OFSTED_COLORS[g], label=g) for g in ofsted_order
 ax.legend(handles=handles, fontsize=9, loc="lower right", frameon=False)
 ax.tick_params(axis="y", labelsize=9)
 plt.tight_layout()
-plt.savefig(os.path.join(paths["charts"], "chart2_schools_per_borough.png"))
+plt.savefig(os.path.join(paths["charts"], "chart1_schools_per_borough.png"))
 plt.close()
-print(f"    → {os.path.join(paths['charts'], 'chart2_schools_per_borough.png')}")
+print(f"    → {os.path.join(paths['charts'], 'chart1_schools_per_borough.png')}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -773,44 +773,3 @@ plt.close()
 print(f"    → {out_2c}")
 
 print("\nTravel section dark-theme charts done.")
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# EXPORT — borough ranking CSV (for the page's interactive table)
-# ══════════════════════════════════════════════════════════════════════════════
-print("\nWriting borough_ranking.csv...")
-
-export = (
-    la.rename(columns={
-        "la_name":         "Borough",
-        "school_count":    "Schools",
-        "p8_school_count": "Top-25% P8 schools",
-        "total_pupils":    "Pupils",
-        "utilisation_pct": "Utilisation (%)",
-        "Transit any":     "Transit to any school (min)",
-        "Transit P8":      "Transit to P8 school (min)",
-        "Transit Outstanding": "Transit to Outstanding school (min)",
-        "Transit Att8":    "Transit to Att8 school (min)",
-        "penalty_transit": "Quality penalty P8 — transit (min)",
-        "penalty_transit_outstanding": "Quality penalty Outstanding — transit (min)",
-        "penalty_transit_att8": "Quality penalty Att8 — transit (min)",
-        "Walk any":        "Walk to any school (min)",
-        "Walk P8":         "Walk to P8 school (min)",
-        "Walk Outstanding":"Walk to Outstanding school (min)",
-        "Walk Att8":       "Walk to Att8 school (min)",
-        "Cycle any":       "Cycle to any school (min)",
-        "Cycle P8":        "Cycle to P8 school (min)",
-        "Cycle Outstanding":"Cycle to Outstanding school (min)",
-        "Cycle Att8":      "Cycle to Att8 school (min)",
-        "Car any":         "Car to any school (min)",
-        "Car P8":          "Car to P8 school (min)",
-    })
-    .sort_values("Transit to P8 school (min)")
-    .round(1)
-)
-export.to_csv(os.path.join(paths["outputs"], "borough_ranking.csv"), index=False)
-print(f"    → {os.path.join(paths['outputs'], 'borough_ranking.csv')}")
-
-print("\n" + "=" * 60)
-print(f"All done. Charts saved to {paths['charts']}")
-print("=" * 60)
