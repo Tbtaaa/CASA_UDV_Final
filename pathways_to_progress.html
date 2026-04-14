@@ -411,16 +411,15 @@
     /* tooltip for info */
     .tooltip-term {
       position: relative;
-      text-decoration: underline;
-      text-decoration-color: rgba(255, 144, 67, 0.45);
-      text-underline-offset: 3px;
+      color: #FF9043;
       cursor: help;
       transition: color 0.2s ease, text-decoration-color 0.2s ease;
     }
-    .tooltip-term:hover {
-      color: var(--text-primary);
-      text-decoration-color: var(--accent);
-    }
+    .tooltip-term:hover,
+.tooltip-term:active,
+.tooltip-term:focus {
+  color: #FF9043;
+}
     .tooltip-term::after {
       content: attr(data-tooltip);
       position: absolute;
@@ -1832,14 +1831,14 @@
           <div class="iso-toggle" id="iso-toggle">
             <button class="iso-btn" data-origin="clapham" onclick="switchIsoView('clapham')">
               <span class="iso-btn-name">Clapham North</span>
-              <span class="iso-btn-meta">Lambeth · Zone 2</span>
+              <span class="iso-btn-meta">Lambeth · Inner London</span>
               <span class="iso-btn-stat">
                 <span class="iso-btn-num">96</span>schools within 45 min
               </span>
             </button>
             <button class="iso-btn active" data-origin="harold_hill" onclick="switchIsoView('harold_hill')">
               <span class="iso-btn-name">Harold Hill</span>
-              <span class="iso-btn-meta">Havering · Bus only</span>
+              <span class="iso-btn-meta">Havering · Outer London</span>
               <span class="iso-btn-stat">
                 <span class="iso-btn-num">7</span>schools within 45 min
               </span>
@@ -1855,7 +1854,7 @@
           <p>
             <br>
           </p>
-          <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="margin-top: -15px; display: flex; flex-direction: column; gap: 12px;">
             <div class="pillar-card" style="padding:16px 20px">
               <div class="pillar-header">
                 <div class="pillar-num">01</div>
@@ -3525,8 +3524,8 @@ const s2StepActions = {
             '#fff6ec'
           ],
           'circle-opacity':        0.8,
-          'circle-stroke-width':   1.5,
-          'circle-stroke-color':   '#C96820',
+          'circle-stroke-width':   1.7,
+          'circle-stroke-color':   '#A33A14',
           'circle-stroke-opacity': 0.9
         }
       }, 'waterway-label');
@@ -3551,10 +3550,10 @@ const s2StepActions = {
         'source-layer': SCHOOLS_SRC_LAYER,
         filter:         ['==', 'top_p8_quartile_GLA', true],
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
-        'circle-color': '#C96820',
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 2, 12, 6],
+        'circle-color': '#A33A14',
         'circle-opacity': 0.9,
-        'circle-stroke-width': 1.2,
+        'circle-stroke-width': 1.5,
         'circle-stroke-color': '#ffffff',
         'circle-stroke-opacity': 0.9
       }
@@ -3920,9 +3919,9 @@ const s2StepActions = {
               'circle-radius':  ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
               'circle-color':          '#ffffff',
               'circle-opacity':        0.95,
-              'circle-stroke-width':   1.5,
-              'circle-stroke-color':   '#C96820',
-              'circle-stroke-opacity': 0.7
+              'circle-stroke-width':   1.7,
+              'circle-stroke-color':   '#A33A14',
+              'circle-stroke-opacity': 0.9
             }
           }, 'waterway-label');
 
@@ -3934,10 +3933,10 @@ const s2StepActions = {
             'source-layer': SCHOOLS_SRC_LAYER,
             filter:         ['==', 'top_p8_quartile_GLA', true],
             paint: {
-              'circle-radius':         ['interpolate', ['linear'], ['zoom'], 8, 1.8, 12, 5],
-              'circle-color':          '#C96820',
+              'circle-radius':         ['interpolate', ['linear'], ['zoom'], 8, 2, 12, 6],
+              'circle-color':          '#A33A14',
               'circle-opacity':        0.95,
-              'circle-stroke-width':   1.5,
+              'circle-stroke-width':   1.7,
               'circle-stroke-color':   '#ffffff',
               'circle-stroke-opacity': 0.7
             }
