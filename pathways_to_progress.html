@@ -767,8 +767,8 @@
     .chart-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-top: 40px;
+      gap: 20px;
+      margin-top: 2cqw;
     }
     .chart-card {
       background: var(--bg3);
@@ -778,21 +778,21 @@
     }
     .chart-card-label {
       font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 0.14em;
+      font-size: 14px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 6px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
     }
     .chart-card-title {
-      font-size: 15.6px;
+      font-size: 20px;
       font-weight: 500;
       color: var(--text-primary);
       margin-bottom: 4px;
       line-height: 1.4;
     }
     .chart-card-source {
-      font-size: 13.2px;
+      font-size: 12px;
       color: var(--text-muted);
       margin-bottom: 18px;
     }
@@ -806,7 +806,7 @@
     }
     .chart-placeholder {
       width: 100%;
-      height: 160px;
+      height: 280px;
       background: var(--surface);
       border: 1px dashed rgba(255,144,67,0.25);
       border-radius: 4px;
@@ -821,6 +821,59 @@
       line-height: 1.6;
     }
 
+    /* ── S3 population two-column layout ── */
+    .s3-pop-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 20px;
+      margin-top: 8px;
+    }
+    .s3-pop-col-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      padding-bottom: 5px;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .s3-pop-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 5px 0;
+      border-bottom: 0.5px solid rgba(255,255,255,0.04);
+    }
+    .s3-pop-name {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+    .s3-pop-val {
+      font-size: 16px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    .s3-pop-val.top  { color: #FF9043; }
+    .s3-pop-val.bot  { color: var(--text-muted); }
+
+    /* ── S3 quote card ── */
+    .s3-quote-card {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    .s3-quote-text {
+      font-family: var(--font-body);
+      font-size: 18px;
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      border-left: 3px solid var(--accent);
+      padding-left: 20px;
+    }
+
     /* stat callout for Chart 3 */
     .stat-callout {
       display: flex;
@@ -830,10 +883,11 @@
     }
     .stat-big {
       font-family: var(--font-mono);
-      font-size: 56px;
+      font-size: 60px;
       font-weight: 500;
       color: var(--accent);
-      line-height: 1;
+      line-height: 1.2;
+      padding-bottom: 6px;
     }
     .stat-context {
       font-size: 15.6px;
@@ -1912,38 +1966,63 @@
     <p class="section-label reveal">Travel to school</p>
     <h2 class="section-headline reveal reveal-delay-1">How do London's children get to school?</h2>
     <p class="section-intro-body reveal reveal-delay-2" style="max-width:900px; margin-top:12px; margin-bottom:0">
-      
       Understanding how children travel, and the barriers they face, sets the context
       for examining whether all children can realistically exercise school choice.
     </p>
 
+    <!-- Row 1: Charts 1 & 2 -->
     <div class="chart-grid-2 reveal reveal-delay-3">
-      <!-- Chart 1 — Mode share donut -->
+
+      <!-- Chart 1 — Mode share time series line chart -->
       <div class="chart-card">
         <div class="chart-card-label">Chart 1</div>
-        <div class="chart-card-title">How children travel to school — mode share 2024</div>
-        <div class="chart-card-source">Source: DfT National Travel Survey 2024</div>
-        <div class="chart-canvas-wrap" style="height:220px">
+        <div class="chart-card-title">Walking or cycling is the preferred mode of travel to schools for most students</div>
+        <div class="chart-card-source">Source: DfT National Travel Survey 2017–2024, Trips to and from school by main mode and region</div>
+        <div class="chart-canvas-wrap" style="height:260px">
           <canvas id="chart1-mode"></canvas>
         </div>
       </div>
 
-      <!-- Chart 2 — Schools per borough bar -->
+      <!-- Chart 2 — Population top/bottom 5 boroughs -->
       <div class="chart-card">
         <div class="chart-card-label">Chart 2</div>
-        <div class="chart-card-title">Secondary schools per borough — top 10</div>
-        <div class="chart-card-source">Source: DfE Get Information About Schools 2024</div>
-        <div class="chart-canvas-wrap" style="height:220px">
-          <canvas id="chart2-boroughs"></canvas>
+        <div class="chart-card-title">71% of students live in Outer London compared to 29% in Inner London</div>
+        <div class="chart-card-source">Source: ONS Population Estimates, Population in LA by single year of age (11-16)</div>
+        <div id="chart2-pop-cols" class="s3-pop-cols" style="height:260px"><!-- injected by JS --></div>
+      </div>
+    </div>
+
+    <!-- Row 2: Charts 3 & 4 -->
+    <div class="chart-grid-2 reveal reveal-delay-1" style="margin-top:24px">
+
+      <!-- Chart 3 — Schools by admissions policy stacked bar -->
+      <div class="chart-card">
+        <div class="chart-card-label">Chart 3</div>
+        <div class="chart-card-title">Most Boroughs have a good number of schools, but some have more schools with selective admission policies</div>
+        <div class="chart-card-source">Source: DfE Get Information About Schools 2024, Number of Schools per Borough by Admissions Policy</div>
+        <div class="chart-canvas-wrap" style="height:260px">
+          <canvas id="chart3-admissions"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 4 — Capacity utilisation top 10 boroughs -->
+      <div class="chart-card">
+        <div class="chart-card-label">Chart 4</div>
+        <div class="chart-card-title">Most Boroughs have schools operating within capacity, but some are oversubscribed</div>
+        <div class="chart-card-source">Source: DfE SCAP 2024, Pupils to places ratio for schools in Borough (%), Non-selective schools</div>
+        <div class="chart-canvas-wrap" style="height:260px">
+          <canvas id="chart4-capacity"></canvas>
         </div>
       </div>
     </div>
 
+    <!-- Row 3: Charts 5 & 6 side by side -->
     <div class="chart-grid-2 reveal reveal-delay-1" style="margin-top:24px">
-      <!-- Chart 3 — Cross-LA stat callout -->
+
+      <!-- Chart 5 — Cross-authority attendance by region -->
       <div class="chart-card">
-        <div class="chart-card-label">Chart 3</div>
-        <div class="chart-card-title">Cross-authority secondary school attendance by region</div>
+        <div class="chart-card-label">Chart 5</div>
+        <div class="chart-card-title">More students in London travel outside their boroughs to school compared to other parts of the UK</div>
         <div class="chart-card-source">Source: DfE Schools, Pupils and their Characteristics 2024</div>
         <div class="stat-callout">
           <div class="stat-big" id="stat3-counter">0%</div>
@@ -1951,38 +2030,24 @@
             of London secondary students are educated <strong>outside</strong> their home local authority
           </div>
         </div>
-        <div class="region-bars" id="region-bars">
-          <!-- injected by JS -->
-        </div>
+        <div class="region-bars" id="region-bars"><!-- injected by JS --></div>
         <p style="font-size:14.4px;color:var(--text-muted);margin-top:14px;line-height:1.5">
           London has the highest rate in England — illustrating willingness to travel for
           opportunity. But how many children have the means to do so?
         </p>
       </div>
 
-      <!-- Chart 4 — Barriers + incentives lollipop -->
+      <!-- Chart 6 — First-choice school by borough -->
       <div class="chart-card">
-        <div class="chart-card-label">Chart 4</div>
-        <div class="chart-card-title">Barriers to walking &amp; what would encourage it</div>
-        <div class="chart-card-source">Source: DfT Walking and Cycling Statistics, England 2024</div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:13.2px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">Barriers to walking more</div>
-          <canvas id="chart4a-barriers" style="max-height:110px"></canvas>
-        </div>
-        <div style="margin-top:16px">
-          <div style="font-size:13.2px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">What would encourage walking</div>
-          <canvas id="chart4b-incentives" style="max-height:110px"></canvas>
+        <div class="chart-card-label">Chart 6</div>
+        <div class="chart-card-title">Students living in some Boroughs were more likely to get their 1st choice secondary school compared to others</div>
+        <div class="chart-card-source">Source: Pan-London Admissions Board, % of students in Borough that obtained 1st choice secondary school</div>
+        <div class="chart-canvas-wrap" style="height:280px">
+          <canvas id="chart6-firstchoice"></canvas>
         </div>
       </div>
     </div>
-
-    <div class="section-bridge reveal">
-      <p class="bridge-text">
-        "19.9% of London's secondary students travel outside their home borough —
-        the highest rate in England. But willingness to travel only translates
-        to opportunity when the journey is actually possible."
-      </p>
-    </div>
+    <div class="spacer"></div>
   </section>
 
   <!-- ═══════════════════════════════════════
@@ -4602,13 +4667,13 @@ const s2StepActions = {
         titleColor: '#f0ece4',
         bodyColor: '#b8a898',
         padding: 11,
-        titleFont: { family: "'Roboto Mono'", size: 12 },
-        bodyFont:  { family: "'Roboto Mono'", size: 12 }
+        titleFont: { family: "'Roboto Mono'", size: 16 },
+        bodyFont:  { family: "'Roboto Mono'", size: 16 }
       }
     },
     scales: {
-      x: { ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
-      y: { ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+      x: { ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11.5 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11.5 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
     }
   };
 
@@ -4616,70 +4681,445 @@ const s2StepActions = {
     return Object.assign(JSON.parse(JSON.stringify(CHART_DEFAULTS)), overrides);
   }
 
-  // Chart 1 — Mode share donut
-  new Chart(document.getElementById('chart1-mode'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Walk / cycle', 'Transit', 'Car'],
-      datasets: [{
-        data: [57, 24, 19],
-        backgroundColor: ['#66bb6a', '#4fc3f7', '#FF9043'],
-        borderColor: '#0e1420',
-        borderWidth: 3,
-        hoverOffset: 6
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      cutout: '62%',
-      animation: { animateRotate: true, duration: 1200 },
-      plugins: {
-        legend: { position: 'bottom', labels: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 12 }, padding: 14, boxWidth: 12 } },
-        tooltip: CHART_DEFAULTS.plugins.tooltip
-      }
-    }
-  });
+  // ── S3 Chart 1 — Mode share time series line chart ────────────────────────
+  (function() {
+    const YEARS      = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
+    const WALK_CYCLE = [52, 52, 54, 71, 61, 51, 54, 57];
+    const TRANSIT    = [29, 27, 26,  9, 24, 24, 24, 24];
+    const CAR        = [19, 21, 20, 19, 14, 24, 22, 19];
 
-  // Chart 2 — Schools per borough (placeholder data — replace with real values)
-  const BOROUGH_DATA = [
-    // [ borough_name, count ] — replace with real data
-    ['Barnet',          19],
-    ['Bromley',         18],
-    ['Croydon',         17],
-    ['Southwark',       16],
-    ['Lambeth',         16],
-    ['Ealing',          15],
-    ['Greenwich',       14],
-    ['Lewisham',        14],
-    ['Newham',          13],
-    ['Brent',           13],
-  ];
-  new Chart(document.getElementById('chart2-boroughs'), {
-    type: 'bar',
-    data: {
-      labels: BOROUGH_DATA.map(d => d[0]),
-      datasets: [{
-        label: 'Secondary schools',
-        data: BOROUGH_DATA.map(d => d[1]),
-        backgroundColor: BOROUGH_DATA.map((_, i) => i < 3 ? '#FF9043' : '#3d2a18'),
-        borderRadius: 3,
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: true,
-      animation: { duration: 1000, delay: (ctx) => ctx.dataIndex * 60 },
-      plugins: { legend: { display: false }, tooltip: CHART_DEFAULTS.plugins.tooltip },
-      scales: {
-        x: { ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        y: { ticks: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 11 } }, grid: { display: false } }
-      }
-    }
-  });
+    const monoFont   = { family: "'Roboto Mono'", size: 11 };
+    const secColour  = 'var(--text-secondary)';  // axis label colour
 
-  // Chart 3 — Cross-LA region bars
+    new Chart(document.getElementById('chart1-mode'), {
+      type: 'line',
+      data: {
+        labels: YEARS,
+        datasets: [
+          {
+            label: 'Walk & Cycle',
+            data: WALK_CYCLE,
+            borderColor: '#66bb6a',
+            backgroundColor: 'rgba(102,187,106,0.06)',
+            pointBackgroundColor: '#66bb6a',
+            pointRadius: 4, pointHoverRadius: 6,
+            borderWidth: 2.5, tension: 0.3, fill: false
+          },
+          {
+            label: 'Transit',
+            data: TRANSIT,
+            borderColor: '#FF9043',
+            backgroundColor: 'rgba(255,144,67,0.06)',
+            pointBackgroundColor: '#FF9043',
+            pointRadius: 4, pointHoverRadius: 8,
+            borderWidth: 2.5, tension: 0.3, fill: false
+          },
+          {
+            label: 'Car',
+            data: CAR,
+            borderColor: '#4fc3f7',
+            backgroundColor: 'rgba(79,195,247,0.06)',
+            pointBackgroundColor: '#4fc3f7',
+            pointRadius: 4, pointHoverRadius: 6,
+            borderWidth: 2.5, tension: 0.3, fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        animation: { duration: 900 },
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: '#d1c0ae',
+              font: monoFont,
+              padding: 10,          
+              boxWidth: 10,
+              usePointStyle: true,
+              pointStyleWidth: 10
+            }
+          },
+          tooltip: {
+            ...CHART_DEFAULTS.plugins.tooltip,
+            titleFont: { family: "'Roboto Mono'", size: 16 },
+            bodyFont:  { family: "'Roboto Mono'", size: 16 },
+            padding: 10,
+            callbacks: {
+              label: ctx => `  ${ctx.dataset.label}: ${ctx.raw}%`
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#d1c0ae', font: monoFont },
+            grid:  { color: 'rgba(255,255,255,0.04)' }
+          },
+          y: {
+            min: 0, max: 80,
+            ticks: { color: '#d1c0ae', font: monoFont, callback: v => v + '%' },
+            grid:  { color: 'rgba(255,255,255,0.06)' }
+          }
+        }
+      }
+    });
+  })();
+
+  // ── S3 Chart 2 — Population top 5 / bottom 5 boroughs ───────────────────────
+  (function() {
+    const POP_ALL = [
+      { name: 'Barnet',                   n: 32970 },
+      { name: 'Croydon',                  n: 31889 },
+      { name: 'Enfield',                  n: 28882 },
+      { name: 'Ealing',                   n: 28659 },
+      { name: 'Newham',                   n: 27295 },
+      { name: 'Redbridge',                n: 25959 },
+      { name: 'Bromley',                  n: 25850 },
+      { name: 'Brent',                    n: 25267 },
+      { name: 'Hillingdon',               n: 24992 },
+      { name: 'Hounslow',                 n: 23268 },
+      { name: 'Barking and Dagenham',     n: 22357 },
+      { name: 'Greenwich',                n: 21655 },
+      { name: 'Havering',                 n: 20898 },
+      { name: 'Bexley',                   n: 20738 },
+      { name: 'Harrow',                   n: 20664 },
+      { name: 'Tower Hamlets',            n: 20558 },
+      { name: 'Lewisham',                 n: 20440 },
+      { name: 'Waltham Forest',           n: 20031 },
+      { name: 'Southwark',                n: 18963 },
+      { name: 'Sutton',                   n: 18706 },
+      { name: 'Haringey',                 n: 18319 },
+      { name: 'Wandsworth',               n: 18293 },
+      { name: 'Hackney',                  n: 17842 },
+      { name: 'Lambeth',                  n: 17542 },
+      { name: 'Richmond upon Thames',     n: 16338 },
+      { name: 'Merton',                   n: 15840 },
+      { name: 'Kingston upon Thames',     n: 13586 },
+      { name: 'Camden',                   n: 12136 },
+      { name: 'Islington',                n: 11640 },
+      { name: 'Hammersmith and Fulham',   n: 10476 },
+      { name: 'Westminster',              n:  9789 },
+      { name: 'Kensington and Chelsea',   n:  7314 },
+      { name: 'City of London',           n:   278 },
+    ].sort((a, b) => b.n - a.n);
+
+    const top5 = POP_ALL.slice(0, 5);
+    const bot5 = POP_ALL.slice(-5).reverse();
+
+    const container = document.getElementById('chart2-pop-cols');
+    if (!container) return;
+
+    function colHTML(title, rows, cls) {
+      return `
+        <div>
+          <div class="s3-pop-col-label">${title}</div>
+          ${rows.map(d => `
+            <div class="s3-pop-row">
+              <span class="s3-pop-name">${d.name}</span>
+              <span class="s3-pop-val ${cls}">${d.n.toLocaleString()}</span>
+            </div>`).join('')}
+        </div>`;
+    }
+    container.innerHTML =
+      colHTML('Top 5 boroughs', top5, 'top') +
+      colHTML('Bottom 5 boroughs', bot5, 'bot');
+  })();
+
+  // ── S3 Chart 3 — Schools by admissions policy stacked bar ───────────────────
+  (function() {
+    // Top 10 boroughs by total school count — [name, selective, non-selective]
+    // Replace with real DfE GIAS data
+    const ADMISSIONS_DATA = [
+      { name: 'Barnet',         sel: 4,  non: 24 },
+      { name: 'Croydon',        sel: 1,  non: 22 },
+      { name: 'Hillingdon',     sel: 0,  non: 22 },
+      { name: 'Enfield',        sel: 1,  non: 20 },
+      { name: 'Newham',         sel: 0,  non: 21 },
+      { name: 'Hounslow',       sel: 1,  non: 20 },
+      { name: 'Southward',      sel: 1,  non: 19 },
+      { name: 'Redbridge',      sel: 2,  non: 17 },
+      { name: 'Bromley',        sel: 2,  non: 17 },
+      { name: 'Tower Hamlets',  sel: 0,  non: 18 },
+    ].sort((a,b) => (b.sel + b.non) - (a.sel + a.non));
+
+    const monoFont = { family: "'Roboto Mono'", size: 11 };
+    new Chart(document.getElementById('chart3-admissions'), {
+      type: 'bar',
+      data: {
+        labels: ADMISSIONS_DATA.map(d => d.name),
+        datasets: [
+          {
+            label: 'Non-selective',
+            data: ADMISSIONS_DATA.map(d => d.non),
+            backgroundColor: '#FF9043cc',
+            borderRadius: 3,
+            stack: 'schools'
+          },
+          {
+            label: 'Selective',
+            data: ADMISSIONS_DATA.map(d => d.sel),
+            backgroundColor: 'rgba(180,170,160,0.35)',
+            borderRadius: 3,
+            stack: 'schools'
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        animation: { duration: 900 },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { color: '#b8a898', font: monoFont, padding: 14, boxWidth: 10 }
+          },
+          tooltip: {
+            ...CHART_DEFAULTS.plugins.tooltip,
+            callbacks: {
+              title: ctx => ctx[0].label,
+              label: ctx => ` ${ctx.dataset.label}: ${ctx.raw} schools`
+            }
+          }
+        },
+        layout: { padding: { left: 15 } },
+        scales: {
+          x: {
+            stacked: true,
+            ticks: { color: '#d1c0ae', font: monoFont },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            stacked: true,
+            ticks: { color: '#d1c0ae', font: monoFont, mirror: false },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  })();
+
+  // ── S3 Chart 4 — Capacity utilisation top 10 boroughs ───────────────────────
+  (function() {
+    // % capacity utilisation for non-selective schools — replace with real SCAP 2024 data
+    const CAPACITY_DATA = [
+      { name: 'Richmond upon Thames',        pct: 104 },
+      { name: 'Kensington and Chelsea',      pct: 103 },
+      { name: 'Haringey',                    pct: 103 },
+      { name: 'Sutton',                      pct: 103 },
+      { name: 'Kingston upon Thames',        pct: 101 },
+      { name: 'Bromley',                     pct:  96 },
+      { name: 'Greenwich',                   pct:  96 },
+      { name: 'Havering',                    pct:  96 },
+      { name: 'Redbridge',                   pct:  95 },
+      { name: 'Harrow',                      pct:  95 },
+    ].sort((a,b) => b.pct - a.pct);
+
+    const monoFont = { family: "'Roboto Mono'", size: 10 };
+    new Chart(document.getElementById('chart4-capacity'), {
+      type: 'bar',
+      data: {
+        labels: CAPACITY_DATA.map(d => d.name),
+        datasets: [{
+          label: 'Capacity utilisation',
+          data: CAPACITY_DATA.map(d => d.pct),
+          backgroundColor: CAPACITY_DATA.map(d =>
+            d.pct >= 103 ? '#ef5350cc' :
+            d.pct >= 100 ? '#FF9043cc' :
+            'rgba(79,195,247,0.55)'
+          ),
+          borderRadius: 3,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        animation: { duration: 900 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            ...CHART_DEFAULTS.plugins.tooltip,
+            callbacks: {
+              label: ctx => ` ${ctx.raw}% capacity`
+            }
+          }
+        },
+        layout: { padding: { left: 10 } },
+        scales: {
+          x: {
+            min: 75, max: 105,
+            ticks: { color: '#d1c0ae', font: monoFont, callback: v => v + '%' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            ticks: { color: '#d1c0ae', font: monoFont },
+            grid: { display: false }
+          }
+        }
+      },
+      plugins: [{
+        id: 's4-capacity-line',
+        afterDraw(chart) {
+          const xAxis = chart.scales.x;
+          const yAxis = chart.scales.y;
+          const ctx   = chart.ctx;
+
+          // ── Dotted 100% line ──
+          const x100 = xAxis.getPixelForValue(100);
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x100, yAxis.top);
+          ctx.lineTo(x100, yAxis.bottom);
+          ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+          ctx.lineWidth   = 1.5;
+          ctx.setLineDash([4, 4]);
+          ctx.stroke();
+          ctx.restore();
+          ctx.save();
+          ctx.fillStyle = 'rgba(255,255,255,0.4)';
+          ctx.font = "10px 'Roboto Mono'";
+          ctx.textAlign = 'center';
+          ctx.restore();
+
+          // ── Inner-end % labels on each bar ──
+          const meta = chart.getDatasetMeta(0);
+          ctx.save();
+          ctx.font = "bold 12px 'Roboto Mono'";
+          ctx.textBaseline = 'middle';
+          meta.data.forEach((bar, i) => {
+            const val  = chart.data.datasets[0].data[i];
+            const xPx  = xAxis.getPixelForValue(val);
+            const label = val + '%';
+            const textW = ctx.measureText(label).width;
+            // Place label just inside the right end of the bar
+            const xLabel = xPx - textW - 6;
+            ctx.fillStyle = 'rgba(8,12,18,0.9)';
+            ctx.fillText(label, xLabel, bar.y);
+          });
+          ctx.restore();
+        }
+      }]
+    });
+  })();
+
+  // ── S3 Chart 6 — First-choice school % by borough (top 5 / bottom 5) ─────────
+  (function() {
+    const TOP5 = [
+      { name: 'Barking and Dagenham', pct: 88 },
+      { name: 'Waltham Forest',       pct: 84 },
+      { name: 'Haringey',             pct: 79 },
+      { name: 'Enfield',              pct: 78 },
+      { name: 'Hackney',              pct: 77 },
+    ].sort((a,b) => b.pct - a.pct);
+
+    const BOT5 = [
+      { name: 'Greenwich',              pct: 64 },
+      { name: 'Hammersmith and Fulham', pct: 64 },
+      { name: 'Lambeth',               pct: 64 },
+      { name: 'Lewisham',              pct: 64 },
+      { name: 'Wandsworth',            pct: 64 },
+    ].sort((a,b) => b.pct - a.pct);
+
+    // Combine: top5 first, then bottom5 — separator drawn in plugin
+    const ALL    = [...TOP5, ...BOT5];
+    const labels = ALL.map(d => d.name);
+    const values = ALL.map(d => d.pct);
+    const colors = ALL.map((_, i) => i < TOP5.length ? '#FF9043cc' : 'rgba(79,195,247,0.55)');
+    const hcolors= ALL.map((_, i) => i < TOP5.length ? '#FF9043'   : '#4fc3f7');
+
+    const monoFont   = { family: "'Roboto Mono'", size: 10 };
+    const splitIndex = TOP5.length; // index where bottom 5 starts
+
+    new Chart(document.getElementById('chart6-firstchoice'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: '% first choice',
+          data: values,
+          backgroundColor: colors,
+          hoverBackgroundColor: hcolors,
+          borderRadius: 3,
+          barThickness: 18,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        animation: { duration: 900 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            ...CHART_DEFAULTS.plugins.tooltip,
+            callbacks: {
+              label: ctx => ` ${ctx.raw}% received 1st choice`
+            }
+          }
+        },
+        layout: { padding: { left: 12 } },
+        scales: {
+          x: {
+            min: 40, max: 100,
+            ticks: { color: '#d1c0ae', font: monoFont, callback: v => v + '%' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            ticks: { color: '#d1c0ae', font: monoFont },
+            grid:  { display: false }
+          }
+        }
+      },
+      plugins: [{
+        id: 'c6-separator',
+        afterDraw(chart) {
+          const xAxis = chart.scales.x;
+          const yAxis = chart.scales.y;
+          const ctx   = chart.ctx;
+          const meta  = chart.getDatasetMeta(0);
+
+          // ── Separator line between top5 and bottom5 ──
+          if (meta.data.length > splitIndex) {
+            const barAbove = meta.data[splitIndex - 1];
+            const barBelow = meta.data[splitIndex];
+            const sepY = (barAbove.y + barAbove.height / 2 + barBelow.y - barBelow.height / 2) / 2;
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(xAxis.left, sepY);
+            ctx.lineTo(xAxis.right, sepY);
+            ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+            ctx.lineWidth   = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            // Labels either side of line
+            ctx.fillStyle = 'rgba(255,144,67,0.7)';
+            ctx.font = "14px 'Roboto Mono'";
+            ctx.textAlign = 'left';
+            ctx.fillText('TOP 5', xAxis.right - 35, sepY - 5);
+            ctx.fillStyle = 'rgba(79,195,247,0.7)';
+            ctx.fillText('BOTTOM 5', xAxis.right - 60 , sepY + 16);
+            ctx.restore();
+          }
+
+          // ── Inner-end % labels on each bar ──
+          ctx.save();
+          ctx.font = "bold 12px 'Roboto Mono'";
+          ctx.textBaseline = 'middle';
+          meta.data.forEach((bar, i) => {
+            const val    = values[i];
+            const xPx    = xAxis.getPixelForValue(val);
+            const label  = val + '%';
+            const textW  = ctx.measureText(label).width;
+            const xLabel = xPx - textW - 5;
+            ctx.fillStyle = 'rgba(8,12,18,0.9)';
+            ctx.fillText(label, xLabel, bar.y);
+          });
+          ctx.restore();
+        }
+      }]
+    });
+  })();
+
+  // ── S3 Chart 5 — Cross-LA region bars (retained) ────────────────────────────
   const REGION_BARS_DATA = [
     { label: 'London',     val: 19.9, highlight: true },
     { label: 'South East', val: 12.3, highlight: false },
@@ -4710,40 +5150,6 @@ const s2StepActions = {
     }
     requestAnimationFrame(step);
   }
-
-  // Chart 4a — Barriers
-  new Chart(document.getElementById('chart4a-barriers'), {
-    type: 'bar',
-    data: {
-      labels: ['Too far', 'Takes too long', 'Children too young'],
-      datasets: [{ data: [39, 15, 10], backgroundColor: '#ef5350', borderRadius: 3 }]
-    },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: CHART_DEFAULTS.plugins.tooltip },
-      scales: {
-        x: { max: 50, ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 }, callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        y: { ticks: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 11 } }, grid: { display: false } }
-      }
-    }
-  });
-
-  // Chart 4b — Incentives
-  new Chart(document.getElementById('chart4b-incentives'), {
-    type: 'bar',
-    data: {
-      labels: ['No change needed', 'Safer roads', 'Safer crossings'],
-      datasets: [{ data: [54, 22, 9], backgroundColor: '#66bb6a', borderRadius: 3 }]
-    },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: CHART_DEFAULTS.plugins.tooltip },
-      scales: {
-        x: { max: 65, ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 }, callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        y: { ticks: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 11 } }, grid: { display: false } }
-      }
-    }
-  });
 
   // Chart 8 — Cluster vs London average comparison
   new Chart(document.getElementById('chart8-cluster-compare'), {
