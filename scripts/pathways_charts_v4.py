@@ -4,15 +4,6 @@ Pathways to Progress — Chart Generation  v2
 Merged with GLA boundary clipping and selective-school exclusion,
 matching exactly the filtering logic in review-traveltimematrix-code-2.py.
 
-Requirements:
-    pip install pyarrow pandas geopandas matplotlib numpy shapely
-
-File layout expected (edit PATHS block below if yours differ):
-    data/
-        england_secondary_schools.parquet
-        lsoa_travel_times.parquet
-        gla_boundary.geojson          ← or .gpkg / .shp
-
 Outputs → paths['charts']  (outputs/charts/ subfolder)
     chart2_schools_per_borough.png   Section 3 — schools per borough + Ofsted overlay
     chart2b_utilisation.png          Section 3 — pupil-place utilisation by borough
