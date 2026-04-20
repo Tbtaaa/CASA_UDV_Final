@@ -13,6 +13,7 @@ import geopandas as gpd
 import pandas as pd
 import os
 import sys
+import json
 
 # ── 0. Paths ──────────────────────────────────────────────────────────────────
 
@@ -159,3 +160,30 @@ if size_mb > 50:
     print("  Then re-run the export block.")
 else:
     print("  File size is within Mapbox free tier limits (< 50 MB).")
+
+# ── 6. Creating JSON for Travel Time data ──────────────────────────────────────────────────────────────────
+
+df = pd.read_parquet('data/lsoa_travel_times.parquet')
+
+
+output = {
+    "transit": {
+        "any":    df['tt_transit_nearest_any'].dropna().tolist(),
+        "p8":     df['tt_transit_nearest_top25_p8'].dropna().tolist(),
+        "ofsted": df['tt_transit_nearest_outstanding'].dropna().tolist(),
+    },
+    "walk": {
+        "any":    df['tt_walk_nearest_any'].dropna().tolist(),
+        "p8":     df['tt_walk_nearest_top25_p8'].dropna().tolist(),
+        "ofsted": df['tt_walk_nearest_outstanding'].dropna().tolist(),
+    },
+    "car": {
+        "any":    df['tt_car_nearest_any'].dropna().tolist(),
+        "p8":     df['tt_car_nearest_top25_p8'].dropna().tolist(),
+        "ofsted": df['tt_car_nearest_outstanding'].dropna().tolist(),
+    }
+}
+
+
+with open('./data/violin_data.json', 'w') as f:
+    json.dump(output, f)

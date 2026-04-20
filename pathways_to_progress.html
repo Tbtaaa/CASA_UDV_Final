@@ -523,6 +523,9 @@
       color: var(--accent);
       margin-bottom: 18px;
     }
+    #s3-travel .section-label {
+      margin-top: 10px;
+    }
     .section-headline {
       font-family: var(--font-display);
       font-size: clamp(26px, 4vw, 48px);
@@ -760,21 +763,27 @@
        SECTION 3 — TRAVEL (chart-only)
     ───────────────────────────────────────── */
     #s3-travel {
-      padding: 80px 80px 80px;
+      padding: 30px 80px 40px;
       background: var(--bg2);
     }
-
+    #s3-travel .section-headline {
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+    #s3-travel .section-intro-body {
+      max-width: 100%;
+    }
     .chart-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-top: 2cqw;
+      gap: 14px;
+      margin-top: 1.2cqw;
     }
     .chart-card {
       background: var(--bg3);
       border: 0.5px solid var(--border-mid);
       border-radius: 8px;
-      padding: 24px;
+      padding: 16px;
     }
     .chart-card-label {
       font-family: var(--font-mono);
@@ -785,16 +794,16 @@
       margin-bottom: 2px;
     }
     .chart-card-title {
-      font-size: 20px;
+      font-size: 17px;
       font-weight: 500;
       color: var(--text-primary);
-      margin-bottom: 4px;
-      line-height: 1.4;
+      margin-bottom: 2px;
+      line-height: 1.35;
     }
     .chart-card-source {
       font-size: 12px;
       color: var(--text-muted);
-      margin-bottom: 18px;
+      margin-bottom: 10px;
     }
     .chart-canvas-wrap {
       position: relative;
@@ -834,14 +843,14 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--text-secondary);
-      padding-bottom: 5px;
+      padding-bottom: 3px;
       border-bottom: 0.5px solid var(--border);
     }
     .s3-pop-row {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 5px 0;
+      padding: 3px 0;
       border-bottom: 0.5px solid rgba(255,255,255,0.04);
     }
     .s3-pop-name {
@@ -874,34 +883,34 @@
       padding-left: 20px;
     }
 
-    /* stat callout for Chart 3 */
+    /* stat callout for Chart 4 */
     .stat-callout {
       display: flex;
       align-items: flex-end;
-      gap: 12px;
-      margin: 20px 0 12px;
+      gap: 10px;
+      margin: 10px 0 6px;
     }
     .stat-big {
       font-family: var(--font-mono);
-      font-size: 60px;
+      font-size: 44px;
       font-weight: 500;
       color: var(--accent);
-      line-height: 1.2;
-      padding-bottom: 6px;
+      line-height: 1.1;
+      padding-bottom: 2px;
     }
     .stat-context {
-      font-size: 15.6px;
+      font-size: 13.5px;
       color: var(--text-secondary);
-      line-height: 1.5;
+      line-height: 1.4;
       max-width: 240px;
-      padding-bottom: 6px;
+      padding-bottom: 2px;
     }
-    .region-bars { margin-top: 12px; }
+    .region-bars { margin-top: 6px; }
     .region-bar-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 5px;
+      margin-bottom: 3px;
     }
     .region-bar-label {
       font-size: 13.2px;
@@ -1152,70 +1161,6 @@
     }
     /* ── Map title badges — top corners ── */
     /* ── Explorer map overlay — hover info block (below title) ── */
-    #s4-explorer-hover-info {
-      position: absolute;
-      top: 0;
-      left: 16px;
-      z-index: 50;
-      background: rgba(8,12,18,0.82);
-      border: 0.5px solid var(--border-mid);
-      border-radius: 5px;
-      padding: 10px 16px;
-      pointer-events: none;
-      max-width: 800px;
-      backdrop-filter: blur(4px);
-      display: none;
-    }
-    #s4-explorer-overlay-borough {
-      font-family: var(--font-mono);
-      font-size: 14px;
-      font-weight: 700;
-      color: #ffffff;
-      line-height: 1.3;
-      letter-spacing: 0.04em;
-    }
-    #s4-explorer-overlay-stat {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      line-height: 1.4;
-    }
-    #s4-explorer-overlay-stat span {
-      color: #FF9043;
-      font-weight: 600;
-    }
-
-    #s4-label-left, #s4-label-right {
-      position: absolute;
-      top: 16px;
-      z-index: 50;
-      font-family: var(--font-mono);
-      font-size: 15px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent); 
-      padding: 6px 10px;
-      border-radius: 3px;
-      background: rgba(8,12,18,0.75);
-      border: 0.5px solid var(--border);
-      pointer-events: none;
-    }
-
-    #s4-label-left  { left: 16px;  color: #FF9043; border-color: rgba(255,144,67,0.3); }
-    #s4-label-right { right: 16px; color: var(--text-muted); border-color: var(--border); }
-
-    /* Active = orange; inactive = muted — classes swap on slider cross */
-    #s4-label-left.s4-label-active,
-    #s4-label-right.s4-label-active {
-      color: #FF9043;
-      border-color: rgba(255,144,67,0.3);
-    }
-    #s4-label-left:not(.s4-label-active),
-    #s4-label-right:not(.s4-label-active) {
-      color: var(--text-muted);
-      border-color: var(--border);
-    }
     /* ── Explorer map overlay — title block (top-left) ── */
     #s4-explorer-overlay {
       position: absolute;
@@ -1256,11 +1201,11 @@
       display: none;
     }
     #s4-explorer-overlay-borough {
-      font-family: var(--text-secondary);
-      font-size: 24px;
+      font-family: var(--font-mono);
+      font-size: 26px;
       font-weight: 700;
-      color: var(--text-secondary);
-      line-height: 1.3;
+      color: var(--text-primary);
+      line-height: 1.2;
       letter-spacing: 0.04em;
     }
     #s4-explorer-overlay-stat {
@@ -1276,8 +1221,36 @@
       font-size: 24px;
     }
 
+    /* ── Comparison slider labels (top corners of map) ── */
     #s4-label-left, #s4-label-right {
+      position: absolute;
+      top: 16px;
+      z-index: 50;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 6px 10px;
+      border-radius: 3px;
+      background: rgba(8,12,18,0.75);
+      border: 0.5px solid var(--border);
+      pointer-events: none;
       transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    #s4-label-left  { left: 16px;  color: #FF9043; border-color: rgba(255,144,67,0.3); }
+    #s4-label-right { right: 16px; color: var(--text-muted); border-color: var(--border); }
+
+    /* Active = orange; inactive = muted — swap on slider cross */
+    #s4-label-left.s4-label-active,
+    #s4-label-right.s4-label-active {
+      color: #FF9043;
+      border-color: rgba(255,144,67,0.3);
+    }
+    #s4-label-left:not(.s4-label-active),
+    #s4-label-right:not(.s4-label-active) {
+      color: var(--text-muted);
+      border-color: var(--border);
     }
 
     /* ── Bottom-left legend stack:
@@ -1965,7 +1938,7 @@
   <section id="s3-travel" class="page-section" data-section-index="2">
     <p class="section-label reveal">Travel to school</p>
     <h2 class="section-headline reveal reveal-delay-1">How do London's children get to school?</h2>
-    <p class="section-intro-body reveal reveal-delay-2" style="max-width:900px; margin-top:12px; margin-bottom:0">
+    <p class="section-intro-body reveal reveal-delay-2" style="margin-top:12px; margin-bottom:0">
       Understanding how children travel, and the barriers they face, sets the context
       for examining whether all children can realistically exercise school choice.
     </p>
@@ -1973,56 +1946,42 @@
     <!-- Row 1: Charts 1 & 2 -->
     <div class="chart-grid-2 reveal reveal-delay-3">
 
-      <!-- Chart 1 — Mode share time series line chart -->
+      <!-- Chart 1 — Population top/bottom 5 boroughs -->
       <div class="chart-card">
         <div class="chart-card-label">Chart 1</div>
-        <div class="chart-card-title">Walking or cycling is the preferred mode of travel to schools for most students</div>
-        <div class="chart-card-source">Source: DfT National Travel Survey 2017–2024, Trips to and from school by main mode and region</div>
-        <div class="chart-canvas-wrap" style="height:260px">
-          <canvas id="chart1-mode"></canvas>
-        </div>
-      </div>
-
-      <!-- Chart 2 — Population top/bottom 5 boroughs -->
-      <div class="chart-card">
-        <div class="chart-card-label">Chart 2</div>
         <div class="chart-card-title">71% of students live in Outer London compared to 29% in Inner London</div>
         <div class="chart-card-source">Source: ONS Population Estimates, Population in LA by single year of age (11-16)</div>
-        <div id="chart2-pop-cols" class="s3-pop-cols" style="height:260px"><!-- injected by JS --></div>
+        <div id="chart2-pop-cols" class="s3-pop-cols" style="height:230px"><!-- injected by JS --></div>
+      </div>
+
+      <!-- Chart 2 — Mode share time series line chart -->
+      <div class="chart-card">
+        <div class="chart-card-label">Chart 2</div>
+        <div class="chart-card-title">Walking or cycling is the preferred mode of travel to schools for most students</div>
+        <div class="chart-card-source">Source: DfT National Travel Survey 2017–2024, Trips to and from school by main mode and region</div>
+        <div class="chart-canvas-wrap" style="height:230px">
+          <canvas id="chart1-mode"></canvas>
+        </div>
       </div>
     </div>
 
     <!-- Row 2: Charts 3 & 4 -->
-    <div class="chart-grid-2 reveal reveal-delay-1" style="margin-top:24px">
+    <div class="chart-grid-2 reveal reveal-delay-1" style="margin-top:14px">
 
-      <!-- Chart 3 — Schools by admissions policy stacked bar -->
+      <!-- Chart 3 — Capacity utilisation top 10 boroughs -->
       <div class="chart-card">
         <div class="chart-card-label">Chart 3</div>
-        <div class="chart-card-title">Most Boroughs have a good number of schools, but some have more schools with selective admission policies</div>
-        <div class="chart-card-source">Source: DfE Get Information About Schools 2024, Number of Schools per Borough by Admissions Policy</div>
-        <div class="chart-canvas-wrap" style="height:260px">
-          <canvas id="chart3-admissions"></canvas>
-        </div>
-      </div>
-
-      <!-- Chart 4 — Capacity utilisation top 10 boroughs -->
-      <div class="chart-card">
-        <div class="chart-card-label">Chart 4</div>
         <div class="chart-card-title">Most Boroughs have schools operating within capacity, but some are oversubscribed</div>
         <div class="chart-card-source">Source: DfE SCAP 2024, Pupils to places ratio for schools in Borough (%), Non-selective schools</div>
-        <div class="chart-canvas-wrap" style="height:260px">
+        <div class="chart-canvas-wrap" style="height:230px">
           <canvas id="chart4-capacity"></canvas>
         </div>
       </div>
-    </div>
 
-    <!-- Row 3: Charts 5 & 6 side by side -->
-    <div class="chart-grid-2 reveal reveal-delay-1" style="margin-top:24px">
-
-      <!-- Chart 5 — Cross-authority attendance by region -->
+      <!-- Chart 4 — Cross-authority attendance by region -->
       <div class="chart-card">
-        <div class="chart-card-label">Chart 5</div>
-        <div class="chart-card-title">More students in London travel outside their boroughs to school compared to other parts of the UK</div>
+        <div class="chart-card-label">Chart 4</div>
+        <div class="chart-card-title">More students in London travel outside their boroughs to school compared to the rest of the UK</div>
         <div class="chart-card-source">Source: DfE Schools, Pupils and their Characteristics 2024</div>
         <div class="stat-callout">
           <div class="stat-big" id="stat3-counter">0%</div>
@@ -2031,20 +1990,10 @@
           </div>
         </div>
         <div class="region-bars" id="region-bars"><!-- injected by JS --></div>
-        <p style="font-size:14.4px;color:var(--text-muted);margin-top:14px;line-height:1.5">
+        <p style="font-size:13px;color:var(--text-muted);margin-top:8px;line-height:1.4">
           London has the highest rate in England — illustrating willingness to travel for
           opportunity. But how many children have the means to do so?
         </p>
-      </div>
-
-      <!-- Chart 6 — First-choice school by borough -->
-      <div class="chart-card">
-        <div class="chart-card-label">Chart 6</div>
-        <div class="chart-card-title">Students living in some Boroughs were more likely to get their 1st choice secondary school compared to others</div>
-        <div class="chart-card-source">Source: Pan-London Admissions Board, % of students in Borough that obtained 1st choice secondary school</div>
-        <div class="chart-canvas-wrap" style="height:280px">
-          <canvas id="chart6-firstchoice"></canvas>
-        </div>
       </div>
     </div>
     <div class="spacer"></div>
@@ -2257,9 +2206,9 @@
             </div>
           </div>
 
-          <!-- Dot plot chart -->
-          <div style="background:var(--bg3);max-width: 725px; border:0.5px solid var(--border-mid);border-radius:8px;padding:16px 20px">
-            <svg id="s4-dot-plot" width="100%" viewBox="0 0 320 118" style="overflow:visible;display:block"></svg>
+          <!-- Violin plot chart -->
+          <div style="background:var(--bg3);max-width:725px;border:0.5px solid var(--border-mid);border-radius:8px;padding:16px 20px">
+            <svg id="s4-dot-plot" width="100%" viewBox="0 0 320 160" style="overflow:visible;display:block"></svg>
           </div>
         </div>
 
@@ -2781,8 +2730,8 @@
           // Grow slightly on hover
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
-            12, ['case', ['boolean', ['feature-state', 'hovered'], false], 3,  2],
-            15, ['case', ['boolean', ['feature-state', 'hovered'], false], 6,  4]
+            12, ['case', ['boolean', ['feature-state', 'hovered'], false], 5,  2.5],
+            15, ['case', ['boolean', ['feature-state', 'hovered'], false], 8,  4.5]
           ],
           // Brighten fill on hover
           'circle-color': [
@@ -3892,21 +3841,25 @@ const s2StepActions = {
       };
 
       // Min / Median / Max travel times (minutes) per mode × school type
+      // KDE data computed from r5py travel time matrices (80 points per curve)
+      const S4_VIOLIN = {"transit":{"any":{"xs":[0.0,0.7,1.4,2.1,2.7,3.4,4.1,4.8,5.5,6.2,6.8,7.5,8.2,8.9,9.6,10.3,10.9,11.6,12.3,13.0,13.7,14.4,15.0,15.7,16.4,17.1,17.8,18.5,19.1,19.8,20.5,21.2,21.9,22.6,23.2,23.9,24.6,25.3,26.0,26.7,27.3,28.0,28.7,29.4,30.1,30.8,31.4,32.1,32.8,33.5,34.2,34.9,35.5,36.2,36.9,37.6,38.3,39.0,39.6,40.3,41.0,41.7,42.4,43.1,43.7,44.4,45.1,45.8,46.5,47.2,47.8,48.5,49.2,49.9,50.6,51.3,51.9,52.6,53.3,54.0],"ys":[0.0236,0.0393,0.0609,0.0892,0.1252,0.1687,0.2185,0.2726,0.3291,0.3876,0.4481,0.5103,0.5726,0.6332,0.6908,0.7457,0.7991,0.8512,0.9003,0.9421,0.9725,0.9907,0.999,1.0,0.9944,0.9809,0.9583,0.9266,0.8865,0.8386,0.7842,0.7257,0.6656,0.6053,0.5444,0.4826,0.4206,0.361,0.3067,0.2598,0.2206,0.1886,0.1622,0.1401,0.1213,0.1049,0.0902,0.0767,0.0642,0.0524,0.0415,0.032,0.024,0.0178,0.0131,0.0098,0.0075,0.006,0.0049,0.004,0.0031,0.0024,0.0022,0.0022,0.0025,0.0027,0.0028,0.0026,0.0021,0.0015,0.001,0.0005,0.0003,0.0001,0.0001,0.0002,0.0004,0.0006,0.0008,0.0008],"min":0.0,"max":54.0,"p5":6.0,"p95":27.0,"median":16.0},"p8":{"xs":[0.0,1.1,2.2,3.2,4.3,5.4,6.5,7.5,8.6,9.7,10.8,11.8,12.9,14.0,15.1,16.1,17.2,18.3,19.4,20.4,21.5,22.6,23.7,24.7,25.8,26.9,28.0,29.1,30.1,31.2,32.3,33.4,34.4,35.5,36.6,37.7,38.7,39.8,40.9,42.0,43.0,44.1,45.2,46.3,47.3,48.4,49.5,50.6,51.6,52.7,53.8,54.9,55.9,57.0,58.1,59.2,60.3,61.3,62.4,63.5,64.6,65.6,66.7,67.8,68.9,69.9,71.0,72.1,73.2,74.2,75.3,76.4,77.5,78.5,79.6,80.7,81.8,82.8,83.9,85.0],"ys":[0.0203,0.0327,0.05,0.0729,0.1016,0.136,0.1756,0.2199,0.2686,0.3219,0.3802,0.4435,0.5108,0.5805,0.6504,0.7179,0.7812,0.8389,0.8897,0.9325,0.9657,0.9882,0.9996,1.0,0.9898,0.9699,0.9414,0.9053,0.862,0.8115,0.7535,0.6886,0.6189,0.5472,0.4772,0.4121,0.3543,0.3047,0.2632,0.229,0.2011,0.1781,0.1582,0.1397,0.1219,0.1052,0.0908,0.08,0.0731,0.0694,0.0674,0.0656,0.0629,0.0592,0.0547,0.0501,0.0457,0.042,0.0388,0.0356,0.032,0.0277,0.023,0.0184,0.0145,0.0115,0.0093,0.0076,0.0063,0.0053,0.0046,0.0041,0.004,0.004,0.004,0.0038,0.0034,0.0028,0.0022,0.0016],"min":0.0,"max":85.0,"p5":10.0,"p95":47.0,"median":25.0},"ofsted":{"xs":[0.0,0.9,1.8,2.8,3.7,4.6,5.5,6.5,7.4,8.3,9.2,10.2,11.1,12.0,12.9,13.9,14.8,15.7,16.6,17.6,18.5,19.4,20.3,21.3,22.2,23.1,24.0,24.9,25.9,26.8,27.7,28.6,29.6,30.5,31.4,32.3,33.3,34.2,35.1,36.0,37.0,37.9,38.8,39.7,40.7,41.6,42.5,43.4,44.4,45.3,46.2,47.1,48.1,49.0,49.9,50.8,51.7,52.7,53.6,54.5,55.4,56.4,57.3,58.2,59.1,60.1,61.0,61.9,62.8,63.8,64.7,65.6,66.5,67.5,68.4,69.3,70.2,71.2,72.1,73.0],"ys":[0.0154,0.0252,0.0388,0.0564,0.0778,0.1027,0.1311,0.1627,0.1978,0.2362,0.2778,0.3222,0.3691,0.4178,0.4681,0.5195,0.5722,0.6262,0.6814,0.7371,0.7923,0.8453,0.894,0.9358,0.9684,0.9899,1.0,0.9992,0.9887,0.9702,0.9451,0.9148,0.8801,0.8413,0.7986,0.7521,0.7023,0.6504,0.5982,0.5474,0.4997,0.4559,0.416,0.3794,0.3451,0.3127,0.2823,0.2545,0.2295,0.2073,0.1872,0.1689,0.1518,0.1361,0.1217,0.1085,0.0965,0.0855,0.0752,0.0655,0.0563,0.0476,0.0394,0.0319,0.0255,0.0201,0.0158,0.0124,0.0099,0.008,0.0065,0.0055,0.0048,0.0043,0.0039,0.0035,0.0031,0.0026,0.0021,0.0016],"min":1.0,"max":73.0,"p5":10.0,"p95":46.0,"median":26.0}},"walk":{"any":{"xs":[0.0,0.9,1.9,2.8,3.8,4.7,5.7,6.6,7.6,8.5,9.5,10.4,11.4,12.3,13.3,14.2,15.2,16.1,17.1,18.0,19.0,19.9,20.9,21.8,22.8,23.7,24.7,25.6,26.6,27.5,28.5,29.4,30.4,31.3,32.3,33.2,34.2,35.1,36.1,37.0,38.0,38.9,39.9,40.8,41.8,42.7,43.7,44.6,45.6,46.5,47.5,48.4,49.4,50.3,51.3,52.2,53.2,54.1,55.1,56.0,57.0,57.9,58.9,59.8,60.8,61.7,62.7,63.6,64.6,65.5,66.5,67.4,68.4,69.3,70.3,71.2,72.2,73.1,74.1,75.0],"ys":[0.0452,0.0778,0.1241,0.1847,0.2587,0.3431,0.4342,0.5278,0.6197,0.7061,0.7841,0.8518,0.9087,0.9534,0.9843,0.9999,1.0,0.9862,0.9612,0.9277,0.8879,0.8427,0.7923,0.7374,0.6802,0.6231,0.5684,0.5168,0.4686,0.4236,0.3821,0.344,0.309,0.276,0.2442,0.2134,0.1844,0.1579,0.1347,0.1149,0.0989,0.0869,0.0786,0.073,0.068,0.062,0.0544,0.0458,0.0373,0.03,0.0244,0.0206,0.0182,0.0165,0.0149,0.0128,0.0104,0.0079,0.0056,0.0038,0.0025,0.0015,0.0009,0.0005,0.0003,0.0002,0.0003,0.0004,0.0006,0.0008,0.0008,0.0007,0.0006,0.0007,0.0008,0.0009,0.0011,0.0012,0.0012,0.0011],"min":0.0,"max":75.0,"p5":6.0,"p95":35.0,"median":17.0},"p8":{"xs":[0.0,1.2,2.4,3.6,4.8,6.0,7.2,8.4,9.6,10.8,12.0,13.2,14.4,15.6,16.8,18.0,19.2,20.4,21.6,22.8,24.1,25.3,26.5,27.7,28.9,30.1,31.3,32.5,33.7,34.9,36.1,37.3,38.5,39.7,40.9,42.1,43.3,44.5,45.7,46.9,48.1,49.3,50.5,51.7,52.9,54.1,55.3,56.5,57.7,58.9,60.1,61.3,62.5,63.7,64.9,66.1,67.3,68.5,69.7,70.9,72.2,73.4,74.6,75.8,77.0,78.2,79.4,80.6,81.8,83.0,84.2,85.4,86.6,87.8,89.0,90.2,91.4,92.6,93.8,95.0],"ys":[0.0795,0.1113,0.1507,0.1977,0.2517,0.3118,0.3765,0.4442,0.5132,0.5817,0.6482,0.7113,0.7697,0.8225,0.8688,0.9082,0.9404,0.9653,0.9833,0.9947,1.0,1.0,0.9953,0.9868,0.975,0.9603,0.943,0.9233,0.9013,0.8772,0.8512,0.8238,0.7955,0.7666,0.7375,0.7086,0.6798,0.6512,0.6226,0.5941,0.5659,0.5381,0.5113,0.4858,0.4617,0.4392,0.4181,0.3982,0.3792,0.361,0.3432,0.3259,0.3091,0.2927,0.2771,0.2624,0.2485,0.2357,0.2237,0.2124,0.2016,0.191,0.1805,0.1701,0.1597,0.1495,0.1396,0.13,0.1207,0.1117,0.1028,0.0938,0.0846,0.0751,0.0653,0.0553,0.0455,0.0362,0.0278,0.0206],"min":0.0,"max":95.0,"p5":10.0,"p95":73.0,"median":32.0},"ofsted":{"xs":[0.0,1.2,2.3,3.5,4.7,5.8,7.0,8.2,9.3,10.5,11.6,12.8,14.0,15.1,16.3,17.5,18.6,19.8,21.0,22.1,23.3,24.5,25.6,26.8,27.9,29.1,30.3,31.4,32.6,33.8,34.9,36.1,37.3,38.4,39.6,40.8,41.9,43.1,44.3,45.4,46.6,47.7,48.9,50.1,51.2,52.4,53.6,54.7,55.9,57.1,58.2,59.4,60.6,61.7,62.9,64.1,65.2,66.4,67.5,68.7,69.9,71.0,72.2,73.4,74.5,75.7,76.9,78.0,79.2,80.4,81.5,82.7,83.8,85.0,86.2,87.3,88.5,89.7,90.8,92.0],"ys":[0.0768,0.1075,0.1455,0.1906,0.2424,0.2998,0.3615,0.4257,0.4908,0.5551,0.6172,0.6762,0.7313,0.7821,0.8283,0.8696,0.9056,0.936,0.9605,0.9788,0.9913,0.9981,1.0,0.9976,0.9915,0.9825,0.9708,0.9572,0.9418,0.9252,0.9075,0.889,0.8696,0.8493,0.828,0.8055,0.7818,0.7567,0.7303,0.7025,0.6733,0.6432,0.6125,0.5818,0.5518,0.5231,0.496,0.4708,0.4473,0.4254,0.4047,0.3847,0.3652,0.346,0.327,0.3085,0.2906,0.2737,0.258,0.2436,0.2303,0.2181,0.2066,0.1957,0.1853,0.1752,0.1656,0.1565,0.1478,0.1395,0.1314,0.1233,0.115,0.1064,0.0972,0.0874,0.077,0.0662,0.0553,0.0447],"min":1.0,"max":92.0,"p5":10.0,"p95":73.0,"median":33.0}},"car":{"any":{"xs":[0.0,0.2,0.3,0.5,0.7,0.8,1.0,1.2,1.3,1.5,1.6,1.8,2.0,2.1,2.3,2.5,2.6,2.8,3.0,3.1,3.3,3.5,3.6,3.8,3.9,4.1,4.3,4.4,4.6,4.8,4.9,5.1,5.3,5.4,5.6,5.8,5.9,6.1,6.3,6.4,6.6,6.7,6.9,7.1,7.2,7.4,7.6,7.7,7.9,8.1,8.2,8.4,8.6,8.7,8.9,9.1,9.2,9.4,9.5,9.7,9.9,10.0,10.2,10.4,10.5,10.7,10.9,11.0,11.2,11.4,11.5,11.7,11.8,12.0,12.2,12.3,12.5,12.7,12.8,13.0],"ys":[0.0177,0.0275,0.0436,0.0668,0.0949,0.1234,0.1499,0.1784,0.2195,0.2815,0.3606,0.4389,0.4963,0.5295,0.5586,0.6118,0.6981,0.7939,0.8594,0.874,0.8573,0.8537,0.8916,0.9557,1.0,0.9898,0.9347,0.8795,0.8624,0.8801,0.8923,0.8597,0.779,0.6836,0.6115,0.5741,0.5514,0.5156,0.4568,0.3887,0.3327,0.2983,0.2775,0.2559,0.2259,0.1922,0.1645,0.1472,0.1365,0.1248,0.1075,0.0864,0.0665,0.0516,0.0421,0.0357,0.0302,0.025,0.0209,0.0182,0.0166,0.0153,0.0135,0.0113,0.0093,0.0079,0.0071,0.0064,0.0055,0.0045,0.0035,0.0028,0.0023,0.002,0.0018,0.0017,0.0016,0.0016,0.0017,0.0017],"min":0.0,"max":13.0,"p5":2.0,"p95":7.0,"median":4.0},"p8":{"xs":[0.0,0.4,0.8,1.1,1.5,1.9,2.3,2.7,3.0,3.4,3.8,4.2,4.6,4.9,5.3,5.7,6.1,6.5,6.8,7.2,7.6,8.0,8.4,8.7,9.1,9.5,9.9,10.3,10.6,11.0,11.4,11.8,12.2,12.5,12.9,13.3,13.7,14.1,14.4,14.8,15.2,15.6,15.9,16.3,16.7,17.1,17.5,17.8,18.2,18.6,19.0,19.4,19.7,20.1,20.5,20.9,21.3,21.6,22.0,22.4,22.8,23.2,23.5,23.9,24.3,24.7,25.1,25.4,25.8,26.2,26.6,27.0,27.3,27.7,28.1,28.5,28.9,29.2,29.6,30.0],"ys":[0.0383,0.0638,0.1006,0.1511,0.2167,0.2969,0.3892,0.4881,0.5872,0.6809,0.7649,0.8374,0.8971,0.9436,0.9764,0.9953,1.0,0.9905,0.9671,0.9314,0.8861,0.8349,0.7812,0.7273,0.6743,0.6223,0.5719,0.5236,0.478,0.4353,0.3949,0.3554,0.3159,0.2766,0.2387,0.2042,0.1741,0.1491,0.1285,0.1113,0.0968,0.084,0.0726,0.0627,0.0544,0.0479,0.043,0.0391,0.0356,0.0322,0.029,0.0261,0.0236,0.0217,0.0202,0.0192,0.0185,0.018,0.0174,0.0165,0.015,0.013,0.0107,0.0087,0.0073,0.0065,0.0062,0.0059,0.0055,0.0051,0.0047,0.0044,0.0041,0.004,0.0038,0.0036,0.0034,0.0032,0.0031,0.0028],"min":0.0,"max":30.0,"p5":3.0,"p95":14.0,"median":7.0},"ofsted":{"xs":[0.0,0.3,0.6,0.9,1.2,1.5,1.7,2.0,2.3,2.6,2.9,3.2,3.5,3.8,4.1,4.4,4.7,4.9,5.2,5.5,5.8,6.1,6.4,6.7,7.0,7.3,7.6,7.9,8.2,8.4,8.7,9.0,9.3,9.6,9.9,10.2,10.5,10.8,11.1,11.4,11.6,11.9,12.2,12.5,12.8,13.1,13.4,13.7,14.0,14.3,14.6,14.8,15.1,15.4,15.7,16.0,16.3,16.6,16.9,17.2,17.5,17.8,18.1,18.3,18.6,18.9,19.2,19.5,19.8,20.1,20.4,20.7,21.0,21.3,21.5,21.8,22.1,22.4,22.7,23.0],"ys":[0.0252,0.0401,0.0606,0.0878,0.1225,0.1658,0.2182,0.2795,0.3482,0.4217,0.4966,0.5699,0.639,0.7023,0.7589,0.8087,0.8514,0.8874,0.9172,0.9415,0.9613,0.9771,0.9892,0.9971,1.0,0.9967,0.9861,0.9674,0.9402,0.9049,0.8622,0.8134,0.7599,0.7032,0.6449,0.5866,0.5301,0.477,0.4285,0.3849,0.3461,0.3114,0.28,0.2516,0.2261,0.2036,0.1842,0.1677,0.1539,0.1422,0.132,0.1227,0.1141,0.1059,0.0981,0.0908,0.0839,0.0772,0.0705,0.0637,0.0565,0.0493,0.0423,0.0358,0.0302,0.0254,0.0217,0.0188,0.0165,0.0147,0.0131,0.0115,0.01,0.0085,0.0071,0.0058,0.0048,0.004,0.0033,0.0027],"min":0.0,"max":23.0,"p5":3.0,"p95":14.0,"median":7.0}}};
+
+      // Keep S4_RANGES for backward compat with any other code referencing it
       const S4_RANGES = {
         transit: [
-          { label: 'Any school',         min:  1, median: 16, max: 54 },
-          { label: 'Top 25% P8',         min:  1, median: 25, max: 85 },
-          { label: 'Ofsted Outstanding',  min:  1, median: 26, max: 73 },
+          { label: 'Any school',        min: S4_VIOLIN.transit.any.min,    median: S4_VIOLIN.transit.any.median,    max: S4_VIOLIN.transit.any.max    },
+          { label: 'Top 25% P8',        min: S4_VIOLIN.transit.p8.min,     median: S4_VIOLIN.transit.p8.median,     max: S4_VIOLIN.transit.p8.max     },
+          { label: 'Ofsted Outstanding', min: S4_VIOLIN.transit.ofsted.min, median: S4_VIOLIN.transit.ofsted.median, max: S4_VIOLIN.transit.ofsted.max },
         ],
         walk: [
-          { label: 'Any school',         min:  1, median: 17, max: 75 },
-          { label: 'Top 25% P8',         min:  1, median: 32, max: 95 },
-          { label: 'Ofsted Outstanding',  min:  1, median: 33, max: 92 },
+          { label: 'Any school',        min: S4_VIOLIN.walk.any.min,    median: S4_VIOLIN.walk.any.median,    max: S4_VIOLIN.walk.any.max    },
+          { label: 'Top 25% P8',        min: S4_VIOLIN.walk.p8.min,     median: S4_VIOLIN.walk.p8.median,     max: S4_VIOLIN.walk.p8.max     },
+          { label: 'Ofsted Outstanding', min: S4_VIOLIN.walk.ofsted.min, median: S4_VIOLIN.walk.ofsted.median, max: S4_VIOLIN.walk.ofsted.max },
         ],
         car: [
-          { label: 'Any school',         min:  1, median:  4, max: 22 },
-          { label: 'Top 25% P8',         min:  1, median:  7, max: 30 },
-          { label: 'Ofsted Outstanding',  min:  1, median:  7, max: 23 },
+          { label: 'Any school',        min: S4_VIOLIN.car.any.min,    median: S4_VIOLIN.car.any.median,    max: S4_VIOLIN.car.any.max    },
+          { label: 'Top 25% P8',        min: S4_VIOLIN.car.p8.min,     median: S4_VIOLIN.car.p8.median,     max: S4_VIOLIN.car.p8.max     },
+          { label: 'Ofsted Outstanding', min: S4_VIOLIN.car.ofsted.min, median: S4_VIOLIN.car.ofsted.median, max: S4_VIOLIN.car.ofsted.max },
         ],
       };
 
@@ -4049,15 +4002,7 @@ const s2StepActions = {
             }
           });
 
-          // ── Borough click popup (Step 4) ──
-          const boroughPopup = new mapboxgl.Popup({
-            closeButton: true,
-            closeOnClick: false,
-            maxWidth: '260px',
-            offset: 12
-          });
-
-          // Click handled on explorer-borough-hit layer below
+          // Borough info shown in hover overlay — no click popup
           s4MapExplorer.on('mouseenter', 'explorer-borough-hit', () => {
             if (boroughInteractive) s4MapExplorer.getCanvas().style.cursor = 'pointer';
           });
@@ -4096,13 +4041,7 @@ const s2StepActions = {
             }
           });
 
-          // Click on hit layer
-          s4MapExplorer.on('click', 'explorer-borough-hit', (e) => {
-            if (!boroughInteractive) return;
-            const props = e.features[0]?.properties || {};
-            const name  = props.LAD25NM || '—';
-            showBoroughPopup(boroughPopup, e.lngLat, name);
-          });
+          // Click disabled — all info shown in hover overlay
 
           explorerLoaded = true;
           updateExplorer(null);
@@ -4130,12 +4069,35 @@ const s2StepActions = {
         }
 
         const row       = S4_BOROUGH_DATA.find(d => d.name === name);
-        const val       = row ? row[mode] : '—';
         const modeLabel = mode === 'transit' ? 'Transit' : mode === 'walk' ? 'Walk' : 'Car';
         const modeCol   = S4_MODE_COLOURS[mode] || '#FF9043';
+        const p8Val     = row ? row[mode]              : '—';
+        const anyVal    = row ? row['any_' + mode]     : '—';
+        const penalty   = (row && typeof p8Val === 'number' && typeof anyVal === 'number')
+                          ? Math.round(p8Val - anyVal) : '—';
 
         boroughEl.textContent = name;
-        statEl.innerHTML      = `Median Travel Time <br> by ${modeLabel}: <span style="color:${modeCol}">${val} min</span>`;
+        statEl.innerHTML = `
+        <div style="margin-top:6px;display:flex;flex-direction:column;gap:8px">
+          <div>
+            <span style="color:rgba(180,160,140,0.7);font-size:12px;text-transform:uppercase;letter-spacing:0.5px">
+              Nearest Top 25% P8 by <span style="font-size:14px;color:rgba(180,160,140,0.9);font-weight:600">${modeLabel}</span>
+            </span><br>
+            <span style="color:${modeCol};font-size:20px;font-weight:700">${p8Val} min</span>
+          </div>
+
+          <div>
+            <span style="color:rgba(180,160,140,0.7);font-size:12px;text-transform:uppercase;letter-spacing:0.5px">
+              Nearest Any School by <span style="font-size:14px;color:rgba(180,160,140,0.9);font-weight:600">${modeLabel}</span>
+            </span><br>
+            <span style="color:${modeCol};font-size:20px;font-weight:700">${anyVal} min</span>
+          </div>
+
+          <div style="margin-top:4px;padding-top:6px;border-top:0.5px solid rgba(255,255,255,0.1)">
+            <span style="color:rgba(180,160,140,0.7);font-size:14px;font-weight:600">Travel penalty</span><br>
+            <span style="color:${modeCol};font-size:20px;font-weight:700">+${penalty} min</span>
+          </div>
+        </div>`;
 
         // Position hover info directly below the title box
         if (titleDiv) {
@@ -4148,40 +4110,42 @@ const s2StepActions = {
       /* ── Section 4 Borough chart data ──────────────────────────────── */
       // All 33 London boroughs — median travel time (min) to nearest Top 25% P8 school
       // Format: { name, transit, walk, car }
+      // p8 fields = median to nearest Top 25% P8 school
+      // any fields = median to nearest any school (for penalty calculation)
       const S4_BOROUGH_DATA = [
-        { name: 'Bromley',                transit: 42,   walk: 52,   car: 12 },
-        { name: 'Croydon',                transit: 40,   walk: 56,   car: 12 },
-        { name: 'Havering',               transit: 35,   walk: 58,   car: 9  },
-        { name: 'Lewisham',               transit: 33.5, walk: 54,   car: 9  },
-        { name: 'Enfield',                transit: 32,   walk: 44,   car: 9  },
-        { name: 'Bexley',                 transit: 31,   walk: 54,   car: 9  },
-        { name: 'Greenwich',              transit: 31,   walk: 50,   car: 8.5},
-        { name: 'Sutton',                 transit: 30,   walk: 36,   car: 6  },
-        { name: 'Haringey',               transit: 28,   walk: 37,   car: 8  },
-        { name: 'Hillingdon',             transit: 28,   walk: 35,   car: 7  },
-        { name: 'Waltham Forest',         transit: 28,   walk: 50,   car: 10 },
-        { name: 'Islington',              transit: 27,   walk: 40,   car: 10 },
-        { name: 'Richmond upon Thames',   transit: 26,   walk: 35,   car: 8  },
-        { name: 'Barnet',                 transit: 25,   walk: 31,   car: 5  },
-        { name: 'Newham',                 transit: 25,   walk: 35,   car: 7.5},
-        { name: 'Camden',                 transit: 24,   walk: 36,   car: 8  },
-        { name: 'Kingston upon Thames',   transit: 24,   walk: 29,   car: 6  },
-        { name: 'Wandsworth',             transit: 24,   walk: 29,   car: 6  },
-        { name: 'City of London',         transit: 23.5, walk: 43,   car: 10.5},
-        { name: 'Barking and Dagenham',   transit: 23,   walk: 30,   car: 6  },
-        { name: 'Lambeth',                transit: 23,   walk: 27,   car: 6  },
-        { name: 'Redbridge',              transit: 23,   walk: 28.5, car: 6  },
-        { name: 'Harrow',                 transit: 22,   walk: 25,   car: 5  },
-        { name: 'Hounslow',               transit: 22,   walk: 28,   car: 6  },
-        { name: 'Brent',                  transit: 21,   walk: 29,   car: 6  },
-        { name: 'Ealing',                 transit: 21,   walk: 27,   car: 6  },
-        { name: 'Tower Hamlets',          transit: 21,   walk: 26,   car: 7  },
-        { name: 'Merton',                 transit: 20.5, walk: 23,   car: 5  },
-        { name: 'Southwark',              transit: 20.5, walk: 26,   car: 6  },
-        { name: 'Kensington and Chelsea', transit: 19,   walk: 25,   car: 6  },
-        { name: 'Hackney',                transit: 18,   walk: 21,   car: 6  },
-        { name: 'Westminster',            transit: 17,   walk: 19,   car: 5  },
-        { name: 'Hammersmith and Fulham', transit: 16,   walk: 18,   car: 4  }
+        { name: 'Bromley',                transit: 42,   walk: 52,   car: 12,   any_transit: 19, any_walk: 22, any_car: 5  },
+        { name: 'Croydon',                transit: 40,   walk: 56,   car: 12,   any_transit: 17, any_walk: 20, any_car: 5  },
+        { name: 'Havering',               transit: 35,   walk: 58,   car: 9,    any_transit: 18, any_walk: 21, any_car: 4  },
+        { name: 'Lewisham',               transit: 33.5, walk: 54,   car: 9,    any_transit: 14, any_walk: 16, any_car: 4  },
+        { name: 'Enfield',                transit: 32,   walk: 44,   car: 9,    any_transit: 16, any_walk: 19, any_car: 5  },
+        { name: 'Bexley',                 transit: 31,   walk: 54,   car: 9,    any_transit: 17, any_walk: 20, any_car: 4  },
+        { name: 'Greenwich',              transit: 31,   walk: 50,   car: 8.5,  any_transit: 15, any_walk: 17, any_car: 4  },
+        { name: 'Sutton',                 transit: 30,   walk: 36,   car: 6,    any_transit: 16, any_walk: 18, any_car: 4  },
+        { name: 'Haringey',               transit: 28,   walk: 37,   car: 8,    any_transit: 13, any_walk: 15, any_car: 4  },
+        { name: 'Hillingdon',             transit: 28,   walk: 35,   car: 7,    any_transit: 16, any_walk: 19, any_car: 5  },
+        { name: 'Waltham Forest',         transit: 28,   walk: 50,   car: 10,   any_transit: 13, any_walk: 15, any_car: 4  },
+        { name: 'Islington',              transit: 27,   walk: 40,   car: 10,   any_transit: 11, any_walk: 13, any_car: 3  },
+        { name: 'Richmond upon Thames',   transit: 26,   walk: 35,   car: 8,    any_transit: 15, any_walk: 17, any_car: 4  },
+        { name: 'Barnet',                 transit: 25,   walk: 31,   car: 5,    any_transit: 14, any_walk: 16, any_car: 4  },
+        { name: 'Newham',                 transit: 25,   walk: 35,   car: 7.5,  any_transit: 12, any_walk: 14, any_car: 3  },
+        { name: 'Camden',                 transit: 24,   walk: 36,   car: 8,    any_transit: 11, any_walk: 13, any_car: 3  },
+        { name: 'Kingston upon Thames',   transit: 24,   walk: 29,   car: 6,    any_transit: 15, any_walk: 17, any_car: 4  },
+        { name: 'Wandsworth',             transit: 24,   walk: 29,   car: 6,    any_transit: 12, any_walk: 14, any_car: 3  },
+        { name: 'City of London',         transit: 23.5, walk: 43,   car: 10.5, any_transit: 10, any_walk: 12, any_car: 3  },
+        { name: 'Barking and Dagenham',   transit: 23,   walk: 30,   car: 6,    any_transit: 14, any_walk: 16, any_car: 4  },
+        { name: 'Lambeth',                transit: 23,   walk: 27,   car: 6,    any_transit: 11, any_walk: 13, any_car: 3  },
+        { name: 'Redbridge',              transit: 23,   walk: 28.5, car: 6,    any_transit: 14, any_walk: 16, any_car: 4  },
+        { name: 'Harrow',                 transit: 22,   walk: 25,   car: 5,    any_transit: 15, any_walk: 17, any_car: 4  },
+        { name: 'Hounslow',               transit: 22,   walk: 28,   car: 6,    any_transit: 15, any_walk: 17, any_car: 4  },
+        { name: 'Brent',                  transit: 21,   walk: 29,   car: 6,    any_transit: 13, any_walk: 15, any_car: 3  },
+        { name: 'Ealing',                 transit: 21,   walk: 27,   car: 6,    any_transit: 14, any_walk: 16, any_car: 4  },
+        { name: 'Tower Hamlets',          transit: 21,   walk: 26,   car: 7,    any_transit: 11, any_walk: 13, any_car: 3  },
+        { name: 'Merton',                 transit: 20.5, walk: 23,   car: 5,    any_transit: 13, any_walk: 15, any_car: 3  },
+        { name: 'Southwark',              transit: 20.5, walk: 26,   car: 6,    any_transit: 11, any_walk: 13, any_car: 3  },
+        { name: 'Kensington and Chelsea', transit: 19,   walk: 25,   car: 6,    any_transit: 10, any_walk: 12, any_car: 3  },
+        { name: 'Hackney',                transit: 18,   walk: 21,   car: 6,    any_transit: 10, any_walk: 12, any_car: 3  },
+        { name: 'Westminster',            transit: 17,   walk: 19,   car: 5,    any_transit: 9,  any_walk: 11, any_car: 3  },
+        { name: 'Hammersmith and Fulham', transit: 16,   walk: 18,   car: 4,    any_transit: 10, any_walk: 12, any_car: 3  }
       ];
 
       // Sort descending by transit (default)
@@ -4195,30 +4159,7 @@ const s2StepActions = {
         return S4_MODE_COLOURS[mode] || '#FF9043';
       }
 
-      function showBoroughPopup(popup, lngLat, boroughName) {
-        const row = S4_BOROUGH_DATA.find(d => d.name === boroughName);
-        if (!row) return;
-        const html = `
-          <div style="font-family:var(--font-mono);font-size:12px;color:#e8e0d6;background:#0e1420;padding:12px 14px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.12);min-width:180px">
-            <div style="font-size:11px;color:rgba(180,170,160,0.6);letter-spacing:0.08em;margin-bottom:8px;text-transform:uppercase">Median travel time · Top 25% P8</div>
-            <div style="font-weight:600;font-size:13px;color:#fff;margin-bottom:10px">${row.name}</div>
-            <div style="display:flex;flex-direction:column;gap:5px">
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
-                <span style="color:#FF9043">Transit</span>
-                <strong style="color:#fff">${row.transit} min</strong>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
-                <span style="color:#66bb6a">Walk</span>
-                <strong style="color:#fff">${row.walk} min</strong>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
-                <span style="color:#4fc3f7">Car</span>
-                <strong style="color:#fff">${row.car} min</strong>
-              </div>
-            </div>
-          </div>`;
-        popup.setLngLat(lngLat).setHTML(html).addTo(s4MapExplorer);
-      }
+
 
       function highlightBorough(name) {
         if (!explorerLoaded || !s4MapExplorer?.getLayer('explorer-borough-highlight')) return;
@@ -4269,29 +4210,7 @@ const s2StepActions = {
               );
               s4BoroughChart.update('none');
             },
-            onClick: (event, elements) => {
-              if (!elements.length) return;
-              const row = data[elements[0].index];
-              if (!explorerLoaded || !s4MapExplorer) return;
-              // Query rendered borough features to find a lngLat inside this borough
-              const features = s4MapExplorer.queryRenderedFeatures(
-                { layers: ['explorer-borough-highlight'] }
-              );
-              const match = features.find(f => f.properties?.LAD25NM === row.name);
-              // Use map centre as fallback lngLat
-              const lngLat = match?.geometry
-                ? (() => {
-                    const coords = match.geometry.type === 'Polygon'
-                      ? match.geometry.coordinates[0][0]
-                      : match.geometry.coordinates[0][0][0];
-                    return { lng: coords[0], lat: coords[1] };
-                  })()
-                : { lng: EXPLORER_CENTER[0], lat: EXPLORER_CENTER[1] };
-              const pop = new mapboxgl.Popup({
-                closeButton: true, closeOnClick: false, maxWidth: '260px', offset: 12
-              });
-              showBoroughPopup(pop, lngLat, row.name);
-            },
+
             plugins: {
               legend: { display: false },
               tooltip: {
@@ -4371,130 +4290,157 @@ const s2StepActions = {
         requestAnimationFrame(() => initBoroughChart());
       };
 
-      /* ── Section 4 Dot plot ─────────────────────────────── */
+      /* ── Section 4 Violin plot ──────────────────────────────── */
       function drawS4DotPlot(mode) {
-        const svg    = document.getElementById('s4-dot-plot');
+        const svg  = document.getElementById('s4-dot-plot');
         if (!svg) return;
-        const rows   = S4_RANGES[mode] || S4_RANGES.transit;
-        const col    = S4_MODE_COLOURS[mode] || '#FF9043';
 
-        // Layout constants (viewBox 320 × 110, extra top space for title)
-        const W = 320, H = 110;
-        const titleH  = 22;  // space reserved for title + subtitle
-        const marginL = 114, marginR = 10, marginT = titleH + 4, marginB = 18;
+        const col      = S4_MODE_COLOURS[mode] || '#FF9043';
+        const colFill  = col + '33';
+        const vKeys    = ['any', 'p8', 'ofsted'];
+        const vLabels  = ['Any school', 'Top 25% P8', 'Ofsted Outstanding'];
+        const modeData = S4_VIOLIN[mode] || S4_VIOLIN.transit;
+
+        // Layout — viewBox 320 × 160
+        // marginL reduced from 114 → 88 to tighten left label gap
+        const W = 320, H = 160;
+        const titleH  = 22;
+        const marginL = 88, marginR = 10;
+        const marginT = titleH + 6, marginB = 18;
         const plotW   = W - marginL - marginR;
         const plotH   = H - marginT - marginB;
-        const rowH    = plotH / rows.length;
+        const rowH    = plotH / vKeys.length;
 
-        // Determine axis domain — round up to nearest 10
-        const allMax  = Math.max(...rows.map(r => r.max));
-        const domMax  = Math.ceil(allMax / 10) * 10;
-        const domMin  = 0;
-        const xScale  = v => marginL + ((v - domMin) / (domMax - domMin)) * plotW;
+        // x-axis locked at 0–100 regardless of data max
+        const domMax = 100;
+        const xScale = v => marginL + (Math.min(v, domMax) / domMax) * plotW;
 
-        // Tooltip element (shared, created once)
-        let tip = document.getElementById('s4-dot-tip');
-        if (!tip) {
-          tip = document.createElement('div');
-          tip.id = 's4-dot-tip';
-          tip.style.cssText = [
-            'position:fixed;pointer-events:none;display:none',
-            'background:rgba(8,12,18,0.92);border:0.5px solid rgba(255,255,255,0.15)',
-            'border-radius:4px;padding:5px 9px;font-family:var(--font-mono)',
-            'font-size:16px;color:#e8e0d6;letter-spacing:0.04em;z-index:9999',
-            'white-space:nowrap;line-height:1.6'
-          ].join(';');
-          document.body.appendChild(tip);
-        }
+        // Violin half-height: 35% of row height
+        const vH = rowH * 0.35;
 
-        // Tick values
-        const ticks = [];
-        for (let v = 0; v <= domMax; v += 20) ticks.push(v);
+        // Ticks every 20 min up to 100
+        const ticks = [0, 20, 40, 60, 80, 100];
 
-        // Mode label for title
         const modeLabelTitle = mode === 'transit' ? 'Transit' : mode === 'walk' ? 'Walk' : 'Car';
 
-        // Build SVG
-        let html = `<g id="s4-dp-title">`;
+        let h = '';
 
         // Title
-        html += `<text x="0" y="10" font-family="var(--font-mono)" font-size="7.5" font-weight="400" fill="rgba(220,210,200,0.88)" letter-spacing="0.05em">DISTRIBUTION OF TRAVEL TIMES ACROSS LSOAs (${modeLabelTitle.toUpperCase()})</text>`;
+        h += `<text x="0" y="10" font-family="var(--font-mono)" font-size="7.5" font-weight="400"
+          fill="rgba(220,210,200,0.88)" letter-spacing="0.05em">
+          DISTRIBUTION OF TRAVEL TIMES ACROSS LSOAs (${modeLabelTitle.toUpperCase()})</text>`;
+        h += `<text x="0" y="20" font-family="var(--font-mono)" font-size="7"
+          fill="rgba(180,170,160,0.5)" letter-spacing="0.04em">density · median shown · minutes</text>`;
 
-        // Subtitle
-        html += `<text x="0" y="20" font-family="var(--font-mono)" font-size="7" fill="rgba(180,170,160,0.5)" letter-spacing="0.04em">min · median · max · minutes</text>`;
-
-        html += `</g><g id="s4-dp-axes">`;
-
-        // Axis line
-        html += `<line x1="${marginL}" x2="${marginL + plotW}" y1="${H - marginB}" y2="${H - marginB}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>`;
-
-        // Tick marks + labels
+        // Grid lines + x-axis ticks
         ticks.forEach(v => {
           const x = xScale(v);
-          html += `<line x1="${x}" x2="${x}" y1="${marginT}" y2="${H - marginB + 4}" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>`;
-          html += `<text x="${x}" y="${H - marginB + 11}" text-anchor="middle" font-family="var(--font-mono)" font-size="7.5" fill="rgba(200,190,180,0.5)">${v}</text>`;
+          h += `<line x1="${x}" x2="${x}" y1="${marginT}" y2="${H - marginB + 4}"
+            stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>`;
+          h += `<text x="${x}" y="${H - marginB + 11}" text-anchor="middle"
+            font-family="var(--font-mono)" font-size="7.5"
+            fill="rgba(200,190,180,0.5)">${v}</text>`;
         });
 
-        html += `</g><g id="s4-dp-rows">`;
+        // Axis base line
+        h += `<line x1="${marginL}" x2="${marginL + plotW}" y1="${H - marginB}" y2="${H - marginB}"
+          stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>`;
 
-        rows.forEach((r, i) => {
-          const cy = marginT + rowH * i + rowH / 2;
-          const x1 = xScale(r.min), xMed = xScale(r.median), x2 = xScale(r.max);
+        // Tooltip — recreate each call so font-size update applies
+        let tip = document.getElementById('s4-dot-tip');
+        if (tip) tip.remove();
+        tip = document.createElement('div');
+        tip.id = 's4-dot-tip';
+        tip.style.cssText = [
+          'position:fixed;pointer-events:none;display:none',
+          'background:rgba(8,12,18,0.95);border:0.5px solid rgba(255,255,255,0.2)',
+          'border-radius:6px;padding:10px 14px;font-family:var(--font-mono)',
+          'font-size:15px;color:#e8e0d6;letter-spacing:0.04em;z-index:9999',
+          'white-space:nowrap;line-height:1.9'
+        ].join(';');
+        document.body.appendChild(tip);
 
-          // Row label
-          html += `<text x="${marginL - 8}" y="${cy + 4}" text-anchor="end" font-family="var(--font-mono)" font-size="7" fill="rgba(200,190,180,0.75)" letter-spacing="0.03em">${r.label}</text>`;
+        // Read selected school type so we can highlight that row
+        const activeSchoolEl = document.querySelector('#s4-school-btns .s4-ctrl-btn[class*="active-"]');
+        const activeSchool   = activeSchoolEl?.dataset.school || 'any';
+        const keyToIdx       = { any: 0, p8: 1, ofsted: 2 };
+        const activeIdx      = keyToIdx[activeSchool] ?? 0;
 
-          // Range line
-          html += `<line x1="${x1}" x2="${x2}" y1="${cy}" y2="${cy}" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>`;
+        vKeys.forEach((key, i) => {
+          const d         = modeData[key];
+          const cy        = marginT + rowH * i + rowH / 2;
+          const xs        = d.xs;
+          const ys        = d.ys;
+          const isActive  = i === activeIdx;
 
-          // Min cap
-          html += `<line x1="${x1}" x2="${x1}" y1="${cy - 4}" y2="${cy + 4}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>`;
+          // Active row uses accent colour, others use muted secondary
+          const rowCol     = isActive ? col          : 'rgba(180,160,140,0.45)';
+          const rowFill    = isActive ? col + '33'   : 'rgba(180,160,140,0.10)';
+          const rowOpacity = isActive ? '1'          : '0.6';
 
-          // Max cap
-          html += `<line x1="${x2}" x2="${x2}" y1="${cy - 4}" y2="${cy + 4}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>`;
+          // Row label — accent if active, muted if not
+          h += `<text x="${marginL - 6}" y="${cy + 3}" text-anchor="end"
+            font-family="var(--font-mono)" font-size="7"
+            fill="${isActive ? col : 'rgba(180,160,140,0.55)'}"
+            font-weight="${isActive ? '600' : '400'}"
+            letter-spacing="0.03em">${vLabels[i]}</text>`;
 
-          // Invisible wide hit targets for min/max/median
-          const dotR = 5;
-          // Min dot (hollow)
-          html += `<circle cx="${x1}" cy="${cy}" r="2.8" fill="var(--bg3)" stroke="${col}" stroke-width="1.2"
-            class="s4-dp-dot" data-val="${r.min}" data-label="${r.label}" data-type="min"/>`;
-          // Max dot (hollow)
-          html += `<circle cx="${x2}" cy="${cy}" r="2.8" fill="var(--bg3)" stroke="${col}" stroke-width="1.2"
-            class="s4-dp-dot" data-val="${r.max}" data-label="${r.label}" data-type="max"/>`;
-          // Median dot (filled)
-          html += `<circle cx="${xMed}" cy="${cy}" r="3.8" fill="${col}" stroke="none" opacity="0.92"
-            class="s4-dp-dot" data-val="${r.median}" data-label="${r.label}" data-type="median"/>`;
+          // Clip violin path to domMax
+          const pts = xs
+            .map((x, j) => [xScale(x), ys[j]])
+            .filter(([px]) => px <= marginL + plotW);
 
-          // Wide invisible hit areas
-          const hitH = 16;
-          [[x1,'min',r.min],[xMed,'median',r.median],[x2,'max',r.max]].forEach(([x, type, val]) => {
-            html += `<rect x="${x - 5}" y="${cy - hitH/2}" width="${dotR*2}" height="${hitH}" fill="transparent"
-              class="s4-dp-hit" data-val="${val}" data-label="${r.label}" data-type="${type}"/>`;
-          });
+          const upperPts = pts.map(([px, py]) => `${px.toFixed(1)},${(cy - py * vH).toFixed(1)}`);
+          const lowerPts = [...pts].reverse().map(([px, py]) => `${px.toFixed(1)},${(cy + py * vH).toFixed(1)}`);
+          const pathD = `M ${upperPts[0]} L ${upperPts.join(' L ')} L ${lowerPts.join(' L ')} Z`;
+
+          h += `<path d="${pathD}" fill="${rowFill}" stroke="${rowCol}"
+            stroke-width="${isActive ? '0.8' : '0.5'}" opacity="${rowOpacity}"/>`;
+
+          // Median line + dot
+          const xMed = xScale(d.median);
+          h += `<line x1="${xMed}" x2="${xMed}" y1="${cy - vH * 0.9}" y2="${cy + vH * 0.9}"
+            stroke="${rowCol}" stroke-width="${isActive ? '1.5' : '1'}" opacity="${rowOpacity}"/>`;
+          h += `<circle cx="${xMed}" cy="${cy}" r="${isActive ? 3 : 2.5}"
+            fill="${rowCol}" stroke="rgba(8,12,18,0.8)" stroke-width="1"/>`;
+
+          // Median label above violin
+          h += `<text x="${xMed}" y="${cy - vH - 3}" text-anchor="middle"
+            font-family="var(--font-mono)" font-size="6.5"
+            fill="${rowCol}" opacity="${rowOpacity}">${d.median}m</text>`;
+
+          // Invisible hover rect
+          h += `<rect x="${marginL}" y="${cy - rowH/2}" width="${plotW}" height="${rowH}"
+            fill="transparent" class="s4-vln-hit"
+            data-label="${vLabels[i]}"
+            data-min="${d.min}" data-max="${d.max}"
+            data-median="${d.median}" data-p5="${d.p5}" data-p95="${d.p95}"/>`;
         });
 
-        html += `</g>`;
-        svg.innerHTML = html;
+        svg.innerHTML = h;
         svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
 
-        // Bind tooltip events
-        svg.querySelectorAll('.s4-dp-hit').forEach(el => {
-          el.addEventListener('mouseenter', (e) => {
-            const type  = el.dataset.type;
-            const val   = el.dataset.val;
-            const label = el.dataset.label;
-            tip.innerHTML = `<span style="color:rgba(180,170,160,0.7)">${label}</span><br><span style="color:${col}">${type}</span> <strong style="color:#e8e0d6">${val} min</strong>`;
+        // Tooltip binding
+        svg.querySelectorAll('.s4-vln-hit').forEach(el => {
+          el.addEventListener('mouseenter', e => {
+            tip.innerHTML = [
+              `<span style="color:rgba(180,170,160,0.7);font-size:13px">${el.dataset.label}</span>`,
+              `<span style="color:${col}">median</span> <strong style="color:${col}">${el.dataset.median} min</strong>`,
+              `<span style="color:${col}">min</span> <strong style="color:${col}">${el.dataset.min} min</strong>` +
+                `&nbsp;&nbsp;<span style="color:${col}">max</span> <strong style="color:${col}">${el.dataset.max} min</strong>`,
+              `<span style="color:rgba(140,130,120,0.6);font-size:13px">5th–95th pct: ${el.dataset.p5}–${el.dataset.p95} min</span>`,
+            ].join('<br>');
             tip.style.display = 'block';
           });
-          el.addEventListener('mousemove', (e) => {
+          el.addEventListener('mousemove', e => {
             tip.style.left = (e.clientX + 14) + 'px';
-            tip.style.top  = (e.clientY - 28) + 'px';
+            tip.style.top  = (e.clientY - 50) + 'px';
           });
           el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
         });
       }
 
-      window.updateExplorer = function(clickedBtn) {
+            window.updateExplorer = function(clickedBtn) {
         // Update active button state within its group
         if (clickedBtn) {
           const group = clickedBtn.closest('.s4-ctrl-btns');
@@ -4827,80 +4773,7 @@ const s2StepActions = {
       colHTML('Bottom 5 boroughs', bot5, 'bot');
   })();
 
-  // ── S3 Chart 3 — Schools by admissions policy stacked bar ───────────────────
-  (function() {
-    // Top 10 boroughs by total school count — [name, selective, non-selective]
-    // Replace with real DfE GIAS data
-    const ADMISSIONS_DATA = [
-      { name: 'Barnet',         sel: 4,  non: 24 },
-      { name: 'Croydon',        sel: 1,  non: 22 },
-      { name: 'Hillingdon',     sel: 0,  non: 22 },
-      { name: 'Enfield',        sel: 1,  non: 20 },
-      { name: 'Newham',         sel: 0,  non: 21 },
-      { name: 'Hounslow',       sel: 1,  non: 20 },
-      { name: 'Southward',      sel: 1,  non: 19 },
-      { name: 'Redbridge',      sel: 2,  non: 17 },
-      { name: 'Bromley',        sel: 2,  non: 17 },
-      { name: 'Tower Hamlets',  sel: 0,  non: 18 },
-    ].sort((a,b) => (b.sel + b.non) - (a.sel + a.non));
-
-    const monoFont = { family: "'Roboto Mono'", size: 11 };
-    new Chart(document.getElementById('chart3-admissions'), {
-      type: 'bar',
-      data: {
-        labels: ADMISSIONS_DATA.map(d => d.name),
-        datasets: [
-          {
-            label: 'Non-selective',
-            data: ADMISSIONS_DATA.map(d => d.non),
-            backgroundColor: '#FF9043cc',
-            borderRadius: 3,
-            stack: 'schools'
-          },
-          {
-            label: 'Selective',
-            data: ADMISSIONS_DATA.map(d => d.sel),
-            backgroundColor: 'rgba(180,170,160,0.35)',
-            borderRadius: 3,
-            stack: 'schools'
-          }
-        ]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true, maintainAspectRatio: false,
-        animation: { duration: 900 },
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: { color: '#b8a898', font: monoFont, padding: 14, boxWidth: 10 }
-          },
-          tooltip: {
-            ...CHART_DEFAULTS.plugins.tooltip,
-            callbacks: {
-              title: ctx => ctx[0].label,
-              label: ctx => ` ${ctx.dataset.label}: ${ctx.raw} schools`
-            }
-          }
-        },
-        layout: { padding: { left: 15 } },
-        scales: {
-          x: {
-            stacked: true,
-            ticks: { color: '#d1c0ae', font: monoFont },
-            grid: { color: 'rgba(255,255,255,0.05)' }
-          },
-          y: {
-            stacked: true,
-            ticks: { color: '#d1c0ae', font: monoFont, mirror: false },
-            grid: { display: false }
-          }
-        }
-      }
-    });
-  })();
-
-  // ── S3 Chart 4 — Capacity utilisation top 10 boroughs ───────────────────────
+  // ── S3 Chart 3 (capacity utilisation top 10 boroughs) ───────────────────────
   (function() {
     // % capacity utilisation for non-selective schools — replace with real SCAP 2024 data
     const CAPACITY_DATA = [
@@ -4945,17 +4818,19 @@ const s2StepActions = {
             }
           }
         },
-        layout: { padding: { left: 10 } },
         scales: {
           x: {
-            min: 75, max: 105,
+            min: 85, max: 105,
             ticks: { color: '#d1c0ae', font: monoFont, callback: v => v + '%' },
             grid: { color: 'rgba(255,255,255,0.05)' }
           },
           y: {
             ticks: { color: '#d1c0ae', font: monoFont },
-            grid: { display: false }
-          }
+            grid: { display: false },
+            afterFit(scale) {
+              scale.width = 160;
+            }
+          },
         }
       },
       plugins: [{
@@ -5003,124 +4878,7 @@ const s2StepActions = {
     });
   })();
 
-  // ── S3 Chart 6 — First-choice school % by borough (top 5 / bottom 5) ─────────
-  (function() {
-    const TOP5 = [
-      { name: 'Barking and Dagenham', pct: 88 },
-      { name: 'Waltham Forest',       pct: 84 },
-      { name: 'Haringey',             pct: 79 },
-      { name: 'Enfield',              pct: 78 },
-      { name: 'Hackney',              pct: 77 },
-    ].sort((a,b) => b.pct - a.pct);
-
-    const BOT5 = [
-      { name: 'Greenwich',              pct: 64 },
-      { name: 'Hammersmith and Fulham', pct: 64 },
-      { name: 'Lambeth',               pct: 64 },
-      { name: 'Lewisham',              pct: 64 },
-      { name: 'Wandsworth',            pct: 64 },
-    ].sort((a,b) => b.pct - a.pct);
-
-    // Combine: top5 first, then bottom5 — separator drawn in plugin
-    const ALL    = [...TOP5, ...BOT5];
-    const labels = ALL.map(d => d.name);
-    const values = ALL.map(d => d.pct);
-    const colors = ALL.map((_, i) => i < TOP5.length ? '#FF9043cc' : 'rgba(79,195,247,0.55)');
-    const hcolors= ALL.map((_, i) => i < TOP5.length ? '#FF9043'   : '#4fc3f7');
-
-    const monoFont   = { family: "'Roboto Mono'", size: 10 };
-    const splitIndex = TOP5.length; // index where bottom 5 starts
-
-    new Chart(document.getElementById('chart6-firstchoice'), {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: '% first choice',
-          data: values,
-          backgroundColor: colors,
-          hoverBackgroundColor: hcolors,
-          borderRadius: 3,
-          barThickness: 18,
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true, maintainAspectRatio: false,
-        animation: { duration: 900 },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            ...CHART_DEFAULTS.plugins.tooltip,
-            callbacks: {
-              label: ctx => ` ${ctx.raw}% received 1st choice`
-            }
-          }
-        },
-        layout: { padding: { left: 12 } },
-        scales: {
-          x: {
-            min: 40, max: 100,
-            ticks: { color: '#d1c0ae', font: monoFont, callback: v => v + '%' },
-            grid: { color: 'rgba(255,255,255,0.05)' }
-          },
-          y: {
-            ticks: { color: '#d1c0ae', font: monoFont },
-            grid:  { display: false }
-          }
-        }
-      },
-      plugins: [{
-        id: 'c6-separator',
-        afterDraw(chart) {
-          const xAxis = chart.scales.x;
-          const yAxis = chart.scales.y;
-          const ctx   = chart.ctx;
-          const meta  = chart.getDatasetMeta(0);
-
-          // ── Separator line between top5 and bottom5 ──
-          if (meta.data.length > splitIndex) {
-            const barAbove = meta.data[splitIndex - 1];
-            const barBelow = meta.data[splitIndex];
-            const sepY = (barAbove.y + barAbove.height / 2 + barBelow.y - barBelow.height / 2) / 2;
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(xAxis.left, sepY);
-            ctx.lineTo(xAxis.right, sepY);
-            ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-            ctx.lineWidth   = 1;
-            ctx.setLineDash([4, 4]);
-            ctx.stroke();
-            // Labels either side of line
-            ctx.fillStyle = 'rgba(255,144,67,0.7)';
-            ctx.font = "14px 'Roboto Mono'";
-            ctx.textAlign = 'left';
-            ctx.fillText('TOP 5', xAxis.right - 35, sepY - 5);
-            ctx.fillStyle = 'rgba(79,195,247,0.7)';
-            ctx.fillText('BOTTOM 5', xAxis.right - 60 , sepY + 16);
-            ctx.restore();
-          }
-
-          // ── Inner-end % labels on each bar ──
-          ctx.save();
-          ctx.font = "bold 12px 'Roboto Mono'";
-          ctx.textBaseline = 'middle';
-          meta.data.forEach((bar, i) => {
-            const val    = values[i];
-            const xPx    = xAxis.getPixelForValue(val);
-            const label  = val + '%';
-            const textW  = ctx.measureText(label).width;
-            const xLabel = xPx - textW - 5;
-            ctx.fillStyle = 'rgba(8,12,18,0.9)';
-            ctx.fillText(label, xLabel, bar.y);
-          });
-          ctx.restore();
-        }
-      }]
-    });
-  })();
-
-  // ── S3 Chart 5 — Cross-LA region bars (retained) ────────────────────────────
+  // ── S3 Chart 4 — Cross-LA region bars ───────────────────────────────────────
   const REGION_BARS_DATA = [
     { label: 'London',     val: 19.9, highlight: true },
     { label: 'South East', val: 12.3, highlight: false },
