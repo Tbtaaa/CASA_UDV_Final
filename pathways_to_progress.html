@@ -16,6 +16,8 @@
 
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <!-- Chart.js annotation plugin (for median reference lines) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
 
   <style>
     /* ─────────────────────────────────────────
@@ -428,10 +430,10 @@
       transition: color 0.2s ease, text-decoration-color 0.2s ease;
     }
     .tooltip-term:hover,
-.tooltip-term:active,
-.tooltip-term:focus {
-  color: #FF9043;
-}
+    .tooltip-term:active,
+    .tooltip-term:focus {
+      color: #FF9043;
+    }
     .tooltip-term::after {
       content: attr(data-tooltip);
       position: absolute;
@@ -445,7 +447,7 @@
       border-radius: 6px;
       padding: 10px 12px;
       font-family: var(--font-body);
-      font-size: 14px;
+      font-size: 15px;
       line-height: 1.5;
       text-transform: none;
       letter-spacing: 0;
@@ -1333,7 +1335,31 @@
       flex-direction: column;
       justify-content: center;
     }
-
+    #s5-vulnerability .section-intro-body {
+      max-width: 650px;
+    }
+    #s5-map-overlay {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 50;
+      background: rgba(8,12,18,0.82);
+      border: 0.5px solid rgba(255,144,67,0.22);
+      border-radius: 5px;
+      padding: 10px 16px;
+      pointer-events: none;
+      max-width: 750px;
+      backdrop-filter: blur(4px);
+    }
+    #s5-map-title {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+      color: #FF9043;
+      line-height: 1.45;
+      transition: opacity 0.5s ease;
+    }
     .vuln-stat-block {
       background: var(--bg3);
       border: 0.5px solid var(--border-mid);
@@ -1358,12 +1384,149 @@
       line-height: 1.55;
     }
 
+    /* Hover Overlay - Top Left*/
+    #s5-hover-overlay {
+      position: absolute;
+      top: 72px;
+      left: 16px;
+      z-index: 50;
+      background: rgba(8,12,18,0.88);
+      border: 0.5px solid rgba(255,144,67,0.22);
+      border-radius: 5px;
+      padding: 12px 16px;
+      pointer-events: none;
+      max-width: 650px;
+      backdrop-filter: blur(4px);
+      display: none;
+    }
+
+    #s5-hover-cluster {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    #s5-hover-tt,
+    #s5-hover-idaci {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--text-secondary);
+    }
+
+    #s5-hover-tt {
+      margin-bottom: 4px;
+    }
+
+    /* LISA cluster explorer — s5-1 */
+    .lisa-btn {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1.5px solid var(--cl, #888);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.035em;
+      cursor: pointer;
+      background: transparent;
+      color: var(--cl, #888);
+      transition: background 0.15s, opacity 0.2s;
+      text-align: center;
+      line-height: 1.4;
+      width: 100%;
+    }
+    .lisa-btn:hover { background: rgba(255,255,255,0.06); }
+    .lisa-btn.active { background: rgba(255,255,255,0.1); opacity: 1; }
+    /* Dim unselected buttons when any is active */
+    #lisa-cluster-btns:has(.lisa-btn.active) .lisa-btn:not(.active) {
+      opacity: 0.35;
+    }
+    .lisa-brick {
+      width: 14px;
+      height: 14px;
+      border-radius: 2px;
+      transition: opacity 0.22s;
+    }
+    .lisa-brick.lit  { opacity: 1; }
+    .lisa-brick.dim  { opacity: 0.1; }
+    .lisa-brick.ns   { opacity: 0.25; }
+    .lisa-stat-panel {
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .lisa-stat-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .lisa-stat-val {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 500;
+      line-height: 1;
+      color: var(--accent-red);
+    }
+    .lisa-stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    #lisa-brick-grid {
+      display: grid;
+      grid-template-columns: repeat(20, 15.8px);
+      grid-template-rows: repeat(5, 15.8px);
+      gap: 3px;
+    }
+    #lisa-brick-caption {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    #lisa-pop-num {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 500;
+      line-height: 1;
+    }
+    #lisa-pop-num-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+    }
+    #lisa-pop-pct {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 500;
+      line-height: 1;
+    }
+    #lisa-pop-pct-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    #lisa-cluster-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 16px;
+      margin-bottom: 10px;
+    }
     /* LISA legend swatches */
-    .swatch-hh  { background: var(--accent-red); }
-    .swatch-lh  { background: #ef9a9a; }
-    .swatch-hl  { background: #3d7fc4; }
-    .swatch-ll  { background: #1e3a5f; }
-    .swatch-ns  { background: var(--surface); border: 0.5px solid var(--border); }
+    .swatch-hh  { background: #ff4d4d; }
+    .swatch-lh  { background: #ffb0b0; }
+    .swatch-hl  { background: #47a4ff; }
+    .swatch-ll  { background: #e0fbfc; }
+    .swatch-ns  { background: var(--surface); border: 0.5px solid var(--border);}
 
     /* ─────────────────────────────────────────
     SECTION 6 — REFLECTIONS
@@ -1990,9 +2153,9 @@
           </div>
         </div>
         <div class="region-bars" id="region-bars"><!-- injected by JS --></div>
-        <p style="font-size:13px;color:var(--text-muted);margin-top:8px;line-height:1.4">
+        <p style="font-size:15px;color:var(--text-secondary);margin-top:8px;line-height:1.4">
           London has the highest rate in England — illustrating willingness to travel for
-          opportunity. But how many children have the means to do so?
+          opportunity. But how many children actually have the means to do so?
         </p>
       </div>
     </div>
@@ -2009,10 +2172,15 @@
       <p class="section-label">Access to opportunity</p>
       <h2 class="section-headline">How does travel time change<br>when quality matters?</h2>
       <p class="section-intro-body">
-        We layer <strong style="color:#FF9043">Progress 8 scores</strong> and 
-        <strong style="color:#FF9043">Ofsted ratings</strong> onto the accessibility
-        analysis — and find that filtering for quality significantly extends
-        the journeys many children must make.
+        We layer 
+        <span class="tooltip-term" data-tooltip="Progress 8 measures how much progress students make between primary school and GCSEs. A score above 0 indicates above-average progress.">
+          <strong style="color:#FF9043">Progress 8 scores</strong>
+        </span> 
+        and 
+        <span class="tooltip-term" data-tooltip="Ofsted ratings reflect the scores given by the UK schools inspectorate. An 'Outstanding' rating indicates exceptional quality of teaching, leadership, and student outcomes.">
+          <strong style="color:#FF9043">Ofsted ratings</strong>
+        </span> 
+        onto the accessibility analysis — and find that filtering for quality significantly extends the journeys many children must make.
       </p>
     </div>
 
@@ -2252,9 +2420,14 @@
         <p class="section-label">Pockets of vulnerability</p>
         <h2 class="section-headline">Where deprivation meets<br>long journeys</h2>
         <p class="section-intro-body">
-          Using spatial clustering methods, we identify neighbourhoods where high 
-          transit times to Progress 8 schools coincide with elevated child deprivation — 
-          compounding barriers to opportunity.
+          Using 
+          <span class="tooltip-term" data-tooltip="We use Local Indicators of Spatial Association (LISA) to analyse clusters where areas with high transit times also have high child deprivation (hotspots), alongside areas with low transit times and low child deprivation (coldspots) that illustrate unequal transport accessibility.">
+            spatial clustering methods
+          </span>, 
+          we identify neighbourhoods where high transit times to Progress 8 schools coincide with  
+          <span class="tooltip-term" data-tooltip="We use the Income Deprivation Affecting Children Index (IDACI) which measures the proportion of children under 16 living in income-deprived households, indicating relative levels of child poverty.">
+            elevated child deprivation
+          </span> — compounding barriers to opportunity.
         </p>
       </div>
 
@@ -2274,84 +2447,184 @@
     <div class="sticky-section" id="s5-map-start">
       <div class="sticky-map-col">
         <div id="s5-map" class="map-canvas"></div>
+
+        <!-- Map title overlay — updated per scroll step -->
+        <div id="s5-map-overlay">
+          <div id="s5-map-title">Clustering by Transit Time to P8 Schools and Deprivation</div>
+        </div>
+
+        <!-- Hover info overlay — anchored top-left, shown on mouseover -->
+        <div id="s5-hover-overlay">
+          <div id="s5-hover-cluster"></div>
+          <div id="s5-hover-tt"></div>
+          <div id="s5-hover-idaci"></div>
+        </div>
+
         <div class="map-legend">
           <div class="map-legend-title">LISA cluster type</div>
-          <div class="legend-row"><div class="legend-swatch swatch-hh"></div><span>High–High (vulnerable)</span></div>
-          <div class="legend-row"><div class="legend-swatch swatch-lh"></div><span>Low–High</span></div>
-          <div class="legend-row"><div class="legend-swatch swatch-hl"></div><span>High–Low</span></div>
-          <div class="legend-row"><div class="legend-swatch swatch-ll"></div><span>Low–Low</span></div>
-          <div class="legend-row"><div class="legend-swatch swatch-ns"></div><span>Not significant</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ff4d4d"></div><span>High–High (vulnerable)</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#ffb0b0"></div><span>Low–High</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#47a4ff"></div><span>High–Low</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#e0fbfc"></div><span>Low–Low</span></div>
+          <div class="legend-row"><div class="legend-swatch" style="background:#252736;border:0.5px solid rgba(255,255,255,0.12)"></div><span>Not significant</span></div>
         </div>
       </div>
 
       <div class="scroll-narrative-col">
-        <!-- Step 1 — clusters appear -->
+
+        <!-- Step 1 — Spatial clustering -->
         <div class="scroll-step active" data-step="s5-0">
           <p class="step-index">01 — Spatial clustering</p>
-          <h3 class="step-heading">Identifying pockets of compounded disadvantage</h3>
+          <h3 class="step-heading">Pockets of compounded disadvantage exist across London</h3>
           <div class="step-body">
             <p>
-              LISA clustering reveals LSOAs where high transit times to P8 schools
-              are spatially concentrated alongside high levels of child deprivation.
-              These High–High clusters represent neighbourhoods where the challenge
-              is greatest.
+              In outer London — east, north-east, and north-west — children face 
+              <strong style="color:#ff4d4d; font-weight: 700;">both high transit times and high deprivation</strong> 
+              , a double penalty where geography compounds disadvantage.
+              <br>
+              <br>
             </p>
             <p>
-              Red areas on the map mark these pockets. They are not random —
-              they cluster in specific outer-London corridors.
+              In contrast, west and south-west London shows 
+              <strong style="color:#e0fbfc; font-weight: 700;">short commutes with low deprivation</strong> 
+              reinforcing one another — families live on the doorstep of the city's best 
+              schools, underwritten by suburban affluence and car ownership.
+              <br>
+              <br>
             </p>
+            <p>
+              Most strikingly in inner east London, we unexpectedly find 
+              <strong style="color:#ffb0b0; font-weight: 700;">fast access and high deprivation</strong>. 
+              If students here are still falling behind, the barrier likely isn't transport — 
+              it's likely social, administrative, or admission-based.
+              <br>
+              <br>
+            </p>
+          </div>
+          <div class="step-instructions">
+            Red clusters mark where disadvantage is compounded. Hover over clusters to view details. 
           </div>
         </div>
 
-        <!-- Step 2 — 20% stat -->
+        <!-- Step 2 — Scale -->
         <div class="scroll-step" data-step="s5-1">
-          <p class="step-index">02 — Scale of the problem</p>
-          <h3 class="step-heading">1 in 5 school-age children live in these neighbourhoods</h3>
+          <p class="step-index">02 — Cluster Deep Dive</p>
+          <h3 class="step-heading">1 in 10 children live in areas with high transit times and high deprivation</h3>
+          <div class="step-body" style="font-size:17px;color:var(--text-secondary);line-height:1.65"  >
+            <p>Toggle the buttons below to explore how many children live in each cluster and how access to quality schools looks like.</p>
+          </div>
+
+          <!-- Cluster selector buttons -->
+          <div id="lisa-cluster-btns">
+            <button class="lisa-btn active" data-cluster="High-High" style="--cl:#ff5f5f">High Transit Times &amp; High Deprivation</button>
+            <button class="lisa-btn" data-cluster="Low-High"  style="--cl:#ffb0b0">Low Transit Times &amp; High Deprivation</button>
+            <button class="lisa-btn" data-cluster="High-Low"  style="--cl:#47a4ff">High Transit Times &amp; Low Deprivation</button>
+            <button class="lisa-btn" data-cluster="Low-Low"   style="--cl:#e0fbfc">Low Transit Times &amp; Low Deprivation</button>
+          </div>
+
+          <!-- Brick grid + population callout -->
+          <div style="display:flex; align-items:flex-start; gap:16px; margin-top:20px;">
+            <div>
+              <div id="lisa-brick-grid"></div>
+              <p id="lisa-brick-caption">Each square ≈ 1% of all London 11–16 children</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <div id="lisa-pop-num" style="color:#ff4d4d">65,002</div>
+              <div id="lisa-pop-num-label">children</div>
+              <div id="lisa-pop-pct" style="color:#ff4d4d; margin-top:2px">10.0%</div>
+              <div id="lisa-pop-pct-label">of children in London aged 11–16</div>
+            </div>
+          </div>
+
+          <!-- Four stat panels -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;">
+
+            <div class="lisa-stat-panel">
+              <div class="lisa-stat-label">IDACI score</div>
+              <div class="lisa-stat-val" id="ls-idaci" style="color:#ff5f5f">0.619</div>
+              <div class="lisa-stat-sub" id="ls-idaci-sub" style="color:var(--text-secondary)">London median: 0.42</div>
+            </div>
+
+            <div class="lisa-stat-panel">
+              <div class="lisa-stat-label">Transit → top P8 school</div>
+              <div style="display:flex;align-items:baseline;gap:6px">
+                <span class="lisa-stat-val" id="ls-tt">32</span>
+                <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">min</span>
+              </div>
+              <div class="lisa-stat-sub" id="ls-tt-sub" style="color:var(--text-secondary)"><span style="color:#ff4d4d">+7 min</span> vs London median (25)</div>
+            </div>
+
+            <div class="lisa-stat-panel">
+              <div class="lisa-stat-label">Walk → top P8 school</div>
+              <div style="display:flex;align-items:baseline;gap:6px">
+                <span class="lisa-stat-val" id="ls-walk">—</span>
+                <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">min</span>
+              </div>
+              <div class="lisa-stat-sub" id="ls-walk-sub" style="color:var(--text-secondary)">London median: —</div>
+            </div>
+
+            <div class="lisa-stat-panel">
+              <div class="lisa-stat-label">Drive → top P8 school</div>
+              <div style="display:flex;align-items:baseline;gap:6px">
+                <span class="lisa-stat-val" id="ls-car">9</span>
+                <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">min</span>
+              </div>
+              <div class="lisa-stat-sub" id="ls-car-sub" style="color:var(--text-secondary)"><span style="color:#ff5f5f">+2 min</span> vs London median (7)</div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Step 3 — Income -->
+        <div class="scroll-step" data-step="s5-2">
+          <p class="step-index">03 — Income Context</p>
+          <h3 class="step-heading">Lower incomes limit the ability to overcome access differences in these areas</h3>
           <div class="step-body">
-            <p>Across London's High–High LISA clusters:</p>
+            <p>On average, households in areas with <strong style="color:var(--accent-red)">High Transit Times and High Deprivation</strong> earn 25% less than the London average.</p>
           </div>
-          <div class="vuln-stat-block">
-            <div class="vuln-stat-num" id="vuln-counter">0%</div>
-            <div class="vuln-stat-desc">
-              of London school-children live in LSOAs where both
-              transit time to a P8 school and child deprivation
-              are above the London median.
-            </div>
+
+          <!-- Income bar chart -->
+          <div style="position:relative;height:220px;margin-top:16px;">
+            <canvas id="s5-income-chart"></canvas>
           </div>
-          <div class="vuln-stat-block" style="margin-top:12px;border-color:rgba(255,179,71,0.3)">
-            <div class="vuln-stat-num" style="color:#FF9043;font-size:32px">
-              <span class="chart-placeholder" style="height:80px;font-size:13px">Median travel time in HH clusters<br>PLACEHOLDER — data pending</span>
-            </div>
-          </div>
-          <div style="margin-top:16px">
-            <canvas id="chart8-cluster-compare" style="max-height:140px"></canvas>
+          <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:10px;margin-bottom:20px;line-height:1.5;">Median annual household income after housing costs, aggregated by LISA cluster.</p>
+
+          <div class="step-body" style="margin-top:16px;">
+            <p>This material difference affects families' ability to manage longer commutes. Lower-income households are less able to rely on private transport or widen their school choices, making them more dependent on public transit.</p>
+            <p style="margin-top:12px">These children face a compounded challenge: longer travel times combined with fewer resources to mitigate them.</p>
           </div>
         </div>
 
-        <!-- Step 3 — income -->
-        <div class="scroll-step" data-step="s5-2">
-          <p class="step-index">03 — Income context</p>
-          <h3 class="step-heading">With incomes below the London average by up to 20%</h3>
+        <!-- Step 4 — Borough patterns -->
+        <div class="scroll-step" data-step="s5-3">
+          <p class="step-index">04 — Borough patterns</p>
+          <h3 class="step-heading">Borough-level patterns highlight where action is most needed</h3>
           <div class="step-body">
             <p>
-              Households in these cluster LSOAs have median incomes approximately
-              <strong style="color:var(--accent-red)">30% below the London average</strong>.
+              The concentration of high-disadvantage neighbourhoods is not evenly spread.
+              Boroughs such as <strong style="color:var(--accent-red)">Newham</strong>,
+              <strong style="color:var(--accent-red)">Enfield</strong>, and
+              <strong style="color:var(--accent-red)">Islington</strong> contain
+              the highest shares of affected LSOAs.
             </p>
-            <p>
-              This makes car ownership — which would substantially cut travel times —
-              or use of faster rail services financially inaccessible for many families.
-              These children are reliant on a transit system that, in these corridors,
-              leaves them furthest from opportunity.
-            </p>
-          </div>
-          <div style="margin-top:20px">
-            <div class="chart-card-label">Chart 10 — LSOA scatter: IMD vs P8 transit time</div>
-            <div class="chart-placeholder" style="height:180px;margin-top:8px">
-              Scatter plot — IMD deprivation score vs median P8 transit time<br>
-              PLACEHOLDER — awaiting final LISA + STATS19 merged dataset
+            <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+              <div class="vuln-stat-block" style="align-items:flex-start;flex-direction:column;gap:6px">
+                <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted)">Outer boroughs</div>
+                <div class="vuln-stat-desc">The issue is primarily <strong>structural</strong> — weaker transport links increase travel times across entire areas.</div>
+              </div>
+              <div class="vuln-stat-block" style="align-items:flex-start;flex-direction:column;gap:6px">
+                <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted)">Inner boroughs (e.g. Islington)</div>
+                <div class="vuln-stat-desc">Pockets of deprivation <strong>persist despite strong overall accessibility</strong> — highlighting inequalities within well-connected areas.</div>
+              </div>
             </div>
+            <p style="margin-top:14px;font-style:italic;color:var(--text-muted);font-size:17px">
+              → Policy responses need to be place-specific: transport improvements in outer London,
+              targeted support and school access strategies in inner-city areas.
+            </p>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -2583,10 +2856,10 @@
   ];
   const LISA_COLOR_EXPR = [
     'match', ['get', 'cluster_type'],
-    'HH', '#ef5350',
-    'LH', '#ef9a9a',
-    'HL', '#3d7fc4',
-    'LL', '#1e3a5f',
+    'HH', '#ff4d4d',
+    'LH', '#ffb0b0',
+    'HL', '#47a4ff',
+    'LL', '#e0fbfc',
     '#1a2236'
   ];
 
@@ -4560,44 +4833,366 @@ const s2StepActions = {
   /* ─────────────────────────────────────────
      MAP 5 — VULNERABILITY (LISA clusters)
   ───────────────────────────────────────── */
-  const s5Map = initMap('s5-map', { zoom: 9.25, extra: { minZoom: 9 } });
+  const s5Map = initMap('s5-map', { zoom: 9.25, extra: { minZoom: 9.25 } });
+
+  const S5_CLUSTER_COLORS = {
+    'High-High': '#ff4d4d',
+    'Low-High':  '#ffb0b0',
+    'Low-Low':   '#e0fbfc',
+    'High-Low':  '#47a4ff',
+  };
+
+  const S5_LISA_COLOR_EXPR = [
+    'match', ['get', 'lisa_cluster'],
+    'High-High', '#ff4d4d',
+    'Low-High',  '#ffb0b0',
+    'Low-Low',   '#e0fbfc',
+    'High-Low',  '#47a4ff',
+    '#252736'
+  ];
+
+  const S5_MAP_TITLES = {
+    's5-0': 'Clustering by Transit Time to P8 Schools and Deprivation',
+    's5-1': 'Population and Composition of Clusters',
+    's5-2': 'Income Composition of Clusters',
+    's5-3': 'Borough Summary — % of LSOAs in High–High Clusters',
+  };
+
+  const S5_CLUSTER_SHORT = {
+    'High-High': 'High Transit Time & High Deprivation',
+    'Low-High':  'Low Transit Time & High Deprivation',
+    'High-Low':  'High Transit Time & Low Deprivation',
+    'Low-Low':   'Low Transit Time & Low Deprivation',
+  };
+
+  function s5SetTitle(stepId, cluster) {
+    const el = document.getElementById('s5-map-title');
+    if (!el) return;
+    const base = S5_MAP_TITLES[stepId];
+    if (!base) return;
+    if (cluster && stepId === 's5-1') {
+      el.textContent = 'Composition of Clusters — ' + (S5_CLUSTER_SHORT[cluster] || cluster);
+    } else if (cluster && stepId === 's5-2') {
+      el.textContent = 'Income of Clusters — ' + (S5_CLUSTER_SHORT[cluster] || cluster);
+    } else {
+      el.textContent = base;
+    }
+  }
+  const S5_FILL_OPACITY_DEFAULT = [
+    'case',
+    ['==', ['get', 'lisa_cluster'], 'Not Significant'], 0.35,
+    0.82
+  ];
+
   if (s5Map) {
     s5Map.on('load', () => {
-      s5Map.addSource('lisa', { type: 'geojson', data: DATA.lsoa_lisa });
-      s5Map.addLayer({
-        id: 'lisa-fill',
-        type: 'fill',
-        source: 'lisa',
-        paint: {
-          'fill-color': LISA_COLOR_EXPR,
-          'fill-opacity': 0.8,
-          'fill-outline-color': 'rgba(0,0,0,0.15)'
+
+      /* ── 1. Darken basemap ───────────────────────────────────────── */
+      s5Map.setPaintProperty('land', 'background-color', '#171717');
+      s5Map.setPaintProperty('landuse', 'fill-color', '#171717');
+      s5Map.setPaintProperty('landuse', 'fill-opacity', 0.9);
+      s5Map.setPaintProperty('national-park', 'fill-color', '#1c1c1c');
+      s5Map.setPaintProperty('national-park', 'fill-opacity', 0.9);
+      s5Map.setPaintProperty('road-simple', 'line-color', '#2a2a2a');
+      s5Map.setPaintProperty('water', 'fill-color', '#080808');
+
+      /* ── 2. Labels ───────────────────────────────────────────────── */
+      ['settlement-label','settlement-major-label','settlement-minor-label','state-label','country-label'].forEach(id => {
+        if (s5Map.getLayer(id)) {
+          s5Map.setPaintProperty(id, 'text-color', '#FFFFFF');
+          s5Map.setPaintProperty(id, 'text-halo-color', '#000000');
+          s5Map.setPaintProperty(id, 'text-halo-width', 1.7);
+          s5Map.setPaintProperty(id, 'text-halo-blur', 0.2);
         }
       });
-      // Tooltip
-      const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
-      s5Map.on('mousemove', 'lisa-fill', e => {
+      ['settlement-subdivision-label','poi-label','airport-label'].forEach(id => {
+        if (s5Map.getLayer(id)) s5Map.setLayoutProperty(id, 'visibility', 'none');
+      });
+
+      /* ── 3. LISA fill ────────────────────────────────────────────── */
+      s5Map.addSource('s5-lisa', { type: 'vector', url: 'mapbox://teechinminben.89a3a4oi' });
+      s5Map.addLayer({
+        id: 's5-lisa-fill',
+        type: 'fill',
+        source: 's5-lisa',
+        'source-layer': 'lisa_clusters',
+        paint: {
+          'fill-color': S5_LISA_COLOR_EXPR,
+          'fill-opacity': S5_FILL_OPACITY_DEFAULT
+        }
+      }, 'waterway-label');
+
+      /* ── 4. LISA outline (cluster-select driven) ─────────────────── */
+      s5Map.addSource('s5-lisa-outline', { type: 'vector', url: 'mapbox://teechinminben.cslr398j' });
+      s5Map.addLayer({
+        id: 's5-lisa-outline',
+        type: 'line',
+        source: 's5-lisa-outline',
+        'source-layer': 'lisa_clusters_outline',
+        paint: {
+          'line-color': '#FFFFFF',
+          'line-width': 1.8,
+          'line-opacity': 0
+        }
+      }, 'waterway-label');
+
+      /* ── 4b. Hover outline (mouseover driven, same source) ───────── */
+      s5Map.addLayer({
+        id: 's5-lisa-hover-outline',
+        type: 'line',
+        source: 's5-lisa-outline',
+        'source-layer': 'lisa_clusters_outline',
+        paint: {
+          'line-color': '#FFFFFF',
+          'line-width': 2.0,
+          'line-opacity': 0,
+          'line-blur': 0.5
+        }
+      });
+
+      /* ── 5. Borough boundaries ───────────────────────────────────── */
+      s5Map.addSource('s5-la', { type: 'vector', url: 'mapbox://teechinminben.8wonydq8' });
+      s5Map.addLayer({
+        id: 's5-la-boundaries',
+        type: 'line',
+        source: 's5-la',
+        'source-layer': 'LAD_Simplified-9zfv2n',
+        paint: {
+          'line-color': '#a4a2a2',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.7, 12, 1.5],
+          'line-opacity': 0.8
+        }
+      }, 'waterway-label');
+
+      /* ── 6. Top 25% P8 schools (commented out — enable when needed) ─
+      s5Map.addSource('s5-schools', {
+        type: 'vector',
+        url: 'mapbox://teechinminben.ch76fhhr',
+        promoteId: { 'London_secondary_schools-bricou': 'establishment_name' }
+      });
+      s5Map.addLayer({
+        id: 's5-schools-dots',
+        type: 'circle',
+        source: 's5-schools',
+        'source-layer': 'London_secondary_schools-bricou',
+        filter: ['all', ['==', 'top_p8_quartile_GLA', true], ['==', 'admissions_policy', 'Non-selective']],
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 2, 12, 6],
+          'circle-color': '#A33A14',
+          'circle-opacity': 0.9,
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': '#ffffff',
+          'circle-stroke-opacity': 0.9
+        }
+      });
+      ── end schools layer ─────────────────────────────────────────── */
+
+      /* ── 7. Hover overlay — anchored top-left, no popup ─────────── */
+      const S5_CLUSTER_LABELS = {
+        'High-High': 'High Transit Times &amp; High Deprivation',
+        'Low-High':  'Low Transit Times &amp; High Deprivation',
+        'High-Low':  'High Transit Times &amp; Low Deprivation',
+        'Low-Low':   'Low Transit Times &amp; Low Deprivation',
+      };
+      const S5_CLUSTER_STATS = {
+        'High-High': { tt: 32, idaci: 0.619 },
+        'Low-High':  { tt: 19, idaci: 0.614 },
+        'High-Low':  { tt: 34, idaci: 0.155 },
+        'Low-Low':   { tt: 20, idaci: 0.161 },
+      };
+
+      const s5HoverEl     = document.getElementById('s5-hover-overlay');
+      const s5HoverCluster = document.getElementById('s5-hover-cluster');
+      const s5HoverTt     = document.getElementById('s5-hover-tt');
+      const s5HoverIdaci  = document.getElementById('s5-hover-idaci');
+      let s5HoveredCluster = null;
+
+      let s5HoverEnabled = true;
+
+      s5Map.on('mousemove', 's5-lisa-fill', e => {
+        if (s5MapMode === 'borough') return;
+        const cluster = e.features[0].properties.lisa_cluster || '';
+        if (!cluster || cluster === 'Not Significant') {
+          s5Map.getCanvas().style.cursor = '';
+          if (s5HoverEl) s5HoverEl.style.display = 'none';
+          if (s5Map.getLayer('s5-lisa-hover-outline') && s5HoveredCluster) {
+            s5Map.setPaintProperty('s5-lisa-hover-outline', 'line-opacity', 0);
+          }
+          s5HoveredCluster = null;
+          return;
+        }
+
+        /* In s5-1/s5-2: show pointer cursor for click affordance but no overlay or outline */
+        if (!s5HoverEnabled) {
+          s5Map.getCanvas().style.cursor = 'pointer';
+          return;
+        }
+
         s5Map.getCanvas().style.cursor = 'pointer';
-        const p = e.features[0].properties;
-        popup.setLngLat(e.lngLat)
-          .setHTML(`<div style="font-family:'Roboto Mono',monospace;font-size:12px;color:#f0ece4;background:#0e1420;padding:8px 10px;border-radius:4px;border:0.5px solid rgba(255,144,67,0.3)">
-            <strong style="color:#FF9043">${p.lsoa_name || p.LSOA21NM || 'LSOA'}</strong><br>
-            Cluster: ${p.cluster_type}<br>
-            P8 time: ${p.travel_min ? p.travel_min + ' min' : '—'}
-          </div>`)
-          .addTo(s5Map);
+        const col   = S5_CLUSTER_COLORS[cluster] || '#aaa';
+        const stats = S5_CLUSTER_STATS[cluster] || {};
+
+        if (cluster !== s5HoveredCluster) {
+          s5HoveredCluster = cluster;
+          if (s5Map.getLayer('s5-lisa-hover-outline')) {
+            s5Map.setFilter('s5-lisa-hover-outline', ['==', ['get', 'lisa_cluster'], cluster]);
+            s5Map.setPaintProperty('s5-lisa-hover-outline', 'line-opacity', 1);
+          }
+        }
+
+        if (s5HoverEl && s5HoverCluster) {
+          s5HoverCluster.innerHTML   = S5_CLUSTER_LABELS[cluster] || cluster;
+          s5HoverCluster.style.color = col;
+          s5HoverTt.textContent      = '~' + stats.tt + ' min transit time to nearest P8 school';
+          s5HoverIdaci.textContent   = stats.idaci.toFixed(3) + ' IDACI score (higher = more deprived)';
+          s5HoverEl.style.display    = 'block';
+        }
       });
-      s5Map.on('mouseleave', 'lisa-fill', () => {
+
+      s5Map.on('mouseleave', 's5-lisa-fill', () => {
+        if (s5MapMode === 'borough') return;
         s5Map.getCanvas().style.cursor = '';
-        popup.remove();
+        s5HoveredCluster = null;
+        if (s5HoverEl) s5HoverEl.style.display = 'none';
+        if (s5Map.getLayer('s5-lisa-hover-outline')) {
+          s5Map.setPaintProperty('s5-lisa-hover-outline', 'line-opacity', 0);
+        }
       });
+
+      /* ── 8. Cluster highlight function (button-driven) ───────────── */
+      window.s5HighlightCluster = function(cluster) {
+        if (!s5Map.getLayer('s5-lisa-outline')) return;
+        if (cluster) {
+          s5Map.setFilter('s5-lisa-outline', ['==', ['get', 'lisa_cluster'], cluster]);
+          s5Map.setPaintProperty('s5-lisa-outline', 'line-opacity', 1);
+          s5Map.setPaintProperty('s5-lisa-fill', 'fill-opacity', [
+            'case',
+            ['==', ['get', 'lisa_cluster'], cluster], 0.9,
+            ['==', ['get', 'lisa_cluster'], 'Not Significant'], 0.15,
+            0.2
+          ]);
+        } else {
+          s5Map.setPaintProperty('s5-lisa-outline', 'line-opacity', 0);
+          s5Map.setPaintProperty('s5-lisa-fill', 'fill-opacity', S5_FILL_OPACITY_DEFAULT);
+        }
+      };
+
+      /* ── 9. Map click — select/deselect in s5-1 and s5-2 only ────── */
+      s5Map.on('click', 's5-lisa-fill', e => {
+        if (s5MapMode !== 'cluster') return;
+        if (s5HoverEnabled) return;  /* s5-0: no click selection, hover does the job */
+        const cluster = e.features[0]?.properties?.lisa_cluster;
+        if (!cluster || cluster === 'Not Significant') return;
+        if (window.s5SelectCluster) window.s5SelectCluster(cluster);
+      });
+
+      /* Expose flag so step actions can toggle hover+overlay together */
+      window.s5SetHoverEnabled = function(val) { s5HoverEnabled = val; };
+
+      /* ── 10. Borough hover layers (used in s5-3) ─────────────────── */
+      s5Map.addSource('s5-borough-src', { type: 'vector', url: 'mapbox://teechinminben.8wonydq8' });
+      s5Map.addLayer({
+        id: 's5-borough-hit',
+        type: 'fill',
+        source: 's5-borough-src',
+        'source-layer': 'LAD_Simplified-9zfv2n',
+        paint: { 'fill-color': '#000000', 'fill-opacity': 0 },
+        layout: { visibility: 'none' }
+      });
+      s5Map.addLayer({
+        id: 's5-borough-highlight',
+        type: 'line',
+        source: 's5-borough-src',
+        'source-layer': 'LAD_Simplified-9zfv2n',
+        paint: { 'line-color': '#ffffff', 'line-width': 3, 'line-opacity': 0 },
+        layout: { visibility: 'none' }
+      });
+
+      const s5BoroughHoverEl = document.getElementById('s5-hover-overlay');
+      const s5BoroughClusterEl = document.getElementById('s5-hover-cluster');
+      const s5BoroughTtEl = document.getElementById('s5-hover-tt');
+      const s5BoroughIdaciEl = document.getElementById('s5-hover-idaci');
+
+      s5Map.on('mousemove', 's5-borough-hit', e => {
+        if (s5MapMode !== 'borough') return;
+        const name = e.features[0]?.properties?.LAD25NM || e.features[0]?.properties?.LAD22NM || '';
+        if (!name) return;
+        s5Map.getCanvas().style.cursor = 'pointer';
+        s5Map.setPaintProperty('s5-borough-highlight', 'line-opacity',
+          ['case', ['==', ['get', 'LAD25NM'], name], 1, 0]
+        );
+        if (s5BoroughHoverEl && s5BoroughClusterEl) {
+          s5BoroughClusterEl.textContent = name;
+          s5BoroughClusterEl.style.color = '#FF9043';
+          if (s5BoroughTtEl) s5BoroughTtEl.textContent = '';
+          if (s5BoroughIdaciEl) s5BoroughIdaciEl.textContent = '';
+          s5BoroughHoverEl.style.display = 'block';
+        }
+      });
+      s5Map.on('mouseleave', 's5-borough-hit', () => {
+        if (s5MapMode !== 'borough') return;
+        s5Map.getCanvas().style.cursor = '';
+        s5Map.setPaintProperty('s5-borough-highlight', 'line-opacity', 0);
+        if (s5BoroughHoverEl) s5BoroughHoverEl.style.display = 'none';
+      });
+
+      /* NOTE: button click wiring is handled in initLisaExplorer */
     });
   }
 
+  /* Track which interaction mode s5 map is in */
+  let s5MapMode = 'cluster'; /* 'cluster' | 'borough' */
+
+  function s5EnterClusterMode(enableHover) {
+    s5MapMode = 'cluster';
+    if (window.s5SetHoverEnabled) window.s5SetHoverEnabled(!!enableHover);
+    if (!s5Map) return;
+    if (s5Map.getLayer('s5-borough-hit'))       s5Map.setLayoutProperty('s5-borough-hit',       'visibility', 'none');
+    if (s5Map.getLayer('s5-borough-highlight'))  s5Map.setLayoutProperty('s5-borough-highlight',  'visibility', 'none');
+    if (s5Map.getLayer('s5-lisa-fill'))          s5Map.setLayoutProperty('s5-lisa-fill',          'visibility', 'visible');
+    if (s5Map.getLayer('s5-lisa-hover-outline')) {
+      s5Map.setLayoutProperty('s5-lisa-hover-outline', 'visibility', enableHover ? 'visible' : 'none');
+    }
+    const s5HoverEl = document.getElementById('s5-hover-overlay');
+    if (s5HoverEl) s5HoverEl.style.display = 'none';
+  }
+
+  function s5EnterBoroughMode() {
+    s5MapMode = 'borough';
+    if (!s5Map) return;
+    if (window.s5HighlightCluster) window.s5HighlightCluster(null);
+    if (window.s5SelectCluster) window.s5SelectCluster(null);
+    if (s5Map.getLayer('s5-lisa-hover-outline')) s5Map.setLayoutProperty('s5-lisa-hover-outline', 'visibility', 'none');
+    if (s5Map.getLayer('s5-borough-hit'))        s5Map.setLayoutProperty('s5-borough-hit',        'visibility', 'visible');
+    if (s5Map.getLayer('s5-borough-highlight'))  s5Map.setLayoutProperty('s5-borough-highlight',   'visibility', 'visible');
+  }
+
+  /* Track current s5 step so title updates are always correct */
+  let s5CurrentStep = 's5-0';
+
   const s5StepActions = {
-    's5-0': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, extra: { minZoom: 9 }, center: [-0.12, 51.50], pitch: 0 }); },
-    's5-1': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, extra: { minZoom: 9 }, center: [-0.05, 51.47], pitch: 20 }); },
-    's5-2': () => { if (s5Map) s5Map.easeTo({ zoom: 9.25, extra: { minZoom: 9 }, center: [-0.15, 51.52], pitch: 15 }); }
+    's5-0': () => {
+      s5CurrentStep = 's5-0';
+      s5SetTitle('s5-0');
+      s5EnterClusterMode(true);
+      if (window.s5SelectCluster) window.s5SelectCluster(null);
+    },
+    's5-1': () => {
+      s5CurrentStep = 's5-1';
+      s5EnterClusterMode(false);
+      if (window.s5SelectCluster) window.s5SelectCluster('High-High', true);
+    },
+    's5-2': () => {
+      s5CurrentStep = 's5-2';
+      s5EnterClusterMode(false);
+      if (typeof initS5IncomeChart === 'function') initS5IncomeChart();
+      if (window.s5SelectCluster) window.s5SelectCluster('High-High', true);
+    },
+    's5-3': () => {
+      s5CurrentStep = 's5-3';
+      s5SetTitle('s5-3');
+      s5EnterBoroughMode();
+    },
   };
 
   /* ─────────────────────────────────────────
@@ -4941,6 +5536,266 @@ const s2StepActions = {
       }
     }
   });
+
+  /* ─────────────────────────────────────────
+     S5-2 INCOME BAR CHART
+  ───────────────────────────────────────── */
+  const S5_INCOME_DATA = [
+    { cluster: 'High-High', label: 'High TT\nHigh Dep', income: 32600, color: '#ff4d4d' },
+    { cluster: 'Low-High',  label: 'Low TT\nHigh Dep',  income: 33400, color: '#ffb0b0' },
+    { cluster: 'High-Low',  label: 'High TT\nLow Dep',  income: 48200, color: '#47a4ff' },
+    { cluster: 'Low-Low',   label: 'Low TT\nLow Dep',   income: 49300, color: '#e0fbfc' },
+  ];
+  const S5_LONDON_MEDIAN_INCOME = 40700;
+  let s5IncomeChart = null;
+
+  function initS5IncomeChart() {
+    const canvas = document.getElementById('s5-income-chart');
+    if (!canvas) return;
+    if (s5IncomeChart) { s5IncomeChart.destroy(); s5IncomeChart = null; }
+
+    const labels  = S5_INCOME_DATA.map(d => d.label);
+    const values  = S5_INCOME_DATA.map(d => d.income);
+    const colours = S5_INCOME_DATA.map(d => d.color + '55');
+
+    /* Custom plugin: draw £value labels above each bar */
+    const valueLabelPlugin = {
+      id: 's5BarLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx, data, scales: { x, y } } = chart;
+        const ds = chart.getDatasetMeta(0);
+        ds.data.forEach((bar, i) => {
+          const val = data.datasets[0].data[i];
+          const bgCol = data.datasets[0].backgroundColor[i];
+          /* Determine opacity from alpha — dim bars get muted text */
+          const isDim = bgCol && bgCol.endsWith('22');
+          ctx.save();
+          ctx.font = "700 16px 'Roboto Mono', monospace";
+          ctx.fillStyle = isDim ? 'rgba(131,110,90,0.5)' : S5_INCOME_DATA[i].color;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText('£' + (val / 1000).toFixed(1) + 'k', bar.x, bar.y - 4);
+          ctx.restore();
+        });
+      }
+    };
+
+    s5IncomeChart = new Chart(canvas, {
+      type: 'bar',
+      plugins: [valueLabelPlugin],
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colours,
+          borderColor: S5_INCOME_DATA.map(d => d.color),
+          borderWidth: 1.5,
+          borderRadius: 4,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 400 },
+        layout: { padding: { top: 28 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0e1420',
+            borderColor: 'rgba(255,144,67,0.25)',
+            borderWidth: 1,
+            titleColor: '#f0ece4',
+            bodyColor: '#b8a898',
+            padding: 10,
+            titleFont: { family: "'Roboto Mono'", size: 13 },
+            bodyFont:  { family: "'Roboto Mono'", size: 13 },
+            callbacks: { label: ctx => '£' + ctx.parsed.y.toLocaleString() + ' /yr' }
+          },
+          annotation: {
+            annotations: {
+              medianLine: {
+                type: 'line',
+                yMin: S5_LONDON_MEDIAN_INCOME,
+                yMax: S5_LONDON_MEDIAN_INCOME,
+                borderColor: '#FF9043',
+                borderWidth: 1.5,
+                borderDash: [5, 4],
+                label: {
+                  display: true,
+                  content: 'London median  £' + S5_LONDON_MEDIAN_INCOME.toLocaleString(),
+                  position: 'end',
+                  backgroundColor: 'rgba(8,12,18,0.9)',
+                  color: '#FF9043',
+                  font: { family: "'Roboto Mono'", size: 12, weight: '500' },
+                  padding: { x: 8, y: 4 }
+                }
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#d1c0ae',
+              font: { family: "'Roboto Mono'", size: 12 },
+              maxRotation: 0
+            },
+            grid: { display: false }
+          },
+          y: {
+            min: 20000,
+            ticks: {
+              color: '#d1c0ae',
+              font: { family: "'Roboto Mono'", size: 12 },
+              callback: v => '£' + (v / 1000).toFixed(0) + 'k'
+            },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          }
+        }
+      }
+    });
+  }
+
+  function s5UpdateIncomeChart(activeCluster) {
+    if (!s5IncomeChart) return;
+    s5IncomeChart.data.datasets[0].backgroundColor = S5_INCOME_DATA.map(d =>
+      !activeCluster || d.cluster === activeCluster ? d.color + 'cc' : d.color + '22'
+    );
+    s5IncomeChart.update('active');
+  }
+
+  /* ─────────────────────────────────────────
+     S5-1 LISA CLUSTER EXPLORER
+  ───────────────────────────────────────── */
+  (function initLisaExplorer() {
+    let activeCluster = null;
+
+    const LONDON_TOTAL = 649434;
+    const BRICKS = 100;
+    const CLUSTER_DATA = {
+      'High-High':       { pop: 65002,  color: '#ff4d4d', idaci: 0.619, tt: 32, walk: 86, car: 9 },
+      'Low-High':        { pop: 98655,  color: '#ffb0b0', idaci: 0.614, tt: 19, walk: 63, car: 6 },
+      'Low-Low':         { pop: 76512,  color: '#e0fbfc', idaci: 0.161, tt: 20, walk: 58, car: 5 },
+      'High-Low':        { pop: 80081,  color: '#47a4ff', idaci: 0.155, tt: 34, walk: 89, car: 9 },
+      'Not Significant': { pop: 329184, color: '#3a3a4a' }
+    };
+    const LONDON_MEDIANS = { tt: 25, walk: 72, car: 7, idaci: 0.42 };
+    const allKeys = ['High-High', 'Low-High', 'Low-Low', 'High-Low', 'Not Significant'];
+
+    const grid = document.getElementById('lisa-brick-grid');
+    if (!grid) return;
+
+    const assignments = [];
+    allKeys.forEach(k => {
+      const count = Math.round((CLUSTER_DATA[k].pop / LONDON_TOTAL) * BRICKS);
+      for (let i = 0; i < count; i++) assignments.push(k);
+    });
+    while (assignments.length < BRICKS) assignments.push('Not Significant');
+    assignments.length = BRICKS;
+
+    assignments.forEach((cluster, i) => {
+      const b = document.createElement('div');
+      b.className = 'lisa-brick ' + (cluster === 'Not Significant' ? 'ns' : 'lit');
+      b.id = 'lbk' + i;
+      b.dataset.cluster = cluster;
+      b.style.background = CLUSTER_DATA[cluster].color;
+      grid.appendChild(b);
+    });
+
+    function delta(val, median, unit) {
+      const d = val - median;
+      const sign = d >= 0 ? '+' : '';
+      const col = d > 0 ? '#ff4d4d' : '#66bb6a';
+      return '<span style="color:' + col + '">' + sign + d + ' ' + unit + '</span> vs London median (' + median + ')';
+    }
+
+    function updateExplorer(active) {
+      const d = CLUSTER_DATA[active];
+      const pct = ((d.pop / LONDON_TOTAL) * 100).toFixed(1);
+
+      const popNum = document.getElementById('lisa-pop-num');
+      const popPct = document.getElementById('lisa-pop-pct');
+      if (popNum) { popNum.textContent = d.pop.toLocaleString(); popNum.style.color = d.color; }
+      if (popPct) { popPct.textContent = pct + '%'; popPct.style.color = d.color; }
+
+      document.querySelectorAll('.lisa-brick').forEach(b => {
+        const c = b.dataset.cluster;
+        b.className = 'lisa-brick ' + (c === 'Not Significant' ? 'ns' : c === active ? 'lit' : 'dim');
+      });
+
+      document.getElementById('ls-idaci').textContent = d.idaci.toFixed(3);
+      document.getElementById('ls-idaci').style.color = d.color;
+      const idaciD = (d.idaci - LONDON_MEDIANS.idaci).toFixed(3);
+      const idaciSign = parseFloat(idaciD) >= 0 ? '+' : '';
+      const idaciCol = parseFloat(idaciD) > 0 ? '#ff4d4d' : '#66bb6a';
+      document.getElementById('ls-idaci-sub').innerHTML =
+        '<span style="color:' + idaciCol + '">' + idaciSign + idaciD + '</span> vs London median (' + LONDON_MEDIANS.idaci + ')';
+
+      document.getElementById('ls-tt').textContent = d.tt;
+      document.getElementById('ls-tt').style.color = d.color;
+      document.getElementById('ls-tt-sub').innerHTML = delta(d.tt, LONDON_MEDIANS.tt, 'min');
+
+      document.getElementById('ls-walk').textContent = d.walk;
+      document.getElementById('ls-walk').style.color = d.color;
+      document.getElementById('ls-walk-sub').innerHTML = delta(d.walk, LONDON_MEDIANS.walk, 'min');
+
+      document.getElementById('ls-car').textContent = d.car;
+      document.getElementById('ls-car').style.color = d.color;
+      document.getElementById('ls-car-sub').innerHTML = delta(d.car, LONDON_MEDIANS.car, 'min');
+    }
+
+    function nullStatPanels() {
+      ['ls-idaci','ls-tt','ls-walk','ls-car'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = '—'; el.style.color = 'var(--text-muted)'; }
+      });
+      ['ls-idaci-sub','ls-tt-sub','ls-walk-sub','ls-car-sub'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '—';
+      });
+    }
+
+    function resetExplorer() {
+      activeCluster = null;
+      document.querySelectorAll('.lisa-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.lisa-brick').forEach(b => {
+        b.className = 'lisa-brick ' + (b.dataset.cluster === 'Not Significant' ? 'ns' : 'lit');
+      });
+      const popNum = document.getElementById('lisa-pop-num');
+      const popPct = document.getElementById('lisa-pop-pct');
+      if (popNum) { popNum.textContent = '—'; popNum.style.color = 'var(--text-muted)'; }
+      if (popPct) { popPct.textContent = '—'; popPct.style.color = 'var(--text-muted)'; }
+      nullStatPanels();
+      if (window.s5HighlightCluster) window.s5HighlightCluster(null);
+      if (typeof s5UpdateIncomeChart === 'function') s5UpdateIncomeChart(null);
+      if (typeof s5SetTitle === 'function') s5SetTitle(s5CurrentStep, null);
+    }
+
+    /* Expose selectCluster globally so step actions can call it */
+    window.s5SelectCluster = function(cluster, forceSelect) {
+      if (!cluster) { resetExplorer(); return; }
+      if (!forceSelect && cluster === activeCluster) { resetExplorer(); return; }
+      activeCluster = cluster;
+      document.querySelectorAll('.lisa-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.cluster === cluster)
+      );
+      updateExplorer(cluster);
+      if (window.s5HighlightCluster) window.s5HighlightCluster(cluster);
+      if (typeof s5UpdateIncomeChart === 'function') s5UpdateIncomeChart(cluster);
+      if (typeof s5SetTitle === 'function') s5SetTitle(s5CurrentStep, cluster);
+    };
+
+    document.querySelectorAll('.lisa-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        window.s5SelectCluster(btn.dataset.cluster);
+      });
+    });
+
+    /* Initial state — null panels, no selection */
+    nullStatPanels();
+    activeCluster = null;
+  })();
 
   /* ─────────────────────────────────────────
      SCROLL ENGINE
