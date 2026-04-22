@@ -189,6 +189,11 @@
       position: absolute;
       inset: 0;
       z-index: 0;
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+    #hero-map.ready {
+      opacity: 1;
     }
     /* dark vignette over map */
     #s1-hero::after {
@@ -2923,80 +2928,53 @@
   ───────────────────────────────────────── */
   const heroMap = initMap('hero-map', {
     center: [-0.25, 51.48],
-    zoom: 10.4,
+    zoom: 10.3,
     pitch: 45,
     bearing: -15,
     extra: { interactive: false }
   });
   if (heroMap) {
-    heroMap.on('load', () => {
-      // Slow pan effect
-      heroMap.easeTo({ bearing: 0, pitch: 45, duration: 30000, easing: t => t });
+    heroMap.once('idle', () => {
+
+      /* Darken basemap */
+      if (heroMap.getLayer('road-simple')) {
+        heroMap.setPaintProperty('road-simple', 'line-color', '#111111');
+        heroMap.setPaintProperty('road-simple', 'line-opacity', 0.4);
+      }
+
+      /* Hide labels */
+      ['settlement-subdivision-label','settlement-label','settlement-major-label',
+       'settlement-minor-label','state-label','country-label','poi-label','airport-label'
+      ].forEach(id => {
+        if (heroMap.getLayer(id)) heroMap.setLayoutProperty(id, 'visibility', 'none');
+      });
 
       heroMap.addSource('bus-routes', {
         type: 'vector',
         url: 'mapbox://teechinminben.6z9v3xbj'
       });
 
-      // Hide non-essential layers 
-        const layersToHide = [
-        'settlement-subdivision-label','settlement-label',
-        'settlement-major-label', 'settlement-minor-label',
-        'state-label', 'country-label', 'poi-label', 'airport-label'
-        ];
-
-        layersToHide.forEach(layerId => {
-        if (heroMap.getLayer(layerId)) {
-            heroMap.setLayoutProperty(layerId, 'visibility', 'none');
-        }
-        });
-
-      if (heroMap.getLayer('road-simple')) {
-        heroMap.setPaintProperty('road-simple', 'line-color', '#111111');
-        heroMap.setPaintProperty('road-simple', 'line-opacity', 0.4);
-      }
-      
-      // Outer halo
+      /* Outer halo */
       heroMap.addLayer({
-        id: 'bus-glow',
-        type: 'line',
-        source: 'bus-routes',
-        'source-layer': 'bus_routes',
-        paint: {
-          'line-color': '#FF9043',
-          'line-width': 10,
-          'line-opacity': 0.05,
-          'line-blur': 10
-        }
-      },'waterway-label');
+        id: 'bus-glow', type: 'line', source: 'bus-routes', 'source-layer': 'bus_routes',
+        paint: { 'line-color': '#FF9043', 'line-width': 10, 'line-opacity': 0.09, 'line-blur': 16 }
+      }, 'waterway-label');
 
-      // Mid glow
+      /* Mid glow */
       heroMap.addLayer({
-        id: 'bus-mid',
-        type: 'line',
-        source: 'bus-routes',
-        'source-layer': 'bus_routes',
-        paint: {
-          'line-color': '#FF9043',
-          'line-width': 2,
-          'line-opacity': 0.1,
-          'line-blur': 2
-        }
-      },'waterway-label');
+        id: 'bus-mid', type: 'line', source: 'bus-routes', 'source-layer': 'bus_routes',
+        paint: { 'line-color': '#FF9043', 'line-width': 2, 'line-opacity': 0.18, 'line-blur': 2 }
+      }, 'waterway-label');
 
-      // Bright core
+      /* Bright core */
       heroMap.addLayer({
-        id: 'bus-core',
-        type: 'line',
-        source: 'bus-routes',
-        'source-layer': 'bus_routes',
-        paint: {
-          'line-color': '#ffc285',
-          'line-width': 0.5,
-          'line-opacity': 0.2
-        }
-      },'waterway-label');
-      
+        id: 'bus-core', type: 'line', source: 'bus-routes', 'source-layer': 'bus_routes',
+        paint: { 'line-color': '#ffd4a8', 'line-width': 0.6, 'line-opacity': 0.35 }
+      }, 'waterway-label');
+
+      /* Fade in then start slow pan */
+      document.getElementById('hero-map').classList.add('ready');
+      heroMap.easeTo({ bearing: 0, pitch: 45, duration: 30000, easing: t => t });
     });
   }
 
