@@ -1,5 +1,5 @@
 # Pathways to Progress
-Benjamin Tee
+Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing
 2026-04-22
 
 - [Overview](#overview)
