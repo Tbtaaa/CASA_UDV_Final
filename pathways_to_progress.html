@@ -1419,6 +1419,25 @@
       margin-bottom: 4px;
     }
 
+    #s5-hover-borough-lsoa,
+    #s5-hover-borough-pop {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      letter-spacing: 0.04em;
+    }
+    #s5-hover-borough-lsoa { margin-top: 8px; }
+    #s5-hover-borough-pop  { margin-top: 4px; }
+
+    #s5-hover-borough-lsoa strong,
+    #s5-hover-borough-pop strong {
+      font-weight: 500;
+      font-size: 20px;
+      color: var(--text-primary);
+      letter-spacing: 0.04em;
+    }
+
     /* LISA cluster explorer — s5-1 */
     .lisa-btn {
       padding: 8px 14px;
@@ -1459,21 +1478,21 @@
     }
     .lisa-stat-label {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 13px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       margin-bottom: 4px;
     }
     .lisa-stat-val {
       font-family: var(--font-mono);
-      font-size: 28px;
+      font-size: 31px;
       font-weight: 500;
       line-height: 1;
       color: var(--accent-red);
     }
     .lisa-stat-sub {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-muted);
       margin-top: 4px;
       line-height: 1.4;
@@ -1486,7 +1505,7 @@
     }
     #lisa-brick-caption {
       font-family: var(--font-mono);
-      font-size: 10.5px;
+      font-size: 11px;
       color: var(--text-muted);
       margin-top: 6px;
       line-height: 1.5;
@@ -2107,7 +2126,7 @@
     </p>
 
     <!-- Row 1: Charts 1 & 2 -->
-    <div class="chart-grid-2 reveal reveal-delay-3">
+    <div class="chart-grid-2 reveal reveal-delay-1">
 
       <!-- Chart 1 — Population top/bottom 5 boroughs -->
       <div class="chart-card">
@@ -2129,7 +2148,7 @@
     </div>
 
     <!-- Row 2: Charts 3 & 4 -->
-    <div class="chart-grid-2 reveal reveal-delay-1" style="margin-top:14px">
+    <div class="chart-grid-2 reveal reveal-delay-3" style="margin-top:14px">
 
       <!-- Chart 3 — Capacity utilisation top 10 boroughs -->
       <div class="chart-card">
@@ -2249,7 +2268,7 @@
           <div class="step-body">
 
             <div>
-              <span class="step-stat" style="font-size:34px;color:#FF9043">16</span>  <span class="step-stat" style="font-size:20px;color:#FF9043">min</span>
+              <span class="step-stat" style="font-size:34px;color:#FF9043" id="stat-16">0</span>  <span class="step-stat" style="font-size:20px;color:#FF9043">min</span>
               <div class="step-stat-label">median transit time <br>Nearest school</div>
             </div>
             <p style="margin-top:14px">
@@ -2277,11 +2296,11 @@
             </p>
             <div style="display:flex;gap:24px;margin:16px 0">
               <div>
-                <span class="step-stat" style="font-size:34px;color:#FF9043">25</span>  <span class="step-stat" style="font-size:20px;color:#FF9043">min</span>
+                <span class="step-stat" style="font-size:34px;color:#FF9043" id="stat-25">0</span>  <span class="step-stat" style="font-size:20px;color:#FF9043">min</span>
                 <div class="step-stat-label"></div> <div class="step-stat-label">median transit time <br> Nearest Top 25% Progress 8 School</div>
               </div>
               <div>
-                <span class="step-stat" style="font-size:34px;color:#FF9043">26</span>  <span class="step-stat" style="font-size:20px;color:#FF9043">min</span>
+                <span class="step-stat" style="font-size:34px;color:#FF9043" id="stat-26">0</span>  <span class="step-stat" style="font-size:20px;color:#FF9043">min</span>
                 <div class="step-stat-label"></div> <div class="step-stat-label">median transit time <br> Nearest Ofsted Outstanding School</div>
               </div>
             </div>
@@ -2458,6 +2477,8 @@
           <div id="s5-hover-cluster"></div>
           <div id="s5-hover-tt"></div>
           <div id="s5-hover-idaci"></div>
+          <div id="s5-hover-borough-lsoa" style="display:none"></div>
+          <div id="s5-hover-borough-pop" style="display:none"></div>
         </div>
 
         <div class="map-legend">
@@ -2511,7 +2532,7 @@
           <p class="step-index">02 — Cluster Deep Dive</p>
           <h3 class="step-heading">1 in 10 children live in areas with high transit times and high deprivation</h3>
           <div class="step-body" style="font-size:17px;color:var(--text-secondary);line-height:1.65"  >
-            <p>Toggle the buttons below to explore how many children live in each cluster and how access to quality schools looks like.</p>
+            <p>Toggle the buttons below to explore how many children live in each cluster and to compare access to quality schools across clusters.</p>
           </div>
 
           <!-- Cluster selector buttons -->
@@ -2571,9 +2592,7 @@
               </div>
               <div class="lisa-stat-sub" id="ls-car-sub" style="color:var(--text-secondary)"><span style="color:#ff5f5f">+2 min</span> vs London median (7)</div>
             </div>
-
           </div>
-
         </div>
 
         <!-- Step 3 — Income -->
@@ -2581,14 +2600,14 @@
           <p class="step-index">03 — Income Context</p>
           <h3 class="step-heading">Lower incomes limit the ability to overcome access differences in these areas</h3>
           <div class="step-body">
-            <p>On average, households in areas with <strong style="color:var(--accent-red)">High Transit Times and High Deprivation</strong> earn 25% less than the London average.</p>
+            <p>On average, households in areas with <strong style="color:var(--accent-red)">High Transit Times and High Deprivation</strong> earn 25% less than the median London household.</p>
           </div>
 
           <!-- Income bar chart -->
-          <div style="position:relative;height:220px;margin-top:16px;">
+          <div style="position:relative;height:260px;margin-top:12px;">
             <canvas id="s5-income-chart"></canvas>
           </div>
-          <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:10px;margin-bottom:20px;line-height:1.5;">Median annual household income after housing costs, aggregated by LISA cluster.</p>
+          <p style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:10px;margin-bottom:20px;line-height:1.5;">Median annual household income after housing costs, aggregated by LISA cluster.</p>
 
           <div class="step-body" style="margin-top:16px;">
             <p>This material difference affects families' ability to manage longer commutes. Lower-income households are less able to rely on private transport or widen their school choices, making them more dependent on public transit.</p>
@@ -2602,26 +2621,26 @@
           <h3 class="step-heading">Borough-level patterns highlight where action is most needed</h3>
           <div class="step-body">
             <p>
-              The concentration of high-disadvantage neighbourhoods is not evenly spread.
-              Boroughs such as <strong style="color:var(--accent-red)">Newham</strong>,
-              <strong style="color:var(--accent-red)">Enfield</strong>, and
-              <strong style="color:var(--accent-red)">Islington</strong> contain
-              the highest shares of affected LSOAs.
+              <strong style="color:var(--accent-red)">Enfield</strong>,
+              <strong style="color:var(--accent-red)">Newham</strong> and
+              <strong style="color:var(--accent-red)">Tower Hamlets</strong>
+              contain the highest shares of such LSOAs.
             </p>
-            <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
-              <div class="vuln-stat-block" style="align-items:flex-start;flex-direction:column;gap:6px">
-                <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted)">Outer boroughs</div>
-                <div class="vuln-stat-desc">The issue is primarily <strong>structural</strong> — weaker transport links increase travel times across entire areas.</div>
-              </div>
-              <div class="vuln-stat-block" style="align-items:flex-start;flex-direction:column;gap:6px">
-                <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted)">Inner boroughs (e.g. Islington)</div>
-                <div class="vuln-stat-desc">Pockets of deprivation <strong>persist despite strong overall accessibility</strong> — highlighting inequalities within well-connected areas.</div>
-              </div>
-            </div>
-            <p style="margin-top:14px;font-style:italic;color:var(--text-muted);font-size:17px">
-              → Policy responses need to be place-specific: transport improvements in outer London,
-              targeted support and school access strategies in inner-city areas.
-            </p>
+          </div>
+
+          <!-- Borough HH chart -->
+          <div style="position:relative;height:240px;margin-top:12px;">
+            <p style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:1px;margin-bottom:5px;line-height:1.2;">% of LSOAs in Borough with High Transit Times & High Deprivation (Descending)</p>
+            <canvas id="s5-borough-chart"></canvas>
+          </div>
+          <button id="s5-borough-expand-btn" style="margin-top:28px ;font-family:var(--font-mono);font-size:12px;letter-spacing:0.08em;background:transparent;border:0.5px solid var(--border);color:var(--text-muted);padding:5px 12px;border-radius:4px;cursor:pointer;">
+            SHOW ALL BOROUGHS ↓
+          </button>
+
+          <div class="step-body" style="margin-top:10px;">
+            <p style="font-family:var(--font-mono);font-size:16px;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);margin-bottom:4px">Place-specific policy response needed</p>
+              <p> Outer London: Improve bus networks to affected areas
+              <br> Inner London: Targeted support to improve access to quality schools</p>
           </div>
         </div>
 
@@ -4321,8 +4340,6 @@ const s2StepActions = {
         });
       }
 
-      // boroughInteractive declared above s4StepActions (hoisted)
-
       // ── Explorer overlay helpers ─────────────────────────────────────────
       function setExplorerOverlayTitle(text) {
         const el = document.getElementById('s4-explorer-overlay-title');
@@ -4503,12 +4520,12 @@ const s2StepActions = {
             },
             scales: {
               x: {
-                ticks: { color: 'rgba(180,170,160,0.6)', font: { family: "'Roboto Mono'", size: 10 } },
+                ticks: { color: 'rgba(180,170,160,0.6)', font: { family: "'Roboto Mono'", size: 10.5 } },
                 grid:  { color: 'rgba(255,255,255,0.05)' },
                 title: { display: true, text: 'minutes', color: 'rgba(180,170,160,0.4)', font: { family: "'Roboto Mono'", size: 10 } }
               },
               y: {
-                ticks: { color: 'rgba(180,170,160,0.8)', font: { family: "'Roboto Mono'", size: 10 } },
+                ticks: { color: 'rgba(180,170,160,0.8)', font: { family: "'Roboto Mono'", size: 10.5 } },
                 grid:  { display: false }
               }
             }
@@ -4910,7 +4927,7 @@ const s2StepActions = {
       });
 
       /* ── 3. LISA fill ────────────────────────────────────────────── */
-      s5Map.addSource('s5-lisa', { type: 'vector', url: 'mapbox://teechinminben.89a3a4oi' });
+      s5Map.addSource('s5-lisa', { type: 'vector', url: 'mapbox://teechinminben.6t7mnv57' });
       s5Map.addLayer({
         id: 's5-lisa-fill',
         type: 'fill',
@@ -5108,32 +5125,50 @@ const s2StepActions = {
         layout: { visibility: 'none' }
       });
 
-      const s5BoroughHoverEl = document.getElementById('s5-hover-overlay');
+      const s5BoroughHoverEl   = document.getElementById('s5-hover-overlay');
       const s5BoroughClusterEl = document.getElementById('s5-hover-cluster');
-      const s5BoroughTtEl = document.getElementById('s5-hover-tt');
-      const s5BoroughIdaciEl = document.getElementById('s5-hover-idaci');
+      const s5BoroughTtEl      = document.getElementById('s5-hover-tt');
+      const s5BoroughIdaciEl   = document.getElementById('s5-hover-idaci');
+      const s5BoroughLsoaEl    = document.getElementById('s5-hover-borough-lsoa');
+      const s5BoroughPopEl     = document.getElementById('s5-hover-borough-pop');
 
       s5Map.on('mousemove', 's5-borough-hit', e => {
         if (s5MapMode !== 'borough') return;
         const name = e.features[0]?.properties?.LAD25NM || e.features[0]?.properties?.LAD22NM || '';
         if (!name) return;
+        s5MapIsHovering = true;
         s5Map.getCanvas().style.cursor = 'pointer';
         s5Map.setPaintProperty('s5-borough-highlight', 'line-opacity',
           ['case', ['==', ['get', 'LAD25NM'], name], 1, 0]
         );
-        if (s5BoroughHoverEl && s5BoroughClusterEl) {
+        const row = S5_BOROUGH_DATA.find(d => d.name === name);
+        if (s5BoroughHoverEl) {
           s5BoroughClusterEl.textContent = name;
           s5BoroughClusterEl.style.color = '#FF9043';
-          if (s5BoroughTtEl) s5BoroughTtEl.textContent = '';
-          if (s5BoroughIdaciEl) s5BoroughIdaciEl.textContent = '';
+          if (row) {
+            s5BoroughTtEl.textContent    = '';
+            s5BoroughIdaciEl.textContent = '';
+            s5BoroughLsoaEl.innerHTML =
+              '<strong>' + row.hh_lsoas.toFixed(0) + ' LSOAs (' + row.pct_lsoas.toFixed(1) + '%)</strong> in High-High clusters';
+            s5BoroughPopEl.innerHTML =
+              '<strong>' + row.hh_pop.toLocaleString() + ' children (' + row.pct_pop.toFixed(1) + '%)</strong> living in High-High clusters';
+            s5BoroughLsoaEl.style.display = 'block';
+            s5BoroughPopEl.style.display  = 'block';
+          } else {
+            s5BoroughLsoaEl.style.display = 'none';
+            s5BoroughPopEl.style.display  = 'none';
+          }
           s5BoroughHoverEl.style.display = 'block';
+          if (window.s5HighlightBoroughBar) window.s5HighlightBoroughBar(name);
         }
       });
       s5Map.on('mouseleave', 's5-borough-hit', () => {
         if (s5MapMode !== 'borough') return;
+        s5MapIsHovering = false;
         s5Map.getCanvas().style.cursor = '';
         s5Map.setPaintProperty('s5-borough-highlight', 'line-opacity', 0);
         if (s5BoroughHoverEl) s5BoroughHoverEl.style.display = 'none';
+        if (window.s5HighlightBoroughBar) window.s5HighlightBoroughBar(null);
       });
 
       /* NOTE: button click wiring is handled in initLisaExplorer */
@@ -5142,9 +5177,11 @@ const s2StepActions = {
 
   /* Track which interaction mode s5 map is in */
   let s5MapMode = 'cluster'; /* 'cluster' | 'borough' */
+  let s5MapIsHovering = false; /* true when map borough is being hovered */
 
   function s5EnterClusterMode(enableHover) {
     s5MapMode = 'cluster';
+    s5MapIsHovering = false;
     if (window.s5SetHoverEnabled) window.s5SetHoverEnabled(!!enableHover);
     if (!s5Map) return;
     if (s5Map.getLayer('s5-borough-hit'))       s5Map.setLayoutProperty('s5-borough-hit',       'visibility', 'none');
@@ -5153,8 +5190,13 @@ const s2StepActions = {
     if (s5Map.getLayer('s5-lisa-hover-outline')) {
       s5Map.setLayoutProperty('s5-lisa-hover-outline', 'visibility', enableHover ? 'visible' : 'none');
     }
+    /* Always hide and clear the overlay when leaving borough mode */
     const s5HoverEl = document.getElementById('s5-hover-overlay');
     if (s5HoverEl) s5HoverEl.style.display = 'none';
+    const lsoaEl = document.getElementById('s5-hover-borough-lsoa');
+    const popEl  = document.getElementById('s5-hover-borough-pop');
+    if (lsoaEl) lsoaEl.style.display = 'none';
+    if (popEl)  popEl.style.display  = 'none';
   }
 
   function s5EnterBoroughMode() {
@@ -5170,28 +5212,42 @@ const s2StepActions = {
   /* Track current s5 step so title updates are always correct */
   let s5CurrentStep = 's5-0';
 
+  const S5_DEFAULT_CENTER = [-0.12, 51.50];
+  const S5_DEFAULT_ZOOM   = 9.25;
+
   const s5StepActions = {
     's5-0': () => {
       s5CurrentStep = 's5-0';
       s5SetTitle('s5-0');
       s5EnterClusterMode(true);
       if (window.s5SelectCluster) window.s5SelectCluster(null);
+      if (s5Map) s5Map.easeTo({ center: S5_DEFAULT_CENTER, zoom: S5_DEFAULT_ZOOM, pitch: 0, bearing: 0, duration: 800 });
     },
     's5-1': () => {
       s5CurrentStep = 's5-1';
       s5EnterClusterMode(false);
       if (window.s5SelectCluster) window.s5SelectCluster('High-High', true);
+      if (s5Map) s5Map.easeTo({ center: S5_DEFAULT_CENTER, zoom: S5_DEFAULT_ZOOM, pitch: 0, bearing: 0, duration: 800 });
     },
     's5-2': () => {
       s5CurrentStep = 's5-2';
       s5EnterClusterMode(false);
       if (typeof initS5IncomeChart === 'function') initS5IncomeChart();
       if (window.s5SelectCluster) window.s5SelectCluster('High-High', true);
+      if (s5Map) s5Map.easeTo({ center: S5_DEFAULT_CENTER, zoom: S5_DEFAULT_ZOOM, pitch: 0, bearing: 0, duration: 800 });
     },
     's5-3': () => {
       s5CurrentStep = 's5-3';
       s5SetTitle('s5-3');
       s5EnterBoroughMode();
+      /* Reset chart to collapsed state */
+      s5BoroughExpanded = false;
+      const expandBtn = document.getElementById('s5-borough-expand-btn');
+      if (expandBtn) expandBtn.textContent = 'Show all boroughs ↓';
+      const wrap = document.getElementById('s5-borough-chart')?.parentElement;
+      if (wrap) wrap.style.height = '260px';
+      if (typeof initS5BoroughChart === 'function') initS5BoroughChart();
+      if (s5Map) s5Map.easeTo({ center: S5_DEFAULT_CENTER, zoom: S5_DEFAULT_ZOOM, pitch: 0, bearing: 0, duration: 800 });
     },
   };
 
@@ -5369,6 +5425,7 @@ const s2StepActions = {
   })();
 
   // ── S3 Chart 3 (capacity utilisation top 10 boroughs) ───────────────────────
+  setTimeout(function() {
   (function() {
     // % capacity utilisation for non-selective schools — replace with real SCAP 2024 data
     const CAPACITY_DATA = [
@@ -5472,8 +5529,10 @@ const s2StepActions = {
       }]
     });
   })();
+  }, 300);
 
   // ── S3 Chart 4 — Cross-LA region bars ───────────────────────────────────────
+  setTimeout(function() {
   const REGION_BARS_DATA = [
     { label: 'London',     val: 19.9, highlight: true },
     { label: 'South East', val: 12.3, highlight: false },
@@ -5492,14 +5551,22 @@ const s2StepActions = {
     });
   }
 
+  }, 400);
+
   // Animated counter for stat3
-  function animateCounter(el, target, suffix='%', duration=1400) {
+  function animateCounter(el, target, suffix='%', duration=1400, integer=false) {
+    if (!el) return;
     let start = null;
     function step(ts) {
       if (!start) start = ts;
       const progress = Math.min((ts - start) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      el.textContent = (eased * target).toFixed(1) + suffix;
+      const val = eased * target;
+      if (integer) {
+        el.textContent = Math.round(val).toLocaleString() + suffix;
+      } else {
+        el.textContent = val.toFixed(1) + suffix;
+      }
       if (progress < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
@@ -5509,10 +5576,10 @@ const s2StepActions = {
   new Chart(document.getElementById('chart8-cluster-compare'), {
     type: 'bar',
     data: {
-      labels: ['HH clusters', 'London median'],
+      labels: ['HH clusters', 'London Median'],
       datasets: [{
         label: 'Median P8 transit time (min)',
-        data: [0, 25],   // PLACEHOLDER — first value: HH cluster median travel time
+        data: [0, 25],   
         backgroundColor: ['#ef5350aa', '#FF904344'],
         borderColor: ['#ef5350', '#FF9043'],
         borderWidth: 1,
@@ -5538,134 +5605,6 @@ const s2StepActions = {
   });
 
   /* ─────────────────────────────────────────
-     S5-2 INCOME BAR CHART
-  ───────────────────────────────────────── */
-  const S5_INCOME_DATA = [
-    { cluster: 'High-High', label: 'High TT\nHigh Dep', income: 32600, color: '#ff4d4d' },
-    { cluster: 'Low-High',  label: 'Low TT\nHigh Dep',  income: 33400, color: '#ffb0b0' },
-    { cluster: 'High-Low',  label: 'High TT\nLow Dep',  income: 48200, color: '#47a4ff' },
-    { cluster: 'Low-Low',   label: 'Low TT\nLow Dep',   income: 49300, color: '#e0fbfc' },
-  ];
-  const S5_LONDON_MEDIAN_INCOME = 40700;
-  let s5IncomeChart = null;
-
-  function initS5IncomeChart() {
-    const canvas = document.getElementById('s5-income-chart');
-    if (!canvas) return;
-    if (s5IncomeChart) { s5IncomeChart.destroy(); s5IncomeChart = null; }
-
-    const labels  = S5_INCOME_DATA.map(d => d.label);
-    const values  = S5_INCOME_DATA.map(d => d.income);
-    const colours = S5_INCOME_DATA.map(d => d.color + '55');
-
-    /* Custom plugin: draw £value labels above each bar */
-    const valueLabelPlugin = {
-      id: 's5BarLabels',
-      afterDatasetsDraw(chart) {
-        const { ctx, data, scales: { x, y } } = chart;
-        const ds = chart.getDatasetMeta(0);
-        ds.data.forEach((bar, i) => {
-          const val = data.datasets[0].data[i];
-          const bgCol = data.datasets[0].backgroundColor[i];
-          /* Determine opacity from alpha — dim bars get muted text */
-          const isDim = bgCol && bgCol.endsWith('22');
-          ctx.save();
-          ctx.font = "700 16px 'Roboto Mono', monospace";
-          ctx.fillStyle = isDim ? 'rgba(131,110,90,0.5)' : S5_INCOME_DATA[i].color;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'bottom';
-          ctx.fillText('£' + (val / 1000).toFixed(1) + 'k', bar.x, bar.y - 4);
-          ctx.restore();
-        });
-      }
-    };
-
-    s5IncomeChart = new Chart(canvas, {
-      type: 'bar',
-      plugins: [valueLabelPlugin],
-      data: {
-        labels,
-        datasets: [{
-          data: values,
-          backgroundColor: colours,
-          borderColor: S5_INCOME_DATA.map(d => d.color),
-          borderWidth: 1.5,
-          borderRadius: 4,
-          borderSkipped: false,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 400 },
-        layout: { padding: { top: 28 } },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: '#0e1420',
-            borderColor: 'rgba(255,144,67,0.25)',
-            borderWidth: 1,
-            titleColor: '#f0ece4',
-            bodyColor: '#b8a898',
-            padding: 10,
-            titleFont: { family: "'Roboto Mono'", size: 13 },
-            bodyFont:  { family: "'Roboto Mono'", size: 13 },
-            callbacks: { label: ctx => '£' + ctx.parsed.y.toLocaleString() + ' /yr' }
-          },
-          annotation: {
-            annotations: {
-              medianLine: {
-                type: 'line',
-                yMin: S5_LONDON_MEDIAN_INCOME,
-                yMax: S5_LONDON_MEDIAN_INCOME,
-                borderColor: '#FF9043',
-                borderWidth: 1.5,
-                borderDash: [5, 4],
-                label: {
-                  display: true,
-                  content: 'London median  £' + S5_LONDON_MEDIAN_INCOME.toLocaleString(),
-                  position: 'end',
-                  backgroundColor: 'rgba(8,12,18,0.9)',
-                  color: '#FF9043',
-                  font: { family: "'Roboto Mono'", size: 12, weight: '500' },
-                  padding: { x: 8, y: 4 }
-                }
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            ticks: {
-              color: '#d1c0ae',
-              font: { family: "'Roboto Mono'", size: 12 },
-              maxRotation: 0
-            },
-            grid: { display: false }
-          },
-          y: {
-            min: 20000,
-            ticks: {
-              color: '#d1c0ae',
-              font: { family: "'Roboto Mono'", size: 12 },
-              callback: v => '£' + (v / 1000).toFixed(0) + 'k'
-            },
-            grid: { color: 'rgba(255,255,255,0.05)' }
-          }
-        }
-      }
-    });
-  }
-
-  function s5UpdateIncomeChart(activeCluster) {
-    if (!s5IncomeChart) return;
-    s5IncomeChart.data.datasets[0].backgroundColor = S5_INCOME_DATA.map(d =>
-      !activeCluster || d.cluster === activeCluster ? d.color + 'cc' : d.color + '22'
-    );
-    s5IncomeChart.update('active');
-  }
-
-  /* ─────────────────────────────────────────
      S5-1 LISA CLUSTER EXPLORER
   ───────────────────────────────────────── */
   (function initLisaExplorer() {
@@ -5674,13 +5613,13 @@ const s2StepActions = {
     const LONDON_TOTAL = 649434;
     const BRICKS = 100;
     const CLUSTER_DATA = {
-      'High-High':       { pop: 65002,  color: '#ff4d4d', idaci: 0.619, tt: 32, walk: 86, car: 9 },
-      'Low-High':        { pop: 98655,  color: '#ffb0b0', idaci: 0.614, tt: 19, walk: 63, car: 6 },
-      'Low-Low':         { pop: 76512,  color: '#e0fbfc', idaci: 0.161, tt: 20, walk: 58, car: 5 },
-      'High-Low':        { pop: 80081,  color: '#47a4ff', idaci: 0.155, tt: 34, walk: 89, car: 9 },
+      'High-High':       { pop: 65002,  color: '#ff4d4d', idaci: 0.619, tt: 32, walk: 47, car: 9 },
+      'Low-High':        { pop: 98655,  color: '#ffb0b0', idaci: 0.614, tt: 19, walk: 23, car: 6 },
+      'Low-Low':         { pop: 76512,  color: '#e0fbfc', idaci: 0.161, tt: 20, walk: 23, car: 5 },
+      'High-Low':        { pop: 80081,  color: '#47a4ff', idaci: 0.155, tt: 34, walk: 49, car: 9 },
       'Not Significant': { pop: 329184, color: '#3a3a4a' }
     };
-    const LONDON_MEDIANS = { tt: 25, walk: 72, car: 7, idaci: 0.42 };
+    const LONDON_MEDIANS = { tt: 25, walk: 32, car: 7, idaci: 0.408 };
     const allKeys = ['High-High', 'Low-High', 'Low-Low', 'High-Low', 'Not Significant'];
 
     const grid = document.getElementById('lisa-brick-grid');
@@ -5712,12 +5651,18 @@ const s2StepActions = {
 
     function updateExplorer(active) {
       const d = CLUSTER_DATA[active];
-      const pct = ((d.pop / LONDON_TOTAL) * 100).toFixed(1);
+      const pct = parseFloat(((d.pop / LONDON_TOTAL) * 100).toFixed(1));
 
       const popNum = document.getElementById('lisa-pop-num');
       const popPct = document.getElementById('lisa-pop-pct');
-      if (popNum) { popNum.textContent = d.pop.toLocaleString(); popNum.style.color = d.color; }
-      if (popPct) { popPct.textContent = pct + '%'; popPct.style.color = d.color; }
+      if (popNum) {
+        popNum.style.color = d.color;
+        animateCounter(popNum, d.pop, '', 1200, true);
+      }
+      if (popPct) {
+        popPct.style.color = d.color;
+        animateCounter(popPct, pct, '%', 1200, false);
+      }
 
       document.querySelectorAll('.lisa-brick').forEach(b => {
         const c = b.dataset.cluster;
@@ -5796,6 +5741,295 @@ const s2StepActions = {
     nullStatPanels();
     activeCluster = null;
   })();
+
+  /* ─────────────────────────────────────────
+     S5-2 INCOME BAR CHART
+  ───────────────────────────────────────── */
+  const S5_INCOME_DATA = [
+    { cluster: 'High-High', label: 'High TT High Dep', income: 32600, color: '#ff4d4d' },
+    { cluster: 'Low-High',  label: 'Low TT High Dep',  income: 33400, color: '#ffb0b0' },
+    { cluster: 'High-Low',  label: 'High TT Low Dep',  income: 48200, color: '#47a4ff' },
+    { cluster: 'Low-Low',   label: 'Low TT Low Dep',   income: 49300, color: '#e0fbfc' },
+  ];
+  const S5_LONDON_MEDIAN_INCOME = 40700;
+  let s5IncomeChart = null;
+
+  function initS5IncomeChart() {
+    const canvas = document.getElementById('s5-income-chart');
+    if (!canvas) return;
+    if (s5IncomeChart) { s5IncomeChart.destroy(); s5IncomeChart = null; }
+
+    const labels  = S5_INCOME_DATA.map(d => d.label);
+    const values  = S5_INCOME_DATA.map(d => d.income);
+    const colours = S5_INCOME_DATA.map(d => d.color + '55');
+
+    /* Custom plugin: draw £value labels above each bar */
+    const valueLabelPlugin = {
+      id: 's5BarLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx, data, scales: { x, y } } = chart;
+        const ds = chart.getDatasetMeta(0);
+        ds.data.forEach((bar, i) => {
+          const val = data.datasets[0].data[i];
+          const bgCol = data.datasets[0].backgroundColor[i];
+          /* Determine opacity from alpha — dim bars get muted text */
+          const isDim = bgCol && bgCol.endsWith('22');
+          ctx.save();
+          ctx.font = "700 16px 'Roboto Mono', monospace";
+          ctx.fillStyle = isDim ? 'rgba(131,110,90,0.5)' : S5_INCOME_DATA[i].color;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText('£' + (val / 1000).toFixed(1) + 'k', bar.x, bar.y - 4);
+          ctx.restore();
+        });
+      }
+    };
+
+    s5IncomeChart = new Chart(canvas, {
+      type: 'bar',
+      plugins: [valueLabelPlugin],
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colours,
+          borderColor: S5_INCOME_DATA.map(d => d.color),
+          borderWidth: 1.5,
+          borderRadius: 4,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 400 },
+        layout: { padding: { top: 28 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0e1420',
+            borderColor: 'rgba(255,144,67,0.25)',
+            borderWidth: 1,
+            titleColor: '#f0ece4',
+            bodyColor: '#b8a898',
+            boxPadding: 6,
+            padding: 14, 
+            titleFont: { family: "'Roboto Mono'", size: 14 },
+            bodyFont:  { family: "'Roboto Mono'", size: 14 },
+            callbacks: { label: ctx => '£' + ctx.parsed.y.toLocaleString() + ' /yr' }
+          },
+          annotation: {
+            annotations: {
+              medianLine: {
+                type: 'line',
+                yMin: S5_LONDON_MEDIAN_INCOME,
+                yMax: S5_LONDON_MEDIAN_INCOME,
+                borderColor: '#FF9043',
+                borderWidth: 1.5,
+                borderDash: [5, 4],
+                label: {
+                  display: true,
+                  content: 'London Median  £' + S5_LONDON_MEDIAN_INCOME.toLocaleString(),
+                  position: 'end',
+                  backgroundColor: 'rgba(8,12,18,0.9)',
+                  color: '#FF9043',
+                  font: { family: "'Roboto Mono'", size: 12, weight: '500' },
+                  padding: { x: 8, y: 4 }
+                }
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#d1c0ae',
+              font: { family: "'Roboto Mono'", size: 12 },
+              maxRotation: 0
+            },
+            grid: { display: false }
+          },
+          y: {
+            min: 20000,
+            ticks: {
+              color: '#d1c0ae',
+              font: { family: "'Roboto Mono'", size: 12 },
+              callback: v => '£' + (v / 1000).toFixed(0) + 'k'
+            },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          }
+        }
+      }
+    });
+  }
+
+  function s5UpdateIncomeChart(activeCluster) {
+    if (!s5IncomeChart) return;
+    s5IncomeChart.data.datasets[0].backgroundColor = S5_INCOME_DATA.map(d =>
+      !activeCluster || d.cluster === activeCluster ? d.color + 'cc' : d.color + '22'
+    );
+    s5IncomeChart.update('active');
+  }
+
+  /* ─────────────────────────────────────────
+     S5-3 BOROUGH HH CHART
+  ───────────────────────────────────────── */
+  const S5_BOROUGH_DATA = [
+    { name: 'Enfield',                  hh_lsoas: 80,  total_lsoas: 183, pct_lsoas: 43.7, hh_pop: 14998, total_pop: 28882, pct_pop: 51.9 },
+    { name: 'Newham',                   hh_lsoas: 66,  total_lsoas: 185, pct_lsoas: 35.7, hh_pop:  9628, total_pop: 27295, pct_pop: 35.3 },
+    { name: 'Tower Hamlets',            hh_lsoas: 37,  total_lsoas: 169, pct_lsoas: 21.9, hh_pop:  4286, total_pop: 20558, pct_pop: 20.8 },
+    { name: 'Haringey',                 hh_lsoas: 30,  total_lsoas: 147, pct_lsoas: 20.4, hh_pop:  3650, total_pop: 18319, pct_pop: 19.9 },
+    { name: 'Islington',                hh_lsoas: 23,  total_lsoas: 126, pct_lsoas: 18.3, hh_pop:  1998, total_pop: 11640, pct_pop: 17.2 },
+    { name: 'Croydon',                  hh_lsoas: 36,  total_lsoas: 229, pct_lsoas: 15.7, hh_pop:  5232, total_pop: 31889, pct_pop: 16.4 },
+    { name: 'Ealing',                   hh_lsoas: 30,  total_lsoas: 199, pct_lsoas: 15.1, hh_pop:  5310, total_pop: 28659, pct_pop: 18.5 },
+    { name: 'Barking and Dagenham',     hh_lsoas: 16,  total_lsoas: 115, pct_lsoas: 13.9, hh_pop:  3347, total_pop: 22357, pct_pop: 15.0 },
+    { name: 'Brent',                    hh_lsoas: 21,  total_lsoas: 181, pct_lsoas: 11.6, hh_pop:  3168, total_pop: 25267, pct_pop: 12.5 },
+    { name: 'Barnet',                   hh_lsoas: 24,  total_lsoas: 220, pct_lsoas: 10.9, hh_pop:  3616, total_pop: 32970, pct_pop: 11.0 },
+    { name: 'Hillingdon',               hh_lsoas: 13,  total_lsoas: 170, pct_lsoas:  7.6, hh_pop:  2080, total_pop: 24992, pct_pop:  8.3 },
+    { name: 'Wandsworth',               hh_lsoas: 14,  total_lsoas: 186, pct_lsoas:  7.5, hh_pop:  1939, total_pop: 18293, pct_pop: 10.6 },
+    { name: 'Southwark',                hh_lsoas:  8,  total_lsoas: 173, pct_lsoas:  4.6, hh_pop:   922, total_pop: 18963, pct_pop:  4.9 },
+    { name: 'Hounslow',                 hh_lsoas:  6,  total_lsoas: 150, pct_lsoas:  4.0, hh_pop:   922, total_pop: 23268, pct_pop:  4.0 },
+    { name: 'Camden',                   hh_lsoas:  5,  total_lsoas: 130, pct_lsoas:  3.8, hh_pop:   438, total_pop: 12136, pct_pop:  3.6 },
+    { name: 'Hackney',                  hh_lsoas:  5,  total_lsoas: 149, pct_lsoas:  3.4, hh_pop:   698, total_pop: 17842, pct_pop:  3.9 },
+    { name: 'Lewisham',                 hh_lsoas:  6,  total_lsoas: 175, pct_lsoas:  3.4, hh_pop:   777, total_pop: 20440, pct_pop:  3.8 },
+    { name: 'Lambeth',                  hh_lsoas:  5,  total_lsoas: 181, pct_lsoas:  2.8, hh_pop:   333, total_pop: 17542, pct_pop:  1.9 },
+    { name: 'Waltham Forest',           hh_lsoas:  4,  total_lsoas: 146, pct_lsoas:  2.7, hh_pop:   608, total_pop: 20031, pct_pop:  3.0 },
+    { name: 'Harrow',                   hh_lsoas:  3,  total_lsoas: 144, pct_lsoas:  2.1, hh_pop:   493, total_pop: 20664, pct_pop:  2.4 },
+    { name: 'Richmond upon Thames',     hh_lsoas:  1,  total_lsoas: 115, pct_lsoas:  0.9, hh_pop:   198, total_pop: 16338, pct_pop:  1.2 },
+    { name: 'Hammersmith and Fulham',   hh_lsoas:  1,  total_lsoas: 115, pct_lsoas:  0.9, hh_pop:   127, total_pop: 10476, pct_pop:  1.2 },
+    { name: 'Greenwich',                hh_lsoas:  1,  total_lsoas: 164, pct_lsoas:  0.6, hh_pop:    75, total_pop: 21655, pct_pop:  0.3 },
+    { name: 'Redbridge',                hh_lsoas:  1,  total_lsoas: 164, pct_lsoas:  0.6, hh_pop:   159, total_pop: 25959, pct_pop:  0.6 },
+  ];
+
+  let s5BoroughChart = null;
+  let s5BoroughExpanded = false;
+
+  function initS5BoroughChart() {
+    const canvas = document.getElementById('s5-borough-chart');
+    if (!canvas) return;
+    if (s5BoroughChart) { s5BoroughChart.destroy(); s5BoroughChart = null; }
+
+    const data = s5BoroughExpanded ? S5_BOROUGH_DATA : S5_BOROUGH_DATA.slice(0, 10);
+    const BAR_COL = '#ff4d4d';
+
+    s5BoroughChart = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: data.map(d => d.name),
+        datasets: [{
+          data:                data.map(d => d.pct_lsoas),
+          backgroundColor:     data.map(() => BAR_COL + 'aa'),
+          hoverBackgroundColor: data.map(() => BAR_COL),
+          borderRadius: 3,
+          borderSkipped: false,
+          barThickness: s5BoroughExpanded ? 12 : 16,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 500 },
+        onHover: (event, elements) => {
+          const hoveredName = elements.length ? data[elements[0].index].name : null;
+
+          /* Dim/highlight bars */
+          s5BoroughChart.data.datasets[0].backgroundColor = data.map((_, i) =>
+            !hoveredName || i === (elements[0]?.index ?? -1) ? BAR_COL + 'dd' : BAR_COL + '33'
+          );
+          s5BoroughChart.update('none');
+
+          /* Sync map outline — only if map isn't already driving the highlight */
+          if (!s5MapIsHovering && s5Map && s5Map.getLayer('s5-borough-highlight')) {
+            s5Map.setPaintProperty('s5-borough-highlight', 'line-opacity',
+              hoveredName ? ['case', ['==', ['get', 'LAD25NM'], hoveredName], 1, 0] : 0
+            );
+          }
+
+          /* Sync anchored overlay — only if map isn't already driving it */
+          if (s5MapIsHovering) return;
+          const overlayEl = document.getElementById('s5-hover-overlay');
+          if (!overlayEl) return;
+          if (!hoveredName) {
+            overlayEl.style.display = 'none';
+            return;
+          }
+          const row = S5_BOROUGH_DATA.find(d => d.name === hoveredName);
+          const clusterEl  = document.getElementById('s5-hover-cluster');
+          const lsoaEl     = document.getElementById('s5-hover-borough-lsoa');
+          const popEl      = document.getElementById('s5-hover-borough-pop');
+          const ttEl       = document.getElementById('s5-hover-tt');
+          const idaciEl    = document.getElementById('s5-hover-idaci');
+          if (clusterEl) { clusterEl.textContent = hoveredName; clusterEl.style.color = '#FF9043'; }
+          if (ttEl)      ttEl.textContent = '';
+          if (idaciEl)   idaciEl.textContent = '';
+          if (row && lsoaEl && popEl) {
+            lsoaEl.innerHTML = '<strong>' + row.hh_lsoas.toFixed(0) + ' LSOAs (' + row.pct_lsoas.toFixed(1) + '%)</strong> in High-High clusters';
+            popEl.innerHTML  = '<strong>' + row.hh_pop.toLocaleString() + ' children (' + row.pct_pop.toFixed(1) + '%)</strong> living in High-High clusters';
+            lsoaEl.style.display = 'block';
+            popEl.style.display  = 'block';
+          }
+          overlayEl.style.display = 'block';
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0e1420',
+            borderColor: 'rgba(255,144,67,0.25)',
+            borderWidth: 1,
+            titleColor: '#f0ece4',
+            bodyColor: '#b8a898',
+            padding: 10,
+            titleFont: { family: "'Roboto Mono'", size: 14 },
+            bodyFont:  { family: "'Roboto Mono'", size: 14 },
+            callbacks: {
+              title: items => items[0].label,
+              label: ctx => ctx.parsed.x.toFixed(1) + '% of LSOAs in High–High cluster'
+            }
+          }
+        },
+        scales: {
+          x: {
+            max: 50,
+            ticks: {
+              color: '#d1c0ae',
+              font: { family: "'Roboto Mono'", size: 11 },
+              callback: v => v + '%'
+            },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            ticks: {
+              color: '#d1c0ae',
+              font: { family: "'Roboto Mono'", size: 11 },
+              autoSkip: false
+            },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+
+    /* Expose bar highlight for map hover sync */
+    window.s5HighlightBoroughBar = function(name) {
+      if (!s5BoroughChart) return;
+      const data = s5BoroughExpanded ? S5_BOROUGH_DATA : S5_BOROUGH_DATA.slice(0, 10);
+      s5BoroughChart.data.datasets[0].backgroundColor = data.map(d =>
+        !name || d.name === name ? '#ff4d4d' + 'dd' : '#ff4d4d' + '33'
+      );
+      s5BoroughChart.update('none');
+    };
+  }
+
+  /* Expand/collapse button */
+  document.addEventListener('click', e => {
+    if (e.target.id !== 's5-borough-expand-btn') return;
+    s5BoroughExpanded = !s5BoroughExpanded;
+    e.target.textContent = s5BoroughExpanded ? 'Show top 10 ↑' : 'Show all boroughs ↓';
+    const wrap = document.getElementById('s5-borough-chart')?.parentElement;
+    if (wrap) wrap.style.height = s5BoroughExpanded ? '520px' : '260px';
+    initS5BoroughChart();
+  });
 
   /* ─────────────────────────────────────────
      SCROLL ENGINE
@@ -5914,9 +6148,21 @@ const s2StepActions = {
         section?.querySelectorAll('.scroll-step').forEach(s => s.classList.remove('active'));
         step.classList.add('active');
         const stepId = step.dataset.step;
+
+        /* Animate stat counters per step */
+        if (stepId === 's4-0') {
+          animateCounter(document.getElementById('stat-16'), 16, '', 1200, true);
+        }
+        if (stepId === 's4-1') {
+          animateCounter(document.getElementById('stat-25'), 25, '', 1200, true);
+          setTimeout(() => animateCounter(document.getElementById('stat-26'), 26, '', 1200, true), 200);
+        }
+
         // Fire map reactions
         if (stepId && s2StepActions[stepId]) s2StepActions[stepId]();
-        if (stepId && s4StepActions[stepId]) s4StepActions[stepId]();
+        try {
+          if (stepId && s4StepActions[stepId]) s4StepActions[stepId]();
+        } catch(e) {}
         if (stepId && s5StepActions[stepId]) s5StepActions[stepId]();
       }
     });
