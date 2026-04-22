@@ -2598,7 +2598,7 @@
         <!-- Step 3 — Income -->
         <div class="scroll-step" data-step="s5-2">
           <p class="step-index">03 — Income Context</p>
-          <h3 class="step-heading">Lower incomes limit the ability to overcome access differences in these areas</h3>
+          <h3 class="step-heading">Lower incomes limit the ability of students to overcome access differences in these areas</h3>
           <div class="step-body">
             <p>On average, households in areas with <strong style="color:var(--accent-red)">High Transit Times and High Deprivation</strong> earn 25% less than the median London household.</p>
           </div>
@@ -2922,15 +2922,81 @@
      MAP 1 — HERO (atmospheric background)
   ───────────────────────────────────────── */
   const heroMap = initMap('hero-map', {
-    zoom: 10.2,
-    pitch: 30,
-    bearing: -10,
+    center: [-0.25, 51.48],
+    zoom: 10.4,
+    pitch: 45,
+    bearing: -15,
     extra: { interactive: false }
   });
   if (heroMap) {
     heroMap.on('load', () => {
       // Slow pan effect
-      heroMap.easeTo({ bearing: 5, duration: 30000, easing: t => t });
+      heroMap.easeTo({ bearing: 0, pitch: 45, duration: 30000, easing: t => t });
+
+      heroMap.addSource('bus-routes', {
+        type: 'vector',
+        url: 'mapbox://teechinminben.6z9v3xbj'
+      });
+
+      // Hide non-essential layers 
+        const layersToHide = [
+        'settlement-subdivision-label','settlement-label',
+        'settlement-major-label', 'settlement-minor-label',
+        'state-label', 'country-label', 'poi-label', 'airport-label'
+        ];
+
+        layersToHide.forEach(layerId => {
+        if (heroMap.getLayer(layerId)) {
+            heroMap.setLayoutProperty(layerId, 'visibility', 'none');
+        }
+        });
+
+      if (heroMap.getLayer('road-simple')) {
+        heroMap.setPaintProperty('road-simple', 'line-color', '#111111');
+        heroMap.setPaintProperty('road-simple', 'line-opacity', 0.4);
+      }
+      
+      // Outer halo
+      heroMap.addLayer({
+        id: 'bus-glow',
+        type: 'line',
+        source: 'bus-routes',
+        'source-layer': 'bus_routes',
+        paint: {
+          'line-color': '#FF9043',
+          'line-width': 10,
+          'line-opacity': 0.05,
+          'line-blur': 10
+        }
+      },'waterway-label');
+
+      // Mid glow
+      heroMap.addLayer({
+        id: 'bus-mid',
+        type: 'line',
+        source: 'bus-routes',
+        'source-layer': 'bus_routes',
+        paint: {
+          'line-color': '#FF9043',
+          'line-width': 2,
+          'line-opacity': 0.1,
+          'line-blur': 2
+        }
+      },'waterway-label');
+
+      // Bright core
+      heroMap.addLayer({
+        id: 'bus-core',
+        type: 'line',
+        source: 'bus-routes',
+        'source-layer': 'bus_routes',
+        paint: {
+          'line-color': '#ffc285',
+          'line-width': 0.5,
+          'line-opacity': 0.2
+        }
+      },'waterway-label');
+      
     });
   }
 
