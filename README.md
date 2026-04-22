@@ -1,6 +1,6 @@
 # Pathways to Progress
 Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing
-2026-04-22
+22 April 2026
 
 - [Overview](#overview)
 - [Research Questions](#research-questions)
@@ -20,6 +20,15 @@ Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing
 - [Webpage Architecture](#webpage-architecture)
 - [References](#references)
 
+------------------------------------------------------------------------
+
+|                  |                                                    |
+|------------------|----------------------------------------------------|
+| **Contributors** | Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing |
+| **Last Updated** | April 2026                                         |
+
+------------------------------------------------------------------------
+
 ## Overview
 
 This project examines how transport accessibility shapes access to
@@ -30,8 +39,8 @@ scrollytelling webpage — *Pathways to Progress* — combining travel time
 modelling, deprivation analysis and spatial clustering, visualised
 through Mapbox GL JS and Chart.js.
 
-**Live site:**
-[benjamintee.github.io/CASA_UDV_Final](https://benjamintee.github.io/CASA_UDV_Final/pathways_to_progress.html)
+**Live site can be found
+[here](https://benjamintee.github.io/CASA_UDV_Final/pathways_to_progress.html)**
 
 ------------------------------------------------------------------------
 
@@ -81,9 +90,8 @@ Ofsted inspection records and KS4 performance data. Schools were
 classified by admissions policy (selective vs. non-selective), Ofsted
 rating (Outstanding, Good, Requires Improvement, Inadequate), and
 performance quartile based on Progress 8 and Attainment 8 scores
-relative to all London schools within a 5 km GLA buffer. Top 25%
-thresholds were computed from this London-wide distribution to ensure
-comparability across boroughs.
+relative to all London schools. Top 25% thresholds were computed from
+this London-wide distribution to ensure comparability across boroughs.
 
 ### 2. Travel Context
 
