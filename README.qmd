@@ -1,10 +1,6 @@
 ---
 title: "Pathways to Progress"
 subtitle: "Investigating how transport connectivity shapes secondary school choice and access to opportunities across London"
-author:
-  - "Benjamin Tee"
-  - "Tabata Paredes"
-  - "Yujing (Olivia) Xing"
 date: today
 date-format: "DD MMMM YYYY"
 format:
@@ -23,8 +19,8 @@ format:
 
 ---
 
- **Contributors** : Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing 
- **Last Updated** :April 2026 
+ **Contributors**: Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing   
+ **Last Updated**: April 2026 
 
 ---
 

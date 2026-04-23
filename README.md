@@ -1,5 +1,5 @@
 # Pathways to Progress
-Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing
+
 23 April 2026
 
 - [Overview](#overview)
@@ -25,8 +25,8 @@ Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing
 
 ------------------------------------------------------------------------
 
-**Contributors** : Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing
-**Last Updated** :April 2026
+**Contributors**: Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing  
+**Last Updated**: April 2026
 
 ------------------------------------------------------------------------
 
