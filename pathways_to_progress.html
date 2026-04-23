@@ -2745,7 +2745,7 @@
         <strong>Pathways to Progress</strong> was developed as part of UCL CASA's MSc in Urban Spatial Science module on Urban Data Visualisation, led by Prof Duncan Smith. The 2026 theme is “Urban Analytics”.
       </p>
       <p class="about-text">
-        We thank Prof Duncan Smith and our PGTA Kayla McInnis for their valuable guidance and input, and extend special acknowledgment to Prof Adam Dennett for his wisdom and insights on the challenges facing secondary schools in London.
+        We thank Prof Duncan Smith and our PGTA Kayla McInnis for their valuable guidance and input, and extend special acknowledgment to Prof Adam Dennett for his insights on the challenges facing secondary schools in London.
       </p>
     </div>
 
@@ -2844,8 +2844,18 @@
 
   <!-- Footer -->
   <footer id="page-footer">
-    <span>Pathways to Progress  <span style="color:var(--accent)">·</span> UCL CASA <span style="color:var(--accent)">·</span> 2026</span>
-    <span>Built with Mapbox GL JS <span style="color:var(--accent)">·</span> Chart.js <span style="color:var(--accent)">·</span> r5py</span>
+    <span>Pathways to Progress <span style="color:var(--accent)">·</span> UCL CASA <span style="color:var(--accent)">·</span> 2026</span>
+    
+    <span class="footer-links">
+      Built with 
+      <a href="https://r5py.readthedocs.io/stable/" target="_blank" style="color:inherit; text-decoration:none;">r5py</a>
+      <span style="color:var(--accent)">·</span>
+      <a href="https://github.com/mapbox/tippecanoe" target="_blank" style="color:inherit; text-decoration:none;">Tippecanoe</a>
+      <span style="color:var(--accent)">·</span>
+      <a href="https://www.mapbox.com/mapbox-gljs" target="_blank" style="color:inherit; text-decoration:none;">Mapbox GL JS</a>
+      <span style="color:var(--accent)">·</span>
+      <a href="https://www.chartjs.org/" target="_blank" style="color:inherit; text-decoration:none;">Chart.js</a>
+    </span>
   </footer>
 
 
@@ -2969,7 +2979,7 @@
       /* Bright core */
       heroMap.addLayer({
         id: 'bus-core', type: 'line', source: 'bus-routes', 'source-layer': 'bus_routes',
-        paint: { 'line-color': '#ffd4a8', 'line-width': 0.6, 'line-opacity': 0.35 }
+        paint: { 'line-color': '#ffd4a8', 'line-width': 0.65, 'line-opacity': 0.4 }
       }, 'waterway-label');
 
       /* Fade in then start slow pan */

@@ -23,7 +23,6 @@ format:
 
 ---
 
-| | |
 |---|---|
 | **Contributors** | Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing |
 | **Last Updated** | April 2026 |
@@ -126,11 +125,11 @@ Several cartographic principles guided the visual design of the webpage:
 
 The project is hosted as a **static site on GitHub Pages**. The entire application is contained within a single `pathways_to_progress.html` file, which embeds all CSS styling, JavaScript logic, chart data, and scroll behaviour inline. Map tile layers are hosted on **Mapbox Studio** as vector tilesets accessed via the Mapbox GL JS API at runtime.
 
-This single-file architecture was a deliberate design choice. By embedding chart data, CSS tokens, and interactive logic directly in the HTML, the project eliminates build tooling, module bundlers, and server-side dependencies allowing a fully portable, version-controllable page that renders identically in any modern browser without a development environment.
+This single-file architecture was a deliberate design choice. By embedding chart data, CSS tokens, and interactive logic directly in the HTML, the project eliminates module bundlers, and server-side dependencies allowing a fully portable, version-controllable page that renders identically in any modern browser without a development environment.
 
 Map layers uploaded to Mapbox Studio include the LISA cluster fill layer, cluster outline layer for hover highlighting, and the LSOA travel time choropleth. Data for charts and summary statistics are embedded directly within the HTML to avoid additional HTTP requests and ensure the page loads as a single unit.
 
-This approach achieves a practical balance between **reliability** — no external data endpoints to fail — and **maintainability** — all logic and content are co-located in one inspectable file, reducing the surface area for deployment errors.
+This approach achieves a practical balance between **reliability** — no external data endpoints to fail — and **maintainability** — all logic and content are co-located in one inspectable file, reducing risk of deployment errors.
 
 ---
 
