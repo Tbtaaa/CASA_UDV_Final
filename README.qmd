@@ -67,7 +67,7 @@ This project examines how transport accessibility shapes access to high-performi
 
 ## Methodology
 
-### 1. School Database
+### 1. School Database ("build_schools_database.py")
 
 A comprehensive database of London secondary schools was compiled from the DfE's Get Information About Schools register, supplemented with Ofsted inspection records and KS4 performance data. Schools were classified by admissions policy (selective vs. non-selective), Ofsted rating (Outstanding, Good, Requires Improvement, Inadequate), and performance quartile based on Progress 8 and Attainment 8 scores relative to all London schools. Top 25% thresholds were computed from this London-wide distribution to ensure comparability across boroughs.
 
@@ -75,15 +75,15 @@ A comprehensive database of London secondary schools was compiled from the DfE's
 
 Desktop research was conducted on school travel patterns for London children, drawing on DfT's National Travel Survey (2017–2024) and published TfL school travel analyses. This established baseline mode shares — walking/cycling (~54%), transit (~24%), car (~19%) — and contextualised the policy landscape around school choice, travel barriers, and the geography of oversubscription.
 
-### 3. Travel Time Matrix
+### 3. Travel Time Matrix ("traveltimematrix.py")
 
 Transit feeds across London's bus and rail network were compiled into an integrated GTFS feed. Using **R5PY** (a Python interface to the R5 routing engine), a travel time matrix was computed from each LSOA 2021 population-weighted centroid to all destination schools, segmented by school quality threshold (all schools, Ofsted Outstanding, Top 25% P8, Top 25% Att8) and travel mode (walk, transit, car). A Tuesday morning peak departure window (08:00–09:00) was used to reflect realistic school commute conditions.
 
-### 4. Isochrones
+### 4. Isochrones ("isochrones.py")
 
 Comparative isochrones were generated in R5PY for two contrasting locations — **Clapham North (Lambeth)** and **Harold Hill (Havering)** — to illustrate the stark difference in catchment accessibility between a well-connected inner London neighbourhood and a peripheral outer London estate. Isochrones were computed at 15, 30, and 45-minute thresholds by transit.
 
-### 5. Spatial Layers and Processing
+### 5. Spatial Layers and Processing 
 
 The travel time matrix was joined to the LSOA 2021 boundary layer. To focus the analysis on human settlements, layers were masked using **OS Meridian 2** built-up area data, following O'Brien & Cheshire (2016). Boundaries were simplified using a 100-metre tolerance to balance visual continuity with file efficiency. Final layers were reprojected to WGS84 (EPSG:4326) and converted to `.mbtiles` using **Tippecanoe**, ensuring full geometric fidelity across all zoom levels for Mapbox integration.
 
@@ -95,7 +95,7 @@ Maps were built in **Mapbox GL JS**, with dark-themed basemap styling applied pr
 
 The **Income Deprivation Affecting Children Index (IDACI)** and overall IMD scores were extracted from MHCLG's Index of Multiple Deprivation (2019) and merged to the LSOA 2021 geographic layer. Median household income after housing costs (AHC) was sourced at MSOA level and matched to each LSOA as a supplementary socio-economic indicator.
 
-### 8. Bivariate LISA Clustering
+### 8. Bivariate LISA Clustering ("clustering.ipynb")
 
 A **bivariate Local Indicators of Spatial Association (LISA)** analysis was conducted using `esda.Moran_Local_BV` from the PySAL ecosystem, with transit time to the nearest Top 25% P8 school as the focal variable (X) and IDACI score as the spatial lag variable (Y). A **K-Nearest Neighbours weight matrix (k=8)** was used in place of Queen contiguity to avoid connectivity gaps introduced by the River Thames. LSOAs without a reachable school within the routing window were assigned a penalty travel time of 120 minutes. Statistical significance was assessed at p < 0.05 using 999 permutations. Clusters were classified into four quadrants: High-High (high travel time, high deprivation — the primary vulnerability indicator), Low-High, High-Low, and Low-Low.
 

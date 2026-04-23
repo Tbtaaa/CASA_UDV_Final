@@ -1802,7 +1802,7 @@
 
     .about-two-col {
       display: grid;
-      grid-template-columns: 1fr 1.2fr; /* slightly wider for table */
+      grid-template-columns: 2fr 3fr; /* 40% / 60% */
       gap: 60px;
       margin-top: 40px;
     }
@@ -2733,141 +2733,142 @@
        S7 — ABOUT
   ═══════════════════════════════════════ -->
   <section id="s7-about" class="page-section" data-section-index="6">
-  <p class="section-label reveal">About</p>
-  <h2 class="section-headline reveal reveal-delay-1">Pathways to Progress</h2>
+    <p class="section-label reveal">About</p>
+    <h2 class="section-headline reveal reveal-delay-1">Pathways to Progress</h2>
 
-  <div class="about-two-col">
+    <div class="about-two-col">
 
-    <!-- Acknowledgements -->
-    <div class="about-block reveal reveal-delay-2">
-      <p class="about-subhead">Acknowledgements</p>
-      <p class="about-text">
-        <strong>Pathways to Progress</strong> was developed as part of UCL CASA's MSc in Urban Spatial Science module on Urban Data Visualisation, led by Prof Duncan Smith. The 2026 theme is “Urban Analytics”.
-      </p>
-      <p class="about-text">
-        We thank Prof Duncan Smith and our PGTA Kayla McInnis for their valuable guidance and input, and extend special acknowledgment to Prof Adam Dennett for his insights on the challenges facing secondary schools in London.
-      </p>
-    </div>
+      <!-- Acknowledgements (40%) -->
+      <div class="about-block reveal reveal-delay-2">
+        <p class="about-subhead">Acknowledgements</p>
+        <p class="about-text">
+          <strong>Pathways to Progress</strong> was developed as part of UCL CASA's MSc in Urban Spatial Science module on Urban Data Visualisation, led by Prof Duncan Smith. The 2026 theme is "Urban Analytics".
+        </p>
+        <p class="about-text">
+          We thank Prof Duncan Smith and our PGTA Kayla McInnis for their valuable guidance and input, and extend special acknowledgment to Prof Adam Dennett for his wisdom and insights on the challenges facing secondary schools in London.
+        </p>
+      </div>
 
-    <!-- Data Sources -->
-    <div class="about-block reveal reveal-delay-3">
-      <p class="about-subhead">Data sources</p>
+      <!-- Data Sources (60%) -->
+      <div class="about-block reveal reveal-delay-3">
+        <p class="about-subhead">Data sources</p>
+        <div class="data-table">
+          <div class="data-row data-header">
+            <div>Agency</div><div>Dataset</div><div>Description</div>
+          </div>
+          <div class="data-row">
+            <div>DfE</div><div>GIAS</div>
+            <div>National register of all educational establishments in England, including location, admissions policy and capacity.</div>
+          </div>
+          <div class="data-row">
+            <div>Ofsted</div><div>Inspections</div>
+            <div>School inspection outcomes and effectiveness ratings.</div>
+          </div>
+          <div class="data-row">
+            <div>DfE</div><div>KS4 Performance</div>
+            <div>Key Stage 4 attainment metrics including Progress 8 and Attainment 8 scores.</div>
+          </div>
+          <div class="data-row">
+            <div>DfE</div><div>SCAP 2024</div>
+            <div>School Capacity Survey — pupil places and capacity utilisation by borough.</div>
+          </div>
+          <div class="data-row">
+            <div>DfT / TfL / RDG</div><div>GTFS</div>
+            <div>Integrated public transport schedules across bus and rail networks for transit routing.</div>
+          </div>
+          <div class="data-row">
+            <div>MHCLG</div><div>IMD 2019</div>
+            <div>Index of Multiple Deprivation, including IDACI (Income Deprivation Affecting Children Index) at LSOA level.</div>
+          </div>
+          <div class="data-row">
+            <div>MHCLG / CACI</div><div>Household Income (AHC)</div>
+            <div>Median household income after housing costs at MSOA level, used to profile cluster socioeconomics.</div>
+          </div>
+          <div class="data-row">
+            <div>DfT</div><div>National Travel Survey 2017–2024</div>
+            <div>Mode share patterns for school travel by region.</div>
+          </div>
+          <div class="data-row">
+            <div>ONS</div><div>LSOA 2021 Boundaries</div>
+            <div>Geographic unit for travel time analysis and deprivation mapping.</div>
+          </div>
+          <div class="data-row">
+            <div>ONS</div><div>Population Estimates</div>
+            <div>Secondary-age (11–16) population estimates by local authority.</div>
+          </div>
+          <div class="data-row">
+            <div>Ordnance Survey</div><div>OS Meridian 2</div>
+            <div>Urban area boundaries used to mask analysis to human settlements.</div>
+          </div>
+          <div class="data-row">
+            <div>GLA</div><div>London Boundary</div>
+            <div>Official geographic boundary for Greater London.</div>
+          </div>
+        </div>
+        <p style="font-size:14px;color:var(--text-muted);margin-top:12px;font-family:var(--font-mono);">
+          For more details on the metadata for the schools database, please
+          <a href="https://benjamintee.github.io/CASA_UDV_Final/admin/metadata.html"
+            style="color:var(--accent);text-decoration:underline;">click here</a>.
+        </p>
+      </div>
 
-      <div class="data-table">
-        <div class="data-row data-header">
-          <div>Agency</div>
-          <div>Dataset</div>
-          <div>Description</div>
+    </div><!-- /about-two-col -->
+
+    <!-- Team — full width below -->
+    <div class="about-block reveal reveal-delay-4" style="margin-top:60px;">
+      <p class="about-subhead">Our team</p>
+      <div class="team-grid">
+
+        <div class="team-card">
+          <div class="team-avatar">BT</div>
+          <div class="team-name">Benjamin Tee</div>
+          <a href="https://github.com/benjamintee" class="team-link">@benjamintee</a>
+          <div class="team-desc">Benjamin is a public servant and is passionate about data-driven and evidence-based policymaking. He is excited about making maps and good visualisations that tell a compelling story and motivate positive action.</div>
         </div>
 
-        <div class="data-row">
-          <div>DfE</div><div>GIAS</div>
-          <div>National register of all educational establishments in England.</div>
+        <div class="team-card">
+          <div class="team-avatar">TP</div>
+          <div class="team-name">Tabata Paredes</div>
+          <a href="https://github.com/Tbtaaa" class="team-link">@Tbtaaa</a>
+          <div class="team-desc">Tabata is a transport planner with an eye for design and clarity. She enjoys using colour, typography, and visual structure to make complex ideas simple, and finds satisfaction when they come together seamlessly with precision and elegance.</div>
         </div>
 
-        <div class="data-row">
-          <div>Ofsted</div><div>Inspections</div>
-          <div>School inspection outcomes and effectiveness ratings.</div>
+        <div class="team-card">
+          <div class="team-avatar">OX</div>
+          <div class="team-name">Yujing (Olivia) Xing</div>
+          <a href="https://github.com/yxing82" class="team-link">@yxing82</a>
+          <div class="team-desc">Olivia is a mathematician with a curiosity for complex urban systems and a commitment to social justice. She enjoys unpacking difficult problems through logical reasoning and translating them into clear insights to make a difference.</div>
         </div>
 
-        <div class="data-row">
-          <div>DfE</div><div>KS4 Performance</div>
-          <div>Key Stage 4 attainment metrics (Attainment 8, Progress 8, EBacc).</div>
-        </div>
-
-        <div class="data-row">
-          <div>DfE</div><div>SCAP</div>
-          <div>School Capacity Survey, including pupil places and utilisation.</div>
-        </div>
-
-        <div class="data-row">
-          <div>MHCLG</div><div>IMD 2025</div>
-          <div>Index of Multiple Deprivation.</div>
-        </div>
-
-        <div class="data-row">
-          <div>DfE</div><div>Workforce</div>
-          <div>School Workforce Census and staffing data.</div>
-        </div>
-
-        <div class="data-row">
-          <div>GLA</div><div>Boundary</div>
-          <div>Official geographic boundary for London.</div>
-        </div>
-
-        <div class="data-row">
-          <div>DfT / RDG</div><div>GTFS</div>
-          <div>Public transport schedules for bus and rail networks.</div>
-        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Team -->
-  <div class="about-block reveal reveal-delay-4">
-    <p class="about-subhead"><br> Our team</p>
-
-    <div class="team-grid">
-      
-      <!-- Benjamin -->
-      <div class="team-card">
-        <div class="team-avatar">BT</div>
-        <div class="team-name">Benjamin Tee</div>
-        <a href="https://github.com/benjamintee" class="team-link">@benjamintee</a>
-        <div class="team-desc">
-          Benjamin is a public servant and is passionate about data-driven and evidence-based policymaking. He is excited about making maps and good visualisations that tell a compelling story and motivate positive action. 
-        </div>
-      </div>
-
-      <!-- Tabata -->
-      <div class="team-card">
-        <div class="team-avatar">TP</div>
-        <div class="team-name">Tabata Paredes</div>
-        <a href="https://github.com/Tbtaaa" class="team-link">@Tbtaaa</a>
-        <div class="team-desc">
-          Tabata is a transport planner with an eye for design and clarity. She enjoys using colour, typography, and visual structure to make complex ideas simple, and finds satisfaction when they come together seamlessly with precision and elegance. 
-        </div>
-      </div>
-
-      <!-- Olivia -->
-      <div class="team-card">
-        <div class="team-avatar">OX</div>
-        <div class="team-name">Yujing (Olivia) Xing</div>
-        <a href="https://github.com/yxing82" class="team-link">@yxing82</a>
-        <div class="team-desc">
-          Olivia is a mathematician with a curiosity for complex urban systems and a commitment to social justice. She enjoys unpacking difficult problems through logical reasoning and translating them into clear insights to make a difference.
-      </div>
-
-    </div>
-  </div>
-</section>
+  </section>
 
   <!-- Footer -->
   <footer id="page-footer">
     <span>Pathways to Progress <span style="color:var(--accent)">·</span> UCL CASA <span style="color:var(--accent)">·</span> 2026</span>
-    
     <span class="footer-links">
-      Built with 
-      <a href="https://r5py.readthedocs.io/stable/" target="_blank" style="color:inherit; text-decoration:none;">r5py</a>
+      Built with
+      <a href="https://r5py.readthedocs.io/stable/" target="_blank" style="color:inherit;text-decoration:none;">r5py</a>
       <span style="color:var(--accent)">·</span>
-      <a href="https://github.com/mapbox/tippecanoe" target="_blank" style="color:inherit; text-decoration:none;">Tippecanoe</a>
+      <a href="https://github.com/mapbox/tippecanoe" target="_blank" style="color:inherit;text-decoration:none;">Tippecanoe</a>
       <span style="color:var(--accent)">·</span>
-      <a href="https://www.mapbox.com/mapbox-gljs" target="_blank" style="color:inherit; text-decoration:none;">Mapbox GL JS</a>
+      <a href="https://www.mapbox.com/mapbox-gljs" target="_blank" style="color:inherit;text-decoration:none;">Mapbox GL JS</a>
       <span style="color:var(--accent)">·</span>
-      <a href="https://www.chartjs.org/" target="_blank" style="color:inherit; text-decoration:none;">Chart.js</a>
+      <a href="https://www.chartjs.org/" target="_blank" style="color:inherit;text-decoration:none;">Chart.js</a>
     </span>
   </footer>
-
 
   <!-- ═══════════════════════════════════════
        JAVASCRIPT
   ═══════════════════════════════════════ -->
   <script>
   /* ─────────────────────────────────────────
-     CONFIGURATION — edit these values
+     CONFIGURATION 
   ───────────────────────────────────────── */
   const MAPBOX_TOKEN = 'pk.eyJ1IjoidGVlY2hpbm1pbmJlbiIsImEiOiJjbWtmcTJldHgwMWg2M2lzYnV2cnUzN2twIn0.6iawA9W8OLSwrcV_ZHG41g'; 
-  // GeoJSON URLs — host these alongside index.html or on a CDN
+  // GeoJSON URLs 
   const DATA = {
     schools:          './data/schools.geojson',
     lsoa_transit_any: './data/lsoa_transit_any.geojson',   // property: travel_min
@@ -3125,7 +3126,6 @@
       });
 
       // ── Click: popup ───────────────────────────────────────────────
-      // London averages for the bar charts (update these when you have borough-level data)
       const LONDON_AVG = {
         att8: 51.6,    // London average Attainment 8
         prog8: 0.31    // London average Progress 8
@@ -3581,8 +3581,6 @@
         }
       });
 
-
-
       // ── View configs for each origin ────────────────────────────────────────────
       const ISO_VIEWS = {
         clapham: {
@@ -3604,8 +3602,6 @@
       };
 
       let currentIsoView = 'clapham';
-
-      // ── switchIsoView — called by toggle buttons and scroll steps ────────────────
 
       // ── Custom label opacity helper ─────────────────────────────────────────────
       window.setCustomLabelOpacity = function(originId) {
@@ -5625,38 +5621,6 @@ const s2StepActions = {
     }
     requestAnimationFrame(step);
   }
-
-  // Chart 8 — Cluster vs London average comparison
-  new Chart(document.getElementById('chart8-cluster-compare'), {
-    type: 'bar',
-    data: {
-      labels: ['HH clusters', 'London Median'],
-      datasets: [{
-        label: 'Median P8 transit time (min)',
-        data: [0, 25],   
-        backgroundColor: ['#ef5350aa', '#FF904344'],
-        borderColor: ['#ef5350', '#FF9043'],
-        borderWidth: 1,
-        borderRadius: 4
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: CHART_DEFAULTS.plugins.tooltip,
-        annotation: {}
-      },
-      scales: {
-        x: { ticks: { color: '#b8a898', font: { family: "'Roboto Mono'", size: 12 } }, grid: { display: false } },
-        y: {
-          ticks: { color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 }, callback: v => v + 'm' },
-          grid: { color: 'rgba(255,255,255,0.05)' },
-          title: { display: true, text: 'minutes', color: '#6a5a4a', font: { family: "'Roboto Mono'", size: 11 } }
-        }
-      }
-    }
-  });
 
   /* ─────────────────────────────────────────
      S5-1 LISA CLUSTER EXPLORER

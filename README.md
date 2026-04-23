@@ -1,19 +1,22 @@
 # Pathways to Progress
 Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing
-22 April 2026
+23 April 2026
 
 - [Overview](#overview)
 - [Research Questions](#research-questions)
 - [Datasets](#datasets)
 - [Methodology](#methodology)
-  - [1. School Database](#1-school-database)
+  - [1. School Database
+    (“build_schools_database.py”)](#1-school-database-build_schools_databasepy)
   - [2. Travel Context](#2-travel-context)
-  - [3. Travel Time Matrix](#3-travel-time-matrix)
-  - [4. Isochrones](#4-isochrones)
+  - [3. Travel Time Matrix
+    (“traveltimematrix.py”)](#3-travel-time-matrix-traveltimematrixpy)
+  - [4. Isochrones (“isochrones.py”)](#4-isochrones-isochronespy)
   - [5. Spatial Layers and Processing](#5-spatial-layers-and-processing)
   - [6. Visualisation Stack](#6-visualisation-stack)
   - [7. Deprivation Data](#7-deprivation-data)
-  - [8. Bivariate LISA Clustering](#8-bivariate-lisa-clustering)
+  - [8. Bivariate LISA Clustering
+    (“clustering.ipynb”)](#8-bivariate-lisa-clustering-clusteringipynb)
   - [9. Income by Cluster](#9-income-by-cluster)
   - [10. Narrative and Interactivity](#10-narrative-and-interactivity)
 - [Cartographic Design](#cartographic-design)
@@ -22,10 +25,8 @@ Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing
 
 ------------------------------------------------------------------------
 
-|                  |                                                    |
-|------------------|----------------------------------------------------|
-| **Contributors** | Benjamin Tee, Tabata Paredes, Yujing (Olivia) Xing |
-| **Last Updated** | April 2026                                         |
+\|—\|—\| \| **Contributors** \| Benjamin Tee, Tabata Paredes, Yujing
+(Olivia) Xing \| \| **Last Updated** \| April 2026 \|
 
 ------------------------------------------------------------------------
 
@@ -82,7 +83,7 @@ socio-economic disadvantage exist?
 
 ## Methodology
 
-### 1. School Database
+### 1. School Database (“build_schools_database.py”)
 
 A comprehensive database of London secondary schools was compiled from
 the DfE’s Get Information About Schools register, supplemented with
@@ -102,7 +103,7 @@ shares — walking/cycling (~54%), transit (~24%), car (~19%) — and
 contextualised the policy landscape around school choice, travel
 barriers, and the geography of oversubscription.
 
-### 3. Travel Time Matrix
+### 3. Travel Time Matrix (“traveltimematrix.py”)
 
 Transit feeds across London’s bus and rail network were compiled into an
 integrated GTFS feed. Using **R5PY** (a Python interface to the R5
@@ -113,7 +114,7 @@ Top 25% Att8) and travel mode (walk, transit, car). A Tuesday morning
 peak departure window (08:00–09:00) was used to reflect realistic school
 commute conditions.
 
-### 4. Isochrones
+### 4. Isochrones (“isochrones.py”)
 
 Comparative isochrones were generated in R5PY for two contrasting
 locations — **Clapham North (Lambeth)** and **Harold Hill (Havering)** —
@@ -149,7 +150,7 @@ IMD scores were extracted from MHCLG’s Index of Multiple Deprivation
 income after housing costs (AHC) was sourced at MSOA level and matched
 to each LSOA as a supplementary socio-economic indicator.
 
-### 8. Bivariate LISA Clustering
+### 8. Bivariate LISA Clustering (“clustering.ipynb”)
 
 A **bivariate Local Indicators of Spatial Association (LISA)** analysis
 was conducted using `esda.Moran_Local_BV` from the PySAL ecosystem, with
@@ -220,10 +221,10 @@ as vector tilesets accessed via the Mapbox GL JS API at runtime.
 
 This single-file architecture was a deliberate design choice. By
 embedding chart data, CSS tokens, and interactive logic directly in the
-HTML, the project eliminates build tooling, module bundlers, and
-server-side dependencies allowing a fully portable, version-controllable
-page that renders identically in any modern browser without a
-development environment.
+HTML, the project eliminates module bundlers, and server-side
+dependencies allowing a fully portable, version-controllable page that
+renders identically in any modern browser without a development
+environment.
 
 Map layers uploaded to Mapbox Studio include the LISA cluster fill
 layer, cluster outline layer for hover highlighting, and the LSOA travel
@@ -233,8 +234,8 @@ the page loads as a single unit.
 
 This approach achieves a practical balance between **reliability** — no
 external data endpoints to fail — and **maintainability** — all logic
-and content are co-located in one inspectable file, reducing the surface
-area for deployment errors.
+and content are co-located in one inspectable file, reducing risk of
+deployment errors.
 
 ------------------------------------------------------------------------
 
